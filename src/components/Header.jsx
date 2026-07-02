@@ -36,8 +36,6 @@ const Header = () => {
                             </div>
                         ) : (
                             <div>
-                                <Link to="/" className="hover:text-yellow-400 transition-colors">Trang chủ</Link>
-                                {/* State: chưa đăng nhập */}
                                 <Link to="/login" className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
                                     Đăng nhập
                                 </Link>
