@@ -14,12 +14,13 @@ import ProfilePage from "./pages/ProfilePage"
 import ProtectedRoute from "./components/ProtectedRoute"
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute"
 import FilmPage from "./pages/admin/FilmPage"
+import RegisterPage from "./pages/RegisterPage"
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, 
-      retry: 1, 
+      retry: 3, 
     }
   }
 })
@@ -32,6 +33,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage/>} />
             <Route path="/" element={<HomeLayout />}>
               <Route index element={<MovieListPage />} />
               <Route path="movie" element={<MovieListPage />} />

@@ -32,7 +32,7 @@ const ProfilePage = () => {
                             <div className="flex flex-wrap items-center gap-3 mb-1">
                                 <h1 className="text-2xl font-bold text-white">{profile?.hoTen}</h1>
                             </div>
-                            <p className="text-gray-400 text-sm">@adminbt</p>
+                            <p className="text-gray-400 text-sm">@{profile?.taiKhoan}</p>
                         </div>
                         {
                             profile?.maLoaiNguoiDung === "QuanTri" && (
@@ -46,15 +46,15 @@ const ProfilePage = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-800">
                         <div>
                             <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Email</p>
-                            <p className="text-white text-sm">newUser@gmail.com</p>
+                            <p className="text-white text-sm">{profile?.email}</p>
                         </div>
                         <div>
                             <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Số điện thoại</p>
-                            <p className="text-white text-sm">0909099809</p>
+                            <p className="text-white text-sm">{profile?.soDT}</p>
                         </div>
                         <div>
-                            <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Nhóm</p>
-                            <p className="text-white text-sm">GP01</p>
+                            <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Role</p>
+                            <p className="text-white text-sm">{profile?.maLoaiNguoiDung}</p>
                         </div>
                     </div>
                 </div>
