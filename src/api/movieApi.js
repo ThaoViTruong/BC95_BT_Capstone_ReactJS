@@ -12,5 +12,25 @@ export const movieApi = {
 
     getBanners: () => {
         return axiosInstance.get('/QuanLyPhim/LayDanhSachBanner')
+    },
+
+    addMovie: (formData) => {
+        return axiosInstance.post('/QuanLyPhim/ThemPhimUploadHinh', formData)
+    },
+
+    updateMovieInfo: (movieData) => {
+        return axiosInstance.post('/QuanLyPhim/CapNhatPhim', movieData)
+    },
+
+    deleteMovie: (maPhim) => {
+        return axiosInstance.delete('/QuanLyPhim/XoaPhim', {
+            params: {
+                MaPhim: Number(maPhim),
+            }
+        })
+    },
+
+    updateMovie: (formData) => {
+        return axiosInstance.post('/QuanLyPhim/CapNhatPhimUpload', formData)
     }
 }
