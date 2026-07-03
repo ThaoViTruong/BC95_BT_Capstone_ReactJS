@@ -34,7 +34,7 @@ const AdminLayout = () => {
         <div className="min-h-screen bg-gray-950 flex font-sans text-white">
             <aside className="w-72 flex-shrink-0 bg-gray-900 border-r border-gray-800 flex flex-col">
                 <div className="px-7 py-6 border-b border-gray-800">
-                    <span className="text-3xl font-bold text-yellow-400">🎬 MovieApp</span>
+                    <span className="text-3xl font-bold text-yellow-400">🎬 Rạp Phim</span>
                 </div>
                 <nav className="flex-1 px-4 py-5 space-y-2">
                     <p className="text-white text-sm uppercase tracking-widest px-5 mb-4">Quản lý</p>
@@ -62,13 +62,17 @@ const AdminLayout = () => {
                 <header className="bg-gray-900 border-b border-gray-800 px-8 py-5 flex items-center justify-between flex-shrink-0">
                     <div className="text-2xl font-semibold text-white"></div>
                     <div className="flex items-center gap-5">
-                        <div className="text-right">
+                        <Link to="/admin/profile" className="text-right transition-opacity hover:opacity-80">
                             <p className="text-white text-lg font-medium">{displayName}</p>
                             <p className="text-white text-sm">Quản trị viên</p>
-                        </div>
-                        <div className="w-11 h-11 rounded-full bg-yellow-400 flex items-center justify-center text-gray-900 font-bold text-lg flex-shrink-0">
+                        </Link>
+                        <Link
+                            to="/admin/profile"
+                            className="w-11 h-11 rounded-full bg-yellow-400 flex items-center justify-center text-gray-900 font-bold text-lg flex-shrink-0 transition-transform hover:scale-105"
+                            aria-label="Trang cá nhân"
+                        >
                             {avatarText}
-                        </div>
+                        </Link>
                         <button
                             onClick = {handleLogout}
                             className="bg-red-600 hover:bg-red-700 text-white text-lg font-medium px-5 py-3 rounded-xl transition-colors">

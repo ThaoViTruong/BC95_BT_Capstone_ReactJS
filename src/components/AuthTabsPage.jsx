@@ -441,7 +441,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
               <p className="mt-4 max-w-xs text-sm leading-6 text-gray-400">
                 Trở về danh sách phim để khám phá các suất chiếu mới nhất và đặt vé nhanh hơn.
               </p>
-              <p className="mt-4 text-sm text-gray-500">© 2026 CINEPLEX Entertainment. Bảo lưu mọi quyền.</p>
+              <p className="mt-4 text-sm text-gray-500">© 2026 CINEPLEX Giải trí. Bảo lưu mọi quyền.</p>
             </div>
 
             {footerSections.map((section) => (

@@ -532,7 +532,7 @@ const UserPage = () => {
                         <button
                           type="button"
                           onClick={() => handleStartEdit(user)}
-                          aria-label={`Edit user ${user.taiKhoan}`}
+                          aria-label={`Sửa người dùng ${user.taiKhoan}`}
                           className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10 text-amber-300 transition hover:bg-amber-400/20"
                         >
                           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
@@ -543,7 +543,7 @@ const UserPage = () => {
                         <button
                           type="button"
                           onClick={() => handleRequestDelete(user)}
-                          aria-label={`Delete user ${user.taiKhoan}`}
+                          aria-label={`Xóa người dùng ${user.taiKhoan}`}
                           className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-300 transition hover:bg-red-500/20"
                         >
                           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">

@@ -48,6 +48,11 @@ function App() {
                   <ProfilePage />
                 </ProtectedRoute>
               } />
+              <Route path="thongtincanhan" element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              } />
             </Route>
 
             {/* admin routes */}
@@ -57,6 +62,7 @@ function App() {
               </ProtectedAdminRoute>
             }>
               <Route index element={<FilmPage />} />
+              <Route path="profile" element={<ProfilePage />} />
               <Route path="users" element={<UserPage />} />
               <Route path="films" element={<FilmPage />} />
               <Route path="films/edit/:idFilm" element={<FilmEditPage />} />

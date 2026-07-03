@@ -5,9 +5,9 @@ import { useMovieList } from '../../hooks/useMovies'
 
 const MA_NHOM = 'GP01'
 const HALLS = [
-  { id: 'room-01', name: 'Room 01', format: 'IMAX Laser' },
-  { id: 'room-02', name: 'Room 02', format: 'Dolby Atmos' },
-  { id: 'room-03', name: 'Room 03', format: 'Standard' },
+  { id: 'room-01', name: 'Phòng 01', format: 'IMAX Laser' },
+  { id: 'room-02', name: 'Phòng 02', format: 'Dolby Atmos' },
+  { id: 'room-03', name: 'Phòng 03', format: 'Tiêu chuẩn' },
 ]
 const TIME_SLOTS = ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '00:00', '02:00', '04:00', '06:00']
 const DATE_LABEL_FORMATTER = new Intl.DateTimeFormat('vi-VN', {
@@ -20,17 +20,17 @@ const statusStyles = {
   active: {
     container: 'border-red-500/70 bg-gradient-to-br from-[#161616] to-[#1d1116] shadow-[0_0_0_1px_rgba(239,68,68,0.15)]',
     badge: 'bg-red-500/20 text-red-300',
-    label: 'ACTIVE',
+    label: 'ĐANG MỞ BÁN',
   },
   soldOut: {
     container: 'border-yellow-500/60 bg-gradient-to-br from-[#171512] to-[#20190a] shadow-[0_0_0_1px_rgba(234,179,8,0.16)]',
     badge: 'bg-yellow-500/20 text-yellow-200',
-    label: 'SOLD OUT',
+    label: 'HẾT VÉ',
   },
   ended: {
     container: 'border-white/10 bg-gradient-to-br from-[#161616] to-[#131313] opacity-55',
     badge: 'bg-white/10 text-white/60',
-    label: 'ENDED',
+    label: 'ĐÃ KẾT THÚC',
   },
 }
 
@@ -275,7 +275,7 @@ const ShowtimeManagementPage = () => {
                 gridTemplateColumns: '180px repeat(12, minmax(70px, 1fr))',
               }}
             >
-              <div className="self-center text-sm font-semibold uppercase tracking-[0.24em] text-white/30">Cinema Hall</div>
+              <div className="self-center text-sm font-semibold uppercase tracking-[0.24em] text-white/30">Phòng chiếu</div>
               {TIME_SLOTS.map((slot) => (
                 <div key={slot} className="text-center text-xs font-semibold uppercase tracking-[0.16em] text-white/28">
                   {slot}
