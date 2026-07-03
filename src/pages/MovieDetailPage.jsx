@@ -42,7 +42,7 @@ const MovieDetailPage = () => {
                             <h1 className="text-3xl md:text-4xl font-bold mb-3">Lật mặt 48h</h1>
                             {/* Badges */}
                             <div className="flex flex-wrap gap-2 mb-4">
-                                <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">🔥 HOT</span>
+                                <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">🔥 Nổi bật</span>
                                 <span className="bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full">✅ Đang chiếu</span>
                                 <span className="bg-blue-500 text-white text-sm font-bold px-3 py-1 rounded-full">🕐 Sắp chiếu</span>
                             </div>
@@ -91,7 +91,7 @@ const MovieDetailPage = () => {
                             </div>
                             {/* Trailer Button */}
                             <a href="https://www.youtube.com/watch?v=kBY2k3G6LsM" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl transition-colors">
-                                ▶ Xem Trailer
+                                ▶ Xem giới thiệu phim
                             </a>
                         </div>
                     </div>
@@ -99,9 +99,9 @@ const MovieDetailPage = () => {
             </div>
             {/* Trailer Embed Section */}
             <div className="max-w-7xl mx-auto px-4 py-8">
-                <h2 className="text-2xl font-bold mb-6">Trailer</h2>
+                <h2 className="text-2xl font-bold mb-6">Giới thiệu phim</h2>
                 <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl">
-                    <iframe src="https://www.youtube.com/embed/kBY2k3G6LsM" title="Movie Trailer" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="absolute inset-0 w-full h-full" />
+                    <iframe src="https://www.youtube.com/embed/kBY2k3G6LsM" title="Video giới thiệu phim" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="absolute inset-0 w-full h-full" />
                 </div>
             </div>
         </div>

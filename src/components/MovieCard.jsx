@@ -8,7 +8,7 @@ const MovieCard = ({ movie }) => {
         <img src={movie.hinhAnh} alt={movie.tenPhim} className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500" />
         {/* Badges */}
         <div className="absolute top-2 right-2 flex flex-col gap-1">
-          {movie.hot && (<span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">HOT</span>)}
+          {movie.hot && (<span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">Nổi bật</span>)}
           {movie.dangChieu && (<span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">Đang chiếu</span>)}
           {movie.sapChieu && (<span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">Sắp chiếu</span>)}
         </div>

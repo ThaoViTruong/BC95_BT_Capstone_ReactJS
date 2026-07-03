@@ -251,7 +251,7 @@ const MovieFormModal = ({
             </div>
 
             <div className="xl:col-span-2">
-              <label className={labelClassName}>Trailer</label>
+              <label className={labelClassName}>Liên kết giới thiệu</label>
               <input
                 name="trailer"
                 value={formState.trailer}
