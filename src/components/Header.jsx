@@ -3,10 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
 import { logout, selectorIsLoggedIn, selectorUser } from '../store/authSlice';
 import { useQueryClient } from '@tanstack/react-query';
+import { useProfile } from '../hooks/useUser'
 
 const Header = () => {
-    const isLoggedIn = useSelector(selectorIsLoggedIn);
-    const user = useSelector(selectorUser);
+    const isLoggedIn = useSelector(selectorIsLoggedIn)
+    const user = useSelector(selectorUser)
+    const { data: profile } = useProfile(isLoggedIn)
 
     const dispatch = useDispatch();
     const queryClient = useQueryClient();
@@ -17,6 +19,14 @@ const Header = () => {
         queryClient.removeQueries({ queryKey: ['profile'] });
         dispatch(logout());
     }, [dispatch, queryClient]);
+    const queryClient = useQueryClient()
+    const displayName = profile?.hoTen || user?.hoTen || user?.taiKhoan || 'Người dùng'
+    const avatarText = displayName
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((word) => word[0]?.toUpperCase())
+        .join('') || 'U'
 
     return (
         // 2. UX: Thêm `sticky top-0 z-50` để header luôn ghim ở trên cùng khi cuộn trang

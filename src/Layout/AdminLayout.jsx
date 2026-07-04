@@ -1,19 +1,29 @@
 import { useQueryClient } from '@tanstack/react-query'
 import React from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, NavLink, Outlet } from 'react-router-dom'
-import { logout } from '../store/authSlice'
+import { logout, selectorIsLoggedIn, selectorUser } from '../store/authSlice'
+import { useProfile } from '../hooks/useUser'
 
 const AdminLayout = () => {
+    const dispatch = useDispatch()
+    const queryClient = useQueryClient()
+    const user = useSelector(selectorUser)
+    const isLoggedIn = useSelector(selectorIsLoggedIn)
+    const { data: profile } = useProfile(isLoggedIn)
+    const displayName = profile?.hoTen || user?.hoTen || user?.taiKhoan || 'Quản trị viên'
+    const avatarText = displayName
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((word) => word[0]?.toUpperCase())
+        .join('') || 'A'
 
     const navLinkClassName = ({isActive}) => {
         return isActive ?
-        "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-yellow-400 text-gray-900"
-        : "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-400 hover:bg-gray-800 hover:text-white"
+        "flex items-center gap-4 px-5 py-4 rounded-2xl text-lg font-semibold transition-all bg-yellow-400 text-gray-900"
+        : "flex items-center gap-4 px-5 py-4 rounded-2xl text-lg font-semibold transition-all text-white hover:bg-gray-800"
     }
-
-    const dispatch = useDispatch()
-    const queryClient = useQueryClient()
 
     const handleLogout = () => {
         queryClient.refetchQueries({queryKey: ['profile']})
@@ -21,55 +31,56 @@ const AdminLayout = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-950 flex">
-            <aside className="w-64 flex-shrink-0 bg-gray-900 border-r border-gray-800 flex flex-col">
-                <div className="px-6 py-5 border-b border-gray-800">
-                    <span className="text-xl font-bold text-yellow-400">🎬 MovieApp</span>
-                    <p className="text-gray-500 text-xs mt-1">Admin Dashboard</p>
+        <div className="min-h-screen bg-gray-950 flex font-sans text-white">
+            <aside className="w-72 flex-shrink-0 bg-gray-900 border-r border-gray-800 flex flex-col">
+                <div className="px-7 py-6 border-b border-gray-800">
+                    <span className="text-3xl font-bold text-yellow-400">🎬 Rạp Phim</span>
                 </div>
-                <nav className="flex-1 px-3 py-4 space-y-1">
-                    <p className="text-gray-600 text-xs uppercase tracking-widest px-4 mb-3">Quản lý</p>
+                <nav className="flex-1 px-4 py-5 space-y-2">
+                    <p className="text-white text-sm uppercase tracking-widest px-5 mb-4">Quản lý</p>
                     <NavLink to="/admin/users" className={navLinkClassName}>
-                        <span className="text-lg">👥</span>
+                        <span className="text-2xl">👥</span>
                         Người dùng
                     </NavLink>
                     <NavLink to="/admin/films" className={navLinkClassName}>
-                        <span className="text-lg">🎬</span>
+                        <span className="text-2xl">🎬</span>
                         Phim
                     </NavLink>
                     <NavLink to="/admin/showtimes" className={navLinkClassName}>
-                        <span className="text-lg">🕐</span>
+                        <span className="text-2xl">🕐</span>
                         Lịch chiếu
                     </NavLink>
                 </nav>
-                <div className="px-3 pb-4 border-t border-gray-800 pt-4">
-                    <Link to="/" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-400 hover:bg-gray-800 hover:text-white transition-all">
-                        <span>←</span>
+                <div className="px-4 pb-5 border-t border-gray-800 pt-5">
+                    <Link to="/" className="flex items-center gap-4 px-5 py-4 rounded-2xl text-lg text-white hover:bg-gray-800 transition-all">
+                        <span className="text-xl">←</span>
                         Về trang chủ
                     </Link>
                 </div>
             </aside>
             <div className="flex-1 flex flex-col min-w-0">
-                <header className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between flex-shrink-0">
-                    <div>
-                        <h1 className="text-white font-semibold text-lg">Admin Dashboard</h1>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="text-right">
-                            <p className="text-white text-sm font-medium">Admin User</p>
-                            <p className="text-yellow-400 text-xs">Quản trị viên</p>
-                        </div>
-                        <div className="w-9 h-9 rounded-full bg-yellow-400 flex items-center justify-center text-gray-900 font-bold text-sm flex-shrink-0">
-                            A
-                        </div>
+                <header className="bg-gray-900 border-b border-gray-800 px-8 py-5 flex items-center justify-between flex-shrink-0">
+                    <div className="text-2xl font-semibold text-white"></div>
+                    <div className="flex items-center gap-5">
+                        <Link to="/admin/profile" className="text-right transition-opacity hover:opacity-80">
+                            <p className="text-white text-lg font-medium">{displayName}</p>
+                            <p className="text-white text-sm">Quản trị viên</p>
+                        </Link>
+                        <Link
+                            to="/admin/profile"
+                            className="w-11 h-11 rounded-full bg-yellow-400 flex items-center justify-center text-gray-900 font-bold text-lg flex-shrink-0 transition-transform hover:scale-105"
+                            aria-label="Trang cá nhân"
+                        >
+                            {avatarText}
+                        </Link>
                         <button
                             onClick = {handleLogout}
-                            className="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+                            className="bg-red-600 hover:bg-red-700 text-white text-lg font-medium px-5 py-3 rounded-xl transition-colors">
                             Đăng xuất
                         </button>
                     </div>
                 </header>
-                <main className="flex-1 p-6 overflow-auto">
+                <main className="flex-1 p-7 overflow-auto">
                     <Outlet />
                 </main>
             </div>
