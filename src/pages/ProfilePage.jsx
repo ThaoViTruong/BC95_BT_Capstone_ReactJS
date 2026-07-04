@@ -83,6 +83,21 @@ const formatCurrency = (value = 0) => {
   }).format(value)
 }
 
+const formLabelClassName = 'mb-2 block text-sm font-medium text-white'
+const formInputClassName =
+  'w-full rounded-2xl border border-white/10 bg-gray-950 px-4 py-3 text-sm text-white outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20'
+const formInputDisabledClassName =
+  'w-full rounded-2xl border border-white/10 bg-gray-950/70 px-4 py-3 text-sm text-white/65 outline-none'
+const summaryCardClassName = 'rounded-2xl border border-white/10 bg-black/20 p-4'
+
+const renderFieldError = (formik, fieldName) => {
+  if (!formik.touched[fieldName] || !formik.errors[fieldName]) {
+    return null
+  }
+
+  return <p className="mt-2 text-sm text-red-400">{formik.errors[fieldName]}</p>
+}
+
 const ProfilePage = () => {
   const isLoggedIn = useSelector(selectorIsLoggedIn)
   const currentUser = useSelector(selectorUser)
@@ -91,10 +106,9 @@ const ProfilePage = () => {
   const updateUserMutation = useUpdateUser()
   const [activeTab, setActiveTab] = useState(PROFILE_TABS.info)
   const [actionMessage, setActionMessage] = useState(null)
-
-  const tickets = profile?.thongTinDatVe || []
   const [selectedTicketId, setSelectedTicketId] = useState(null)
 
+  const tickets = profile?.thongTinDatVe || []
   const selectedTicket = useMemo(() => {
     return tickets.find((ticket) => ticket.maVe === selectedTicketId) || tickets[0] || null
   }, [selectedTicketId, tickets])
@@ -209,7 +223,9 @@ const ProfilePage = () => {
                   </div>
                   <div>
                     <p className="text-xs uppercase tracking-[0.25em] text-white/35">Lần đặt vé gần nhất</p>
-                    <p className="mt-2 text-sm text-white/85">{latestTicket ? formatDateTime(latestTicket.ngayDat) : 'Chưa có lịch sử đặt vé'}</p>
+                    <p className="mt-2 text-sm text-white/85">
+                      {latestTicket ? formatDateTime(latestTicket.ngayDat) : 'Chưa có lịch sử đặt vé'}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -277,53 +293,112 @@ const ProfilePage = () => {
                     </div>
                   ) : null}
 
-            <div className="max-w-4xl mx-auto px-4 py-10">
-                <div className="bg-gray-900 rounded-2xl p-6 mb-6 border border-gray-800">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                        <div className="w-20 h-20 rounded-full bg-yellow-400 flex items-center justify-center text-gray-900 text-3xl font-bold flex-shrink-0">
-                            {avatar}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <div className="flex flex-wrap items-center gap-3 mb-1">
-                                <h1 className="text-2xl font-bold text-white">{profile?.hoTen}</h1>
-                            </div>
-                            <p className="text-gray-400 text-sm">@{profile?.taiKhoan}</p>
-                        </div>
-                        {
-                            profile?.maLoaiNguoiDung === "QuanTri" && (
-                                <Link to="/admin" className="flex-shrink-0 flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-5 py-2.5 rounded-xl transition-colors text-sm">
-                                    ⚙️ Trang quản trị
-                                </Link>
-                            )
-                        }
-
+                  <div className="grid gap-5 md:grid-cols-2">
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-white">Tài khoản</label>
+                      <label className={formLabelClassName}>Tài khoản</label>
                       <input
                         type="text"
                         value={formik.values.taiKhoan}
                         disabled
-                        className="w-full rounded-2xl border border-white/10 bg-gray-950/70 px-4 py-3 text-sm text-white/65 outline-none"
+                        className={formInputDisabledClassName}
                       />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-800">
-                        <div>
-                            <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Email</p>
-                            <p className="text-white text-sm">{profile?.email}</p>
-                        </div>
-                        <div>
-                            <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Số điện thoại</p>
-                            <p className="text-white text-sm">{profile?.soDT}</p>
-                        </div>
-                        <div>
-                            <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Role</p>
-                            <p className="text-white text-sm">{profile?.maLoaiNguoiDung}</p>
-                        </div>
+
+                    <div>
+                      <label className={formLabelClassName}>Họ tên</label>
+                      <input
+                        type="text"
+                        {...formik.getFieldProps('hoTen')}
+                        placeholder="Nhập họ tên"
+                        className={formInputClassName}
+                      />
+                      {renderFieldError(formik, 'hoTen')}
                     </div>
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="text-white/45">Nhóm / Loại người dùng</span>
-                      <span className="font-medium text-white">{profile.maNhom || 'GP00'} / {profile.maLoaiNguoiDung || 'Khách hàng'}</span>
+
+                    <div>
+                      <label className={formLabelClassName}>Email</label>
+                      <input
+                        type="email"
+                        {...formik.getFieldProps('email')}
+                        placeholder="Nhập email"
+                        className={formInputClassName}
+                      />
+                      {renderFieldError(formik, 'email')}
                     </div>
+
+                    <div>
+                      <label className={formLabelClassName}>Số điện thoại</label>
+                      <input
+                        type="text"
+                        {...formik.getFieldProps('soDt')}
+                        placeholder="Nhập số điện thoại"
+                        className={formInputClassName}
+                      />
+                      {renderFieldError(formik, 'soDt')}
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className={formLabelClassName}>Mật khẩu mới</label>
+                      <input
+                        type="password"
+                        {...formik.getFieldProps('matKhau')}
+                        placeholder="Để trống nếu không muốn thay đổi"
+                        className={formInputClassName}
+                      />
+                      {renderFieldError(formik, 'matKhau')}
+                    </div>
+
+                    {formik.values.matKhau.trim() ? (
+                      <div className="md:col-span-2">
+                        <label className={formLabelClassName}>Xác nhận mật khẩu</label>
+                        <input
+                          type="password"
+                          {...formik.getFieldProps('xacNhanMatKhau')}
+                          placeholder="Nhập lại mật khẩu mới để xác nhận"
+                          className={formInputClassName}
+                        />
+                        {renderFieldError(formik, 'xacNhanMatKhau')}
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div className="flex justify-end border-t border-white/10 pt-5">
+                    <button
+                      type="submit"
+                      disabled={updateUserMutation.isPending}
+                      className="inline-flex items-center gap-2 rounded-xl bg-yellow-400 px-5 py-3 text-sm font-bold text-gray-900 transition-colors hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                      {updateUserMutation.isPending ? 'Đang cập nhật...' : 'Cập nhật thông tin'}
+                    </button>
+                  </div>
+                </form>
+
+                <div className="space-y-4 rounded-[24px] border border-white/10 bg-gray-950/60 p-6">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">Tóm tắt tài khoản</h3>
+                    <p className="mt-2 text-sm text-white/60">Thông tin hiện tại của tài khoản đang đăng nhập.</p>
+                  </div>
+
+                  <div className={summaryCardClassName}>
+                    <p className="text-xs uppercase tracking-[0.2em] text-white/40">Họ tên</p>
+                    <p className="mt-2 text-sm font-medium text-white">{profile.hoTen || 'Chưa cập nhật'}</p>
+                  </div>
+
+                  <div className={summaryCardClassName}>
+                    <p className="text-xs uppercase tracking-[0.2em] text-white/40">Email</p>
+                    <p className="mt-2 text-sm font-medium text-white">{profile.email || 'Chưa cập nhật'}</p>
+                  </div>
+
+                  <div className={summaryCardClassName}>
+                    <p className="text-xs uppercase tracking-[0.2em] text-white/40">Số điện thoại</p>
+                    <p className="mt-2 text-sm font-medium text-white">{profile.soDT || 'Chưa cập nhật'}</p>
+                  </div>
+
+                  <div className={summaryCardClassName}>
+                    <p className="text-xs uppercase tracking-[0.2em] text-white/40">Nhóm / Loại người dùng</p>
+                    <p className="mt-2 text-sm font-medium text-white">
+                      {profile.maNhom || 'GP00'} / {profile.maLoaiNguoiDung || 'Khách hàng'}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -349,6 +424,7 @@ const ProfilePage = () => {
                       {tickets.map((ticket) => {
                         const firstSeat = ticket.danhSachGhe?.[0]
                         const isActive = ticket.maVe === selectedTicket?.maVe
+
                         return (
                           <button
                             key={ticket.maVe}
@@ -419,15 +495,15 @@ const ProfilePage = () => {
                       </div>
 
                       <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                        <div className={summaryCardClassName}>
                           <p className="text-xs uppercase tracking-[0.2em] text-white/40">Ngày đặt</p>
                           <p className="mt-2 text-sm font-medium text-white">{formatDateTime(selectedTicket.ngayDat)}</p>
                         </div>
-                        <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                        <div className={summaryCardClassName}>
                           <p className="text-xs uppercase tracking-[0.2em] text-white/40">Mã vé</p>
                           <p className="mt-2 text-sm font-medium text-white">#{selectedTicket.maVe}</p>
                         </div>
-                        <div className="rounded-2xl border border-white/10 bg-black/20 p-4 sm:col-span-2">
+                        <div className={`${summaryCardClassName} sm:col-span-2`}>
                           <p className="text-xs uppercase tracking-[0.2em] text-white/40">Rạp chiếu</p>
                           <p className="mt-2 text-sm font-medium text-white">
                             {selectedTicket.danhSachGhe?.[0]?.tenHeThongRap || 'Chưa có thông tin'}
@@ -436,7 +512,7 @@ const ProfilePage = () => {
                             {selectedTicket.danhSachGhe?.[0]?.tenCumRap || 'Chưa có cụm rạp'} — {selectedTicket.danhSachGhe?.[0]?.tenRap || 'Chưa có rạp'}
                           </p>
                         </div>
-                        <div className="rounded-2xl border border-white/10 bg-black/20 p-4 sm:col-span-2">
+                        <div className={`${summaryCardClassName} sm:col-span-2`}>
                           <p className="text-xs uppercase tracking-[0.2em] text-white/40">Danh sách ghế</p>
                           <div className="mt-3 flex flex-wrap gap-2">
                             {(selectedTicket.danhSachGhe || []).map((seat) => (
