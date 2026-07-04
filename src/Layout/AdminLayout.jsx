@@ -34,7 +34,7 @@ const AdminLayout = () => {
         <div className="min-h-screen bg-gray-950 flex font-sans text-white">
             <aside className="w-72 flex-shrink-0 bg-gray-900 border-r border-gray-800 flex flex-col">
                 <div className="px-7 py-6 border-b border-gray-800">
-                    <span className="text-3xl font-bold text-yellow-400">🎬 Rạp Phim</span>
+                    <span className="text-3xl font-extrabold uppercase tracking-tight text-white">CINE<span className="text-red-500">FLEX</span></span>
                 </div>
                 <nav className="flex-1 px-4 py-5 space-y-2">
                     <p className="text-white text-sm uppercase tracking-widest px-5 mb-4">Quản lý</p>

@@ -56,8 +56,8 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Cột 1: Logo + giới thiệu */}
         <div>
-          <h2 className="text-2xl font-bold text-yellow-400 mb-4">
-            🎬 CapstoneMovie
+          <h2 className="text-2xl font-extrabold uppercase tracking-tight text-white mb-4">
+            CINE<span className="text-red-500">FLEX</span>
           </h2>
           <p className="text-sm leading-relaxed text-gray-400">
             Hệ thống đặt vé xem phim trực tuyến hàng đầu Việt Nam. Khám phá hàng
@@ -164,7 +164,7 @@ const Footer = () => {
       {/* Dòng bản quyền */}
       <div className="border-t border-gray-800 py-4 text-center text-sm text-gray-500">
         © {new Date().getFullYear()}{" "}
-        <span className="text-yellow-400 font-semibold">CapstoneMovie</span>. Bảo
+        <span className="font-semibold text-white">CINE</span><span className="font-semibold text-red-500">FLEX</span>. Bảo
         lưu mọi quyền.
       </div>
     </footer>
