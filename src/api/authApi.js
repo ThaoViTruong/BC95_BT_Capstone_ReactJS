@@ -9,6 +9,8 @@ export const authApi = {
             }
         })
     },
+
+    // data: { taiKhoan, matKhau, email, soDt, maNhom, hoTen }
     register: (data) => {
         return axiosInstance.post("/QuanLyNguoiDung/DangKy", data, {
             headers: {

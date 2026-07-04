@@ -277,18 +277,25 @@ const ProfilePage = () => {
                     </div>
                   ) : null}
 
-                  <div className="grid gap-5 md:grid-cols-2">
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-white">Email</label>
-                      <input
-                        type="email"
-                        {...formik.getFieldProps('email')}
-                        className="w-full rounded-2xl border border-white/10 bg-gray-950 px-4 py-3 text-sm text-white outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
-                      />
-                      {formik.touched.email && formik.errors.email ? (
-                        <p className="mt-2 text-sm text-red-400">{formik.errors.email}</p>
-                      ) : null}
-                    </div>
+            <div className="max-w-4xl mx-auto px-4 py-10">
+                <div className="bg-gray-900 rounded-2xl p-6 mb-6 border border-gray-800">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                        <div className="w-20 h-20 rounded-full bg-yellow-400 flex items-center justify-center text-gray-900 text-3xl font-bold flex-shrink-0">
+                            {avatar}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-3 mb-1">
+                                <h1 className="text-2xl font-bold text-white">{profile?.hoTen}</h1>
+                            </div>
+                            <p className="text-gray-400 text-sm">@{profile?.taiKhoan}</p>
+                        </div>
+                        {
+                            profile?.maLoaiNguoiDung === "QuanTri" && (
+                                <Link to="/admin" className="flex-shrink-0 flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-5 py-2.5 rounded-xl transition-colors text-sm">
+                                    ⚙️ Trang quản trị
+                                </Link>
+                            )
+                        }
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-white">Tài khoản</label>
@@ -299,89 +306,19 @@ const ProfilePage = () => {
                         className="w-full rounded-2xl border border-white/10 bg-gray-950/70 px-4 py-3 text-sm text-white/65 outline-none"
                       />
                     </div>
-
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-white">Họ tên</label>
-                      <input
-                        type="text"
-                        {...formik.getFieldProps('hoTen')}
-                        className="w-full rounded-2xl border border-white/10 bg-gray-950 px-4 py-3 text-sm text-white outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
-                      />
-                      {formik.touched.hoTen && formik.errors.hoTen ? (
-                        <p className="mt-2 text-sm text-red-400">{formik.errors.hoTen}</p>
-                      ) : null}
-                    </div>
-
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-white">Mật khẩu mới</label>
-                      <input
-                        type="password"
-                        {...formik.getFieldProps('matKhau')}
-                        placeholder="********"
-                        className="w-full rounded-2xl border border-white/10 bg-gray-950 px-4 py-3 text-sm text-white outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
-                      />
-                      {formik.touched.matKhau && formik.errors.matKhau ? (
-                        <p className="mt-2 text-sm text-red-400">{formik.errors.matKhau}</p>
-                      ) : null}
-                    </div>
-
-                    {formik.values.matKhau.trim() ? (
-                      <div>
-                        <label className="mb-2 block text-sm font-medium text-white">Xác nhận mật khẩu</label>
-                        <input
-                          type="password"
-                          {...formik.getFieldProps('xacNhanMatKhau')}
-                          placeholder="Nhập lại mật khẩu mới để xác nhận"
-                          className="w-full rounded-2xl border border-white/10 bg-gray-950 px-4 py-3 text-sm text-white outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
-                        />
-                        {formik.touched.xacNhanMatKhau && formik.errors.xacNhanMatKhau ? (
-                          <p className="mt-2 text-sm text-red-400">{formik.errors.xacNhanMatKhau}</p>
-                        ) : null}
-                      </div>
-                    ) : null}
-
-                    <div className="md:col-span-2">
-                      <label className="mb-2 block text-sm font-medium text-white">Số điện thoại</label>
-                      <input
-                        type="text"
-                        {...formik.getFieldProps('soDt')}
-                        className="w-full rounded-2xl border border-white/10 bg-gray-950 px-4 py-3 text-sm text-white outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
-                      />
-                      {formik.touched.soDt && formik.errors.soDt ? (
-                        <p className="mt-2 text-sm text-red-400">{formik.errors.soDt}</p>
-                      ) : null}
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end">
-                    <button
-                      type="submit"
-                      disabled={updateUserMutation.isPending}
-                      className="rounded-2xl bg-yellow-400 px-6 py-3 text-base font-semibold text-gray-900 transition hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
-                    >
-                      {updateUserMutation.isPending ? 'Đang cập nhật...' : 'Cập nhật'}
-                    </button>
-                  </div>
-                </form>
-
-                <div className="rounded-[24px] border border-white/10 bg-gray-950/60 p-6">
-                  <h3 className="text-xl font-bold text-white">Thông tin hiện tại</h3>
-                  <div className="mt-6 space-y-5 text-sm">
-                    <div className="flex items-center justify-between gap-4 border-b border-white/5 pb-3">
-                      <span className="text-white/45">Email</span>
-                      <span className="font-medium text-white">{profile.email || 'Chưa cập nhật'}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-4 border-b border-white/5 pb-3">
-                      <span className="text-white/45">Họ tên</span>
-                      <span className="font-medium text-white">{profile.hoTen || 'Chưa cập nhật'}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-4 border-b border-white/5 pb-3">
-                      <span className="text-white/45">Số điện thoại</span>
-                      <span className="font-medium text-white">{profile.soDT || 'Chưa cập nhật'}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-4 border-b border-white/5 pb-3">
-                      <span className="text-white/45">Tài khoản</span>
-                      <span className="font-medium text-white">{profile.taiKhoan}</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-800">
+                        <div>
+                            <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Email</p>
+                            <p className="text-white text-sm">{profile?.email}</p>
+                        </div>
+                        <div>
+                            <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Số điện thoại</p>
+                            <p className="text-white text-sm">{profile?.soDT}</p>
+                        </div>
+                        <div>
+                            <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Role</p>
+                            <p className="text-white text-sm">{profile?.maLoaiNguoiDung}</p>
+                        </div>
                     </div>
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-white/45">Nhóm / Loại người dùng</span>
