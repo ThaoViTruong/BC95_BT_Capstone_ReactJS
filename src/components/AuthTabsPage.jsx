@@ -172,7 +172,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
         <header className="border-b border-violet-500/30 bg-[#050816]/95">
           <div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
             <Link to="/movie" className="text-2xl font-extrabold uppercase tracking-tight text-white">
-              CINE<span className="text-red-500">PLEX</span>
+              CINE<span className="text-red-500">FLEX</span>
             </Link>
 
             <nav className="hidden items-center gap-6 text-sm text-gray-300 md:flex">
@@ -436,12 +436,12 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
           <div className="grid gap-8 md:grid-cols-[1.2fr_1fr_1fr_1fr]">
             <div>
               <Link to="/movie" className="text-2xl font-extrabold uppercase tracking-tight text-white">
-                CINE<span className="text-red-500">PLEX</span>
+                CINE<span className="text-red-500">FLEX</span>
               </Link>
               <p className="mt-4 max-w-xs text-sm leading-6 text-gray-400">
                 Trở về danh sách phim để khám phá các suất chiếu mới nhất và đặt vé nhanh hơn.
               </p>
-              <p className="mt-4 text-sm text-gray-500">© 2026 CINEPLEX Giải trí. Bảo lưu mọi quyền.</p>
+              <p className="mt-4 text-sm text-gray-500">© 2026 CINEFLEX Giải trí. Bảo lưu mọi quyền.</p>
             </div>
 
             {footerSections.map((section) => (
