@@ -45,7 +45,6 @@ const UserPage = () => {
         resetForm()
         setIsModalOpen(false)
       } catch (error) {
-        console.log(error)
       }
     }
   })
@@ -106,7 +105,7 @@ const UserPage = () => {
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-yellow-400/20 border border-yellow-400/30 flex items-center justify-center text-yellow-400 font-bold text-xs flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-yellow-400/20 border border-yellow-400/30 flex items-center justify-center text-yellow-400 font-bold text-xs shrink-0">
                           {user.hoTen?.charAt(0).toUpperCase()}
                         </div>
                         <span className="text-white">{user.hoTen}</span>

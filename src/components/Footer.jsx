@@ -16,9 +16,9 @@ const Footer = () => {
       {/* Phần nội dung chính */}
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Cột 1: Logo + giới thiệu */}
-        <div>
-          <h2 className="text-2xl font-bold text-yellow-400 mb-4">
-            🎬 CapstoneMovie
+       <div>
+          <h2 className="text-2xl font-extrabold uppercase tracking-tight text-white mb-4">
+            CINE<span className="text-red-500">FLEX</span>
           </h2>
           <p className="text-sm leading-relaxed text-gray-400">
             Hệ thống đặt vé xem phim trực tuyến hàng đầu Việt Nam. Khám phá hàng

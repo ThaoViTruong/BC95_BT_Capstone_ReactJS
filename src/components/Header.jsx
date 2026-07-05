@@ -24,9 +24,9 @@ const Header = () => {
             <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
                 <Link 
                     to="/" 
-                    className="text-2xl font-bold text-yellow-400 tracking-wide focus:outline-none focus:ring-2 focus:ring-yellow-400 rounded-lg p-1"
+                    className="text-2xl font-extrabold uppercase tracking-tight text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 rounded-lg p-1"
                 >
-                    🎬 CapstoneMovie
+                    CINE<span className="text-red-500">FLEX</span>
                 </Link>
 
                 {/* 3. Accessibility: Thêm aria-label cho thẻ nav */}

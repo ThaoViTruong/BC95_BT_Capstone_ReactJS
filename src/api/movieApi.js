@@ -1,9 +1,20 @@
 import axiosInstance from "./axiosInstance"
 
 export const movieApi = {
-
-    getMovieList: (maNhom = 'GP01') => {
-        return axiosInstance.get(`/QuanLyPhim/LayDanhSachPhim?maNhom=${maNhom}`)
+    getMovieList: (maNhom = 'GP01', soTrang = 1, soPhanTuTrenTrang = 10, tenPhim = '') => {
+        // Tạo params object
+        const params = {
+            maNhom,
+            soTrang,
+            soPhanTuTrenTrang,
+        }
+        
+        // ⭐ Chỉ thêm tenPhim khi có giá trị
+        if (tenPhim && tenPhim.trim() !== '') {
+            params.tenPhim = tenPhim
+        }
+        
+        return axiosInstance.get('/QuanLyPhim/LayDanhSachPhimPhanTrang', { params })
     },
 
     getMovieDetail: (maPhim) => {
@@ -12,5 +23,9 @@ export const movieApi = {
 
     getBanners: () => {
         return axiosInstance.get('/QuanLyPhim/LayDanhSachBanner')
-    }
+    },
+    getMovieShowtimes: (maPhim) => {
+        return axiosInstance.get(`/QuanLyRap/LayThongTinLichChieuPhim?MaPhim=${maPhim}`)
+    },
+    
 }

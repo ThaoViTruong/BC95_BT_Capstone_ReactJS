@@ -21,3 +21,14 @@ export const useCumRapTheoHeThong = (maHeThongRap) => {
         enabled: maHeThongRap !== undefined && maHeThongRap !== null && maHeThongRap !== ""
     })
 }
+
+export const useLichChieuHeThongRap = (maHeThongRap) => {
+    return useQuery({
+        queryKey: ['lichChieuHeThongRap', maHeThongRap],
+        queryFn: async () => {
+            const response = await cinemaApi.getLichChieuHeThongRap(maHeThongRap)
+            return response.data.content
+        },
+        enabled: !!maHeThongRap,
+    })
+}
