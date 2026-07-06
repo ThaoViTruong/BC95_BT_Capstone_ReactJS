@@ -13,8 +13,15 @@ axiosInstance.interceptors.request.use((config) => {
     const user = localStorage.getItem("user")
 
     if (user) {
-        const { accessToken } = JSON.parse(user)
-        config.headers.Authorization = `Bearer ${accessToken}`
+        try {
+            const { accessToken } = JSON.parse(user)
+
+            if (accessToken) {
+                config.headers.Authorization = `Bearer ${accessToken}`
+            }
+        } catch {
+            localStorage.removeItem("user")
+        }
     }
 
     return config
