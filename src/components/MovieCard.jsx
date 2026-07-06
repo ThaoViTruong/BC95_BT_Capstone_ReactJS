@@ -2,8 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 // Ảnh fallback khi load lỗi
-const FALLBACK_IMG = "https://via.placeholder.com/300x450/1f2937/facc15?text=No+Image"
-
+const FALLBACK_IMG = "https://placehold.co/300x450/1f2937/facc15?text=No+Image"
 // Format ngày dd/mm/yyyy
 const formatDate = (dateString) => {
   if (!dateString) return "Đang cập nhật"
@@ -40,7 +39,9 @@ const MovieCard = ({ movie }) => {
           src={movie.hinhAnh || FALLBACK_IMG}
           alt={`Poster phim ${movie.tenPhim}`}
           loading="lazy"
-          onError={(e) => { e.target.src = FALLBACK_IMG }}
+          onError={(e) => { 
+            e.target.onerror = null;
+            e.target.src = FALLBACK_IMG }}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         />
 

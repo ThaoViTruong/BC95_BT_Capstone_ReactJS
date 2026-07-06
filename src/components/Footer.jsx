@@ -55,7 +55,7 @@ const Footer = () => {
       {/* Phần nội dung chính */}
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Cột 1: Logo + giới thiệu */}
-        <div>
+       <div>
           <h2 className="text-2xl font-extrabold uppercase tracking-tight text-white mb-4">
             CINE<span className="text-red-500">FLEX</span>
           </h2>

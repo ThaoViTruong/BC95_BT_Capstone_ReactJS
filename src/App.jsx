@@ -22,21 +22,21 @@ import RegisterPage from "./pages/RegisterPage"
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, 
-      retry: 3, 
-    }
-  }
-})
+      staleTime: 5 * 60 * 1000,
+      retry: 3,
+    },
+  },
+});
 
 function App() {
-
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage/>} />
+            <Route path="/register" element={<RegisterPage />} />
+
             <Route path="/" element={<HomeLayout />}>
               <Route index element={<MovieListPage />} />
               <Route path="movie" element={<MovieListPage />} />
@@ -68,12 +68,13 @@ function App() {
               <Route path="films/showtime/:idFilm" element={<FilmShowtimePage />} />
               <Route path="showtimes" element={<ShowtimeManagementPage />} />
             </Route>
+
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BrowserRouter>
       </QueryClientProvider>
     </Provider>
-  )
+  );
 }
 
-export default App
+export default App;
