@@ -3,10 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
 import { logout, selectorIsLoggedIn, selectorUser } from '../store/authSlice';
 import { useQueryClient } from '@tanstack/react-query';
+import { useProfile } from '../hooks/useUser'
 
 const Header = () => {
-    const isLoggedIn = useSelector(selectorIsLoggedIn);
-    const user = useSelector(selectorUser);
+    const isLoggedIn = useSelector(selectorIsLoggedIn)
+    const user = useSelector(selectorUser)
+    const { data: profile } = useProfile(isLoggedIn)
 
     const dispatch = useDispatch();
     const queryClient = useQueryClient();
@@ -17,6 +19,13 @@ const Header = () => {
         queryClient.removeQueries({ queryKey: ['profile'] });
         dispatch(logout());
     }, [dispatch, queryClient]);
+    const displayName = profile?.hoTen || user?.hoTen || user?.taiKhoan || 'Người dùng'
+    const avatarText = displayName
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((word) => word[0]?.toUpperCase())
+        .join('') || 'U'
 
     return (
         // 2. UX: Thêm `sticky top-0 z-50` để header luôn ghim ở trên cùng khi cuộn trang
@@ -37,8 +46,7 @@ const Header = () => {
                                 to="/profile"
                                 className="text-sm text-gray-300 hover:text-white transition-colors"
                             >
-                                {/* 4. UX: Thêm fallback 'Bạn' phòng trường hợp user.hoTen bị null/undefined */}
-                                Xin chào, <span className="text-yellow-400 font-medium">{user?.hoTen || 'Bạn'}</span>
+                                Xin chào, <span className="text-yellow-400 font-medium">{displayName}</span>
                             </Link>
                             <button
                                 className="bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition-all text-white"
