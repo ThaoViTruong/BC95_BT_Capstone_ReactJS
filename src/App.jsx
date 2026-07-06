@@ -18,6 +18,7 @@ import FilmEditPage from "./pages/admin/FilmEditPage"
 import FilmShowtimePage from "./pages/admin/FilmShowtimePage"
 import ShowtimeManagementPage from "./pages/admin/ShowtimeManagementPage"
 import RegisterPage from "./pages/RegisterPage"
+import BookingMovie from "./pages/BookingMovie"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,6 +43,11 @@ function App() {
               <Route path="movie" element={<MovieListPage />} />
               <Route path="movie/:maPhim" element={<MovieDetailPage />} />
               <Route path="cinema" element={<CinemaPage />} />
+              <Route path="booking/:maLichChieu" element={
+                <ProtectedRoute>
+                  <BookingMovie />
+                </ProtectedRoute>
+              } />
               <Route path="profile" element={
                 <ProtectedRoute>
                   <ProfilePage />

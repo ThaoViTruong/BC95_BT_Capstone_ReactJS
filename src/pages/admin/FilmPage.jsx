@@ -407,7 +407,8 @@ const ResultPopup = ({ result, onClose }) => {
 const FilmPage = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { data: movies = [], isLoading, isError, error } = useMovieList(MA_NHOM)
+  const { data, isLoading, isError, error } = useMovieList(MA_NHOM, 1, 1000)
+  const movies = data?.items || []
   const [searchValue, setSearchValue] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)

@@ -136,7 +136,8 @@ const ShowtimeCard = ({ entry, onOpenCreate }) => {
 
 const ShowtimeManagementPage = () => {
   const navigate = useNavigate()
-  const { data: movies = [], isLoading } = useMovieList(MA_NHOM)
+  const { data, isLoading } = useMovieList(MA_NHOM)
+  const movies = data?.items || []
   const dateOptions = useMemo(() => createDateOptions(), [])
   const [activeDate, setActiveDate] = useState(dateOptions[0]?.value || '')
   const [keyword, setKeyword] = useState('')
