@@ -7,6 +7,11 @@ export const cinemaApi = {
     getCumRapTheoHeThong: (maHeThongRap) => {
         return axiosInstance.get(`/QuanLyRap/LayThongTinCumRapTheoHeThong?maHeThongRap=${maHeThongRap}`)
     },
+     getLichChieuHeThongRap: (maHeThongRap) => {
+        return axiosInstance.get(
+            `/QuanLyRap/LayThongTinLichChieuHeThongRap?maHeThongRap=${maHeThongRap}&maNhom=GP01`
+        )
+    },
     createShowtime: (showtimeData) => {
         return axiosInstance.post('/QuanLyDatVe/TaoLichChieu', showtimeData)
     }

@@ -11,9 +11,7 @@ const HomeLayout = () => {
 
   const isProfileRoute = location.pathname === '/profile' || location.pathname === '/thongtincanhan'
 
-  if (user?.maLoaiNguoiDung === 'QuanTri' && !isProfileRoute) {
-    return <Navigate to="/admin" replace />
-  }
+ 
 
   return (
     <div>

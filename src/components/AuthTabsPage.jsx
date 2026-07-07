@@ -42,31 +42,31 @@ const tabClassName =
 const navLinks = [
   { label: 'Phim', to: '/movie' },
   { label: 'Rạp', to: '/cinema' },
-  { label: 'Ưu đãi', to: '/' },
+  { label: 'Ưu đãi', to: '#' },
 ]
 
 const footerSections = [
   {
     title: 'Khám phá',
     links: [
-      { label: 'Phim đang chiếu', to: '/movie' },
-      { label: 'Lịch chiếu', to: '/cinema' },
-      { label: 'Ưu đãi', to: '/' },
+      { label: 'Phim đang chiếu', to: "/movie#flim" },
+      { label: 'Lịch chiếu', to: "/movie#cinema-section" },
+      { label: 'Ưu đãi', to: '#' },
     ],
   },
   {
     title: 'Hỗ trợ',
     links: [
-      { label: 'Trung tâm trợ giúp', to: '/' },
-      { label: 'Liên hệ', to: '/' },
-      { label: 'Câu hỏi thường gặp', to: '/' },
+      { label: 'Trung tâm trợ giúp', to: '#' },
+      { label: 'Liên hệ', to: '#' },
+      { label: 'Câu hỏi thường gặp', to: '#' },
     ],
   },
   {
     title: 'Chính sách',
     links: [
-      { label: 'Chính sách bảo mật', to: '/' },
-      { label: 'Điều khoản dịch vụ', to: '/' },
+      { label: 'Chính sách bảo mật', to: '#' },
+      { label: 'Điều khoản dịch vụ', to: '#' },
     ],
   },
 ]
@@ -449,7 +449,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                 <h3 className="text-sm font-bold uppercase tracking-wide text-yellow-400">{section.title}</h3>
                 <div className="mt-4 space-y-3">
                   {section.links.map((item) => (
-                    <Link key={item.label} to={item.to} className="block text-sm text-gray-300 transition hover:text-white">
+                    <Link key={item.label} to={item.to} className="block text-sm text-gray-300 transition hover:text-yellow-400">
                       {item.label}
                     </Link>
                   ))}

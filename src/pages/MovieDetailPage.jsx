@@ -218,8 +218,8 @@ const MovieDetailPage = () => {
               {/* ============================================= */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
-                  href={movie?.trailer}
-                  target="_blank"
+                  href="#trailer"
+                  
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 
                              bg-white/10 hover:bg-white/20 border border-white/20 
@@ -261,7 +261,9 @@ const MovieDetailPage = () => {
       {/* - Center layout */}
       {/* ============================================= */}
       {movie?.trailer && (
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div 
+        id="trailer"
+        className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <h2 className="text-2xl font-bold mb-8 text-center">
             <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
               Trailer
@@ -272,6 +274,7 @@ const MovieDetailPage = () => {
                           shadow-2xl shadow-black/50 ring-1 ring-white/10"
           >
             <iframe
+              
               src={getYoutubeEmbedUrl(movie.trailer)}
               title="Movie Trailer"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -314,7 +317,7 @@ const MovieDetailPage = () => {
                     onClick={() => setActiveSystem(index)}
                     title={heThong.tenHeThongRap}
                     className={`w-full p-3 sm:p-4 flex items-center justify-center 
-                               border-b border-gray-800 transition-all duration-300 
+                               border-b border-gray-800 transition-all duration-300 cursor-pointer 
                                ${
                                  activeSystem === index
                                    ? "bg-gradient-to-r from-yellow-500/10 to-transparent border-l-4 border-l-yellow-400 opacity-100"
@@ -402,3 +405,4 @@ const MovieDetailPage = () => {
 };
 
 export default MovieDetailPage;
+

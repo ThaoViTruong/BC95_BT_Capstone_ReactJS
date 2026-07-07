@@ -183,7 +183,7 @@ const BookingMovie = () => {
                 <img
                   src={thongTinPhim.hinhAnh}
                   alt={thongTinPhim.tenPhim}
-                  className="w-full h-full object-cover blur-sm scale-110 opacity-40"
+                  className="w-full h-full object-cover "
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
                 <div className="absolute bottom-3 left-4 right-4">

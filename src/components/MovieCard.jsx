@@ -34,7 +34,7 @@ const MovieCard = ({ movie }) => {
       className="block bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-yellow-400/30 hover:-translate-y-1 transition-all duration-300 group"
     >
       {/* Phần ảnh */}
-      <div className="relative overflow-hidden aspect-[2/3]">
+      <div className="relative overflow-hidden aspect-4/5">
         <img 
           src={movie.hinhAnh || FALLBACK_IMG}
           alt={`Poster phim ${movie.tenPhim}`}
@@ -46,7 +46,7 @@ const MovieCard = ({ movie }) => {
         />
 
         {/* Overlay gradient khi hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div className="absolute inset-0 bg-gradient-to-black from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
         {/* Badges */}
         <div className="absolute top-2 right-2 flex flex-col gap-1">
@@ -73,7 +73,7 @@ const MovieCard = ({ movie }) => {
 
       {/* Phần thông tin */}
       <div className="p-4">
-        <h3 className="text-white font-semibold text-lg mb-1 line-clamp-2 min-h-[3.5rem] group-hover:text-yellow-400 transition-colors">
+        <h3 className="text-white font-semibold text-lg mb-1 line-clamp-2 min-h-3.5rem group-hover:text-yellow-400 transition-colors">
           {movie.tenPhim}
         </h3>
         <p className="text-gray-400 text-sm flex items-center gap-1">

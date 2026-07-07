@@ -197,7 +197,7 @@ const ShowtimeManagementPage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center rounded-[32px] border border-white/10 bg-[#101010]">
+      <div className="flex min-h-[60vh] items-center justify-center rounded-32px border border-white/10 bg-[#101010]">
         <LoadingSpinner />
       </div>
     )
@@ -205,7 +205,7 @@ const ShowtimeManagementPage = () => {
 
   return (
     <div className="space-y-8 font-sans text-white">
-      <div className="rounded-[32px] border border-white/10 bg-[#101010] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+      <div className="rounded-32px border border-white/10 bg-[#101010] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div>
             <h1 className="text-4xl font-black uppercase tracking-tight text-white">Quản Lý Lịch Chiếu</h1>
@@ -219,7 +219,7 @@ const ShowtimeManagementPage = () => {
                 value={keyword}
                 onChange={(event) => setKeyword(event.target.value)}
                 placeholder="Tìm phim, rạp..."
-                className="w-full rounded-full border border-white/10 bg-white/[0.04] px-12 py-3 text-base text-white outline-none transition focus:border-white/20 focus:ring-2 focus:ring-red-500/15 placeholder:text-white/35"
+                className="w-full rounded-full border border-white/10 bg-white/0.04 px-12 py-3 text-base text-white outline-none transition focus:border-white/20 focus:ring-2 focus:ring-red-500/15 placeholder:text-white/35"
               />
               <svg viewBox="0 0 24 24" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/35" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="6" />
@@ -245,7 +245,7 @@ const ShowtimeManagementPage = () => {
         <StatCard accentClassName="border-white/15" icon="👥" label="Tỷ lệ lấp đầy" value={`${occupancyRate}%`} subValue="Ước tính theo trạng thái suất chiếu" />
       </div>
 
-      <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#111111] shadow-[0_24px_80px_rgba(0,0,0,0.3)]">
+      <div className="overflow-hidden rounded-32px border border-white/10 bg-[#111111] shadow-[0_24px_80px_rgba(0,0,0,0.3)]">
         <div className="flex flex-col gap-4 border-b border-white/10 px-6 py-5">
           <div className="flex items-center gap-3">
             <span className="rounded-full bg-white/8 px-4 py-2 text-sm font-semibold text-white/85">{activeDateOption?.label}</span>
@@ -269,7 +269,7 @@ const ShowtimeManagementPage = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <div className="min-w-[1100px] px-6 py-6">
+          <div className="min-w-1100px px-6 py-6">
             <div
               className="grid gap-x-4 gap-y-6"
               style={{
@@ -285,15 +285,15 @@ const ShowtimeManagementPage = () => {
 
               {HALLS.map((hall) => (
                 <React.Fragment key={hall.id}>
-                  <div className="flex min-h-[132px] flex-col justify-center rounded-[24px] border border-white/5 bg-white/[0.015] px-5">
+                  <div className="flex min-h-132px flex-col justify-center rounded-24px border border-white/5 bg-white/0.015 px-5">
                     <p className="text-3xl font-black text-white">{hall.name}</p>
                     <p className="mt-2 text-sm font-medium uppercase tracking-[0.18em] text-white/35">{hall.format}</p>
                   </div>
 
-                  <div className="relative col-span-12 min-h-[132px] rounded-[24px] border border-white/5 bg-gradient-to-b from-white/[0.015] to-transparent">
+                  <div className="relative col-span-12 min-h-132px rounded-24px border border-white/5 bg-gradient-to-black from-white/0.015 to-transparent">
                     <div className="absolute inset-0 grid grid-cols-12">
                       {TIME_SLOTS.map((slot) => (
-                        <div key={`${hall.id}-${slot}`} className="border-l border-white/[0.04] first:border-l-0" />
+                        <div key={`${hall.id}-${slot}`} className="border-l border-white/0.04 first:border-l-0" />
                       ))}
                     </div>
 

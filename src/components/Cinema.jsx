@@ -75,7 +75,7 @@ const Cinema = () => {
               <button
                 key={heThongRap.maHeThongRap}
                 onClick={() => handleSelectCinema(heThongRap.maHeThongRap)}
-                className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 ${
+                className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer ${
                   selectedCinema === heThongRap.maHeThongRap
                     ? "bg-yellow-400/10 border border-yellow-400 text-yellow-400"
                     : "bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700"
@@ -126,7 +126,7 @@ const Cinema = () => {
                   <button
                     key={cumRap.maCumRap}
                     onClick={() => setSelectedCumRap(cumRap.maCumRap)}
-                    className={`w-full text-left p-4 border-b border-gray-800 transition ${
+                    className={`w-full text-left p-4 border-b border-gray-800 transition cursor-pointer ${
                       currentCumRap?.maCumRap === cumRap.maCumRap
                         ? "bg-gray-800 border-l-4 border-l-yellow-400"
                         : "hover:bg-gray-800/60 border-l-4 border-l-transparent"

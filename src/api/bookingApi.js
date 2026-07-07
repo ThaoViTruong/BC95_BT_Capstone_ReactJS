@@ -14,8 +14,7 @@ export const bookingApi = {
         params: { MaLichChieu: maLichChieu },
       }
     );
-    // API CyberSoft trả về { statusCode, content, ... }
-    // Chúng ta chỉ cần content
+    
     return res.data.content;
   },
 
@@ -24,7 +23,7 @@ export const bookingApi = {
    * @param {Object} payload
    * @param {number} payload.maLichChieu
    * @param {Array<{ maGhe: number, giaVe: number }>} payload.danhSachVe
-   * @returns {Promise<string>} thông báo từ server
+   * @returns {Promise<string>} 
    */
   datVe: async (payload) => {
     const res = await axiosInstance.post("/QuanLyDatVe/DatVe", payload);
