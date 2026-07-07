@@ -1,4 +1,4 @@
-import React, { useCallback, memo } from 'react';
+import { useCallback, memo } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
 import { logout, selectorIsLoggedIn, selectorUser } from '../store/authSlice';

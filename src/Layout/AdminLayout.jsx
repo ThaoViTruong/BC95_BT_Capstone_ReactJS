@@ -1,5 +1,4 @@
 import { useQueryClient } from '@tanstack/react-query'
-import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { logout, selectorIsLoggedIn, selectorUser } from '../store/authSlice'
@@ -51,12 +50,6 @@ const AdminLayout = () => {
                         Lịch chiếu
                     </NavLink>
                 </nav>
-                <div className="px-4 pb-5 border-t border-gray-800 pt-5">
-                    <Link to="/" className="flex items-center gap-4 px-5 py-4 rounded-2xl text-lg text-white hover:bg-gray-800 transition-all">
-                        <span className="text-xl">←</span>
-                        Về trang chủ
-                    </Link>
-                </div>
             </aside>
             <div className="flex-1 flex flex-col min-w-0">
                 <header className="bg-gray-900 border-b border-gray-800 px-8 py-5 flex items-center justify-between flex-shrink-0">
@@ -90,3 +83,4 @@ const AdminLayout = () => {
 }
 
 export default AdminLayout
+

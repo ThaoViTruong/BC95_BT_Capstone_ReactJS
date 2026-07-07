@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-
+﻿import { useEffect } from 'react'
 const BookingSuccessModal = ({ isOpen, onConfirm, onClose }) => {
   useEffect(() => {
     if (!isOpen) return;
@@ -164,3 +163,4 @@ const BookingSuccessModal = ({ isOpen, onConfirm, onClose }) => {
 };
 
 export default BookingSuccessModal;
+

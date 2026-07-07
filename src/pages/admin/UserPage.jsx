@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAddUser, useDeleteUser, useUpdateUser, useUsers } from '../../hooks/useUser'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
@@ -299,7 +299,8 @@ const UserPage = () => {
 
   useEffect(() => {
     if (!isLoading && currentPage > totalPages) {
-      setCurrentPage(totalPages)
+      const timeoutId = setTimeout(() => setCurrentPage(totalPages), 0)
+      return () => clearTimeout(timeoutId)
     }
   }, [currentPage, isLoading, totalPages])
 
@@ -484,37 +485,38 @@ const UserPage = () => {
       </div>
       <div className="overflow-hidden rounded-2xl border border-white/10 bg-gray-900">
         <div className="overflow-x-auto">
-          <table className="w-full text-base">
+          <table className="min-w-[1080px] w-full text-base">
             <thead>
               <tr className="border-b border-white/10 bg-gray-800/50">
-                <th className="whitespace-nowrap px-5 py-4 text-left font-medium text-white/85">#</th>
-                <th className="whitespace-nowrap px-5 py-4 text-left font-medium text-white/85">Tài khoản</th>
-                <th className="whitespace-nowrap px-5 py-4 text-left font-medium text-white/85">Họ tên</th>
-                <th className="whitespace-nowrap px-5 py-4 text-left font-medium text-white/85">Email</th>
-                <th className="whitespace-nowrap px-5 py-4 text-left font-medium text-white/85">Số điện thoại</th>
-                <th className="whitespace-nowrap px-5 py-4 text-left font-medium text-white/85">Loại tài khoản</th>
-                <th className="whitespace-nowrap px-5 py-4 text-left font-medium text-white/85">Hành động</th>
+                <th className="sticky left-0 z-20 w-14 whitespace-nowrap border-r border-white/10 bg-gray-800 px-4 py-4 text-left font-medium text-white/85">
+                  #
+                </th>
+                <th className="sticky left-14 z-20 min-w-[160px] whitespace-nowrap border-r border-white/10 bg-gray-800 px-4 py-4 text-left font-medium text-white/85 shadow-[8px_0_16px_rgba(0,0,0,0.2)]">
+                  Tài khoản
+                </th>
+                <th className="whitespace-nowrap px-4 py-4 text-left font-medium text-white/85">Họ tên</th>
+                <th className="whitespace-nowrap px-4 py-4 text-left font-medium text-white/85">Email</th>
+                <th className="whitespace-nowrap px-4 py-4 text-left font-medium text-white/85">Số điện thoại</th>
+                <th className="whitespace-nowrap px-4 py-4 text-left font-medium text-white/85">Loại tài khoản</th>
+                <th className="sticky right-0 z-10 whitespace-nowrap border-l border-white/10 bg-gray-800 px-4 py-4 text-left font-medium text-white/85 shadow-[-8px_0_16px_rgba(0,0,0,0.2)]">
+                  Hành động
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/10">
               {
                 users.map((user, index) => (
                   <tr key={user.taiKhoan} className="group transition-colors hover:bg-gray-800/50">
-                    <td className="px-5 py-4 text-white/70">{index + 1}</td>
-                    <td className="px-5 py-4">
+                    <td className="sticky left-0 z-10 w-14 border-r border-white/10 bg-gray-900 px-4 py-4 text-white/70 transition-colors group-hover:bg-gray-800/95">
+                      {index + 1}
+                    </td>
+                    <td className="sticky left-14 z-10 min-w-[160px] border-r border-white/10 bg-gray-900 px-4 py-4 shadow-[8px_0_16px_rgba(0,0,0,0.2)] transition-colors group-hover:bg-gray-800/95">
                       <span className="text-white font-medium">{user.taiKhoan}</span>
                     </td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-yellow-400/20 border border-yellow-400/30 flex items-center justify-center text-yellow-400 font-bold text-xs shrink-0">
-                          {user.hoTen?.charAt(0).toUpperCase()}
-                        </div>
-                        <span className="text-white">{user.hoTen}</span>
-                      </div>
-                    </td>
-                    <td className="px-5 py-4 text-white/85">{user.email}</td>
-                    <td className="px-5 py-4 text-white/85">{user.soDT}</td>
-                    <td className="px-5 py-4">
+                    <td className="px-4 py-4 text-white">{user.hoTen}</td>
+                    <td className="px-4 py-4 text-white/85">{user.email}</td>
+                    <td className="px-4 py-4 text-white/85">{user.soDT}</td>
+                    <td className="px-4 py-4">
                       {
                         user.maLoaiNguoiDung === "KhachHang" ? (
                           <span className="rounded-full border border-white/10 bg-gray-800/50 px-2.5 py-1 text-xs font-medium text-white/85">
@@ -527,7 +529,7 @@ const UserPage = () => {
                         )
                       }
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="sticky right-0 border-l border-white/10 bg-gray-900 px-4 py-4 shadow-[-8px_0_16px_rgba(0,0,0,0.2)] transition-colors group-hover:bg-gray-800/95">
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
@@ -671,3 +673,5 @@ const UserPage = () => {
 }
 
 export default UserPage
+
+

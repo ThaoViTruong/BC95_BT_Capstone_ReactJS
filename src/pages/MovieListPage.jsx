@@ -377,3 +377,4 @@ const formatDateForApi = (date) => {
 };
 
 export default MovieListPage;
+

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { Link, useNavigate } from 'react-router-dom'
@@ -114,7 +114,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
         const loggedInUser = response.data.content
 
         dispatch(login(loggedInUser))
-        navigate(loggedInUser?.maLoaiNguoiDung === 'QuanTri' ? '/admin' : '/', { replace: true })
+        navigate(loggedInUser?.maLoaiNguoiDung === 'QuanTri' ? '/admin/films' : '/', { replace: true })
       } catch (error) {
         setLoginError(getApiMessage(error.response?.data?.content, 'Đăng nhập thất bại. Vui lòng thử lại.'))
       } finally {
@@ -147,7 +147,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
       }
 
       try {
-        const response = await authApi.register(payload)
+        await authApi.register(payload)
         setRegisterSuccess('Đã đăng kí tài khoản thành công!')
         resetForm()
         setTimeout(() => {
@@ -464,3 +464,5 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
 }
 
 export default AuthTabsPage
+
+

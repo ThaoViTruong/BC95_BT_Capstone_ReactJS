@@ -1,10 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react'
+﻿import { useState, useMemo } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { movieApi } from '../../api/movieApi'
 import { useMovieList } from '../../hooks/useMovies'
-
-const MA_NHOM = 'GP01'
+import { buildMovieFormData, emptyMovieForm, getApiMessage, MA_NHOM } from '../../utils/admin/movieFormUtils'
 const ITEMS_PER_PAGE = 8
 
 const statusOptions = [
@@ -13,19 +12,6 @@ const statusOptions = [
   { value: 'sapChieu', label: 'Sắp chiếu' },
   { value: 'hot', label: 'Nổi bật' },
 ]
-
-const emptyMovieForm = {
-  maPhim: '',
-  tenPhim: '',
-  biDanh: '',
-  trailer: '',
-  moTa: '',
-  ngayKhoiChieu: '',
-  danhGia: 0,
-  hot: false,
-  dangChieu: false,
-  sapChieu: false,
-}
 
 const labelClassName = 'mb-3 block text-sm font-semibold uppercase tracking-[0.22em] text-white'
 const inputClassName =
@@ -111,8 +97,6 @@ const MovieFormModal = ({
   mode, title, description, formState, imageFile, isSubmitting,
   onClose, onSubmit, onFieldChange, onImageChange,
 }) => {
-  const submitLabel = mode === 'add' ? 'Thêm phim' : 'Lưu thay đổi'
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-8 backdrop-blur-sm">
       <div className="max-h-[90vh] w-full max-w-5xl overflow-auto rounded-[32px] border border-white/10 bg-[#101010] p-8 shadow-[0_30px_80px_rgba(0,0,0,0.45)]">
@@ -121,9 +105,7 @@ const MovieFormModal = ({
             <p className="text-sm uppercase tracking-[0.3em] text-red-400">{title}</p>
             <h3 className="mt-3 text-4xl font-bold text-white">{description}</h3>
             <p className="mt-3 text-base leading-8 text-white/75">
-              {mode === 'add'
-                ? 'Tạo phim mới với poster, ngày phát hành, trailer và trạng thái trình chiếu.'
-                : 'Cập nhật thông tin phim và lưu nội dung mới nhất lên hệ thống quản trị.'}
+              Tạo phim mới với poster, ngày phát hành, trailer và trạng thái trình chiếu.
             </p>
           </div>
           <button
@@ -162,7 +144,7 @@ const MovieFormModal = ({
               <textarea name="moTa" value={formState.moTa} onChange={onFieldChange} rows="5" className={inputClassName} placeholder="Nhập mô tả phim" />
             </div>
             <div>
-              <label className={labelClassName}>{mode === 'add' ? 'Ảnh poster' : 'Ảnh poster mới'}</label>
+              <label className={labelClassName}>Ảnh poster</label>
               <input
                 type="file"
                 accept="image/*"
@@ -172,9 +154,7 @@ const MovieFormModal = ({
               <p className="mt-3 text-sm text-white/65">
                 {imageFile
                   ? `Đã chọn tệp: ${imageFile.name}`
-                  : mode === 'add'
-                    ? 'Vui lòng chọn ảnh poster trước khi tạo phim.'
-                    : 'Để trống nếu muốn giữ nguyên ảnh hiện tại.'}
+                  : 'Vui lòng chọn ảnh poster trước khi tạo phim.'}
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
@@ -202,7 +182,7 @@ const MovieFormModal = ({
               disabled={isSubmitting}
               className="rounded-2xl bg-gradient-to-r from-red-500 to-red-700 px-6 py-4 text-base font-semibold text-white transition hover:from-red-400 hover:to-red-600 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {isSubmitting ? 'Đang xử lý...' : submitLabel}
+              {isSubmitting ? 'Đang xử lý...' : 'Thêm phim'}
             </button>
           </div>
         </form>
@@ -281,10 +261,6 @@ const FilmPage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [addForm, setAddForm] = useState(emptyMovieForm)
   const [addImageFile, setAddImageFile] = useState(null)
-  const [editingMovie, setEditingMovie] = useState(null)
-  const [editForm, setEditForm] = useState(emptyMovieForm)
-  const [editImageFile, setEditImageFile] = useState(null)
-  const [pendingEditRequest, setPendingEditRequest] = useState(null)
   const [movieToDelete, setMovieToDelete] = useState(null)
   const [resultPopup, setResultPopup] = useState(null)
 
@@ -313,7 +289,7 @@ const FilmPage = () => {
 
   const totalPages = Math.max(1, Math.ceil(filteredMovies.length / ITEMS_PER_PAGE))
   const paginatedMovies = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+    const startIndex = (activePage - 1) * ITEMS_PER_PAGE
     return filteredMovies.slice(startIndex, startIndex + ITEMS_PER_PAGE)
   }, [filteredMovies, currentPage])
 
@@ -330,13 +306,6 @@ const FilmPage = () => {
     setIsAddModalOpen(false)
     setAddForm(emptyMovieForm)
     setAddImageFile(null)
-  }
-
-  const resetEditState = () => {
-    setEditingMovie(null)
-    setEditForm(emptyMovieForm)
-    setEditImageFile(null)
-    setPendingEditRequest(null)
   }
 
   const handleFormFieldChange = (setter) => (event) => {
@@ -415,6 +384,16 @@ const FilmPage = () => {
   const handleStartEdit = (movie) => {
     setActionMessage(null)
     navigate(`/admin/films/edit/${movie.maPhim}`)
+  }
+
+  const handleSearchChange = (event) => {
+    setSearchValue(event.target.value)
+    setCurrentPage(1)
+  }
+
+  const handleStatusChange = (event) => {
+    setStatusFilter(event.target.value)
+    setCurrentPage(1)
   }
 
   const handleOpenShowtime = (movie) => {
@@ -644,7 +623,7 @@ const FilmPage = () => {
               {filteredMovies.length > 0 ? (
                 <div className="flex flex-col gap-5 border-t border-white/10 px-8 py-6 xl:flex-row xl:items-center xl:justify-between">
                   <p className="text-base text-white/75">
-                    Trang <span className="font-semibold text-white">{currentPage}</span> / {totalPages} - tổng cộng {filteredMovies.length} phim
+                    Trang <span className="font-semibold text-white">{activePage}</span> / {totalPages} - tổng cộng {filteredMovies.length} phim
                   </p>
                   <div className="flex flex-wrap items-center gap-3">
                     <button type="button" onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))} disabled={currentPage === 1} className="rounded-2xl border border-white/10 px-4 py-3 text-base text-white transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50">
@@ -675,31 +654,15 @@ const FilmPage = () => {
 
       {isAddModalOpen ? (
         <MovieFormModal
-          mode="add"
-          title="Thêm phim"
-          description="Tạo phim mới"
-          formState={addForm}
-          imageFile={addImageFile}
-          isSubmitting={addMovieMutation.isPending}
-          onClose={resetAddState}
-          onSubmit={handleSubmitAdd}
-          onFieldChange={handleFormFieldChange(setAddForm)}
-          onImageChange={handleFileChange(setAddImageFile)}
-        />
-      ) : null}
-
-      {editingMovie ? (
-        <MovieFormModal
-          mode="edit"
-          title="Sửa phim"
-          description={editingMovie.tenPhim}
-          formState={editForm}
-          imageFile={editImageFile}
-          isSubmitting={updateMovieMutation.isPending}
-          onClose={resetEditState}
-          onSubmit={handleSubmitEdit}
-          onFieldChange={handleFormFieldChange(setEditForm)}
-          onImageChange={handleFileChange(setEditImageFile)}
+            title="Thêm phim"
+            description="Tạo phim mới"
+            formState={addForm}
+            imageFile={addImageFile}
+            isSubmitting={addMovieMutation.isPending}
+            onClose={resetAddState}
+            onSubmit={handleSubmitAdd}
+            onFieldChange={handleFormFieldChange(setAddForm)}
+            onImageChange={handleFileChange(setAddImageFile)}
         />
       ) : null}
 

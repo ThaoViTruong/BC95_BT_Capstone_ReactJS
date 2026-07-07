@@ -1,7 +1,6 @@
-import React, { useMemo, useState } from 'react'
+﻿import { useMemo, useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useQuery } from '@tanstack/react-query'
 import LoadingSpinner from '../components/LoadingSpinner'
@@ -13,6 +12,8 @@ const PROFILE_TABS = {
   info: 'info',
   tickets: 'tickets',
 }
+
+const TICKETS_PER_PAGE = 5
 
 const userInfoSchema = Yup.object({
   email: Yup.string().email('Email không hợp lệ').required('Email không được để trống'),
@@ -33,6 +34,13 @@ const userInfoSchema = Yup.object({
   }),
 })
 
+const formLabelClassName = 'mb-2 block text-sm font-semibold text-white'
+const formInputClassName =
+  'w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20'
+const formInputDisabledClassName =
+  'w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/65 outline-none'
+const cardClassName = 'rounded-[28px] border border-white/10 bg-[#10151f]/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)]'
+
 const getApiMessage = (content, fallbackMessage) => {
   if (typeof content === 'string' && content.trim()) return content
   if (content && typeof content === 'object') {
@@ -45,6 +53,24 @@ const getApiMessage = (content, fallbackMessage) => {
     }
   }
   return fallbackMessage
+}
+
+const formatDate = (dateValue) => {
+  if (!dateValue) {
+    return 'Chưa có dữ liệu'
+  }
+
+  const date = new Date(dateValue)
+
+  if (Number.isNaN(date.getTime())) {
+    return dateValue
+  }
+
+  return new Intl.DateTimeFormat('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(date)
 }
 
 const formatDateTime = (dateValue) => {
@@ -96,6 +122,7 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState(PROFILE_TABS.info)
   const [actionMessage, setActionMessage] = useState(null)
   const [selectedTicketId, setSelectedTicketId] = useState(null)
+  const [currentTicketPage, setCurrentTicketPage] = useState(1)
 
   const { data: allMovies } = useQuery({
     queryKey: ['allMoviesForProfile'],
@@ -214,8 +241,8 @@ const ProfilePage = () => {
 
   if (isError || !profile) {
     return (
-      <div className="min-h-screen bg-gray-950 px-4 py-16 text-white">
-        <div className="mx-auto max-w-3xl rounded-[28px] border border-gray-800 bg-gray-900/80 px-6 py-12 text-center">
+      <div className="min-h-screen bg-[#050d26] px-4 py-16 text-white">
+        <div className="mx-auto max-w-3xl rounded-[28px] border border-white/10 bg-[#10151f]/95 px-6 py-12 text-center">
           <h1 className="text-3xl font-bold">Không thể tải thông tin cá nhân</h1>
           <p className="mt-4 text-white/60">
             Vui lòng thử lại sau hoặc đăng nhập lại để tiếp tục.
@@ -699,9 +726,11 @@ const ProfilePage = () => {
                 </div>
               </div>
             )}
-          </div>
+          </section>
         </div>
       </div>
+
+      <TicketDetailModal selectedTicket={selectedTicket} onClose={() => setSelectedTicketId(null)} />
     </div>
   )
 }
