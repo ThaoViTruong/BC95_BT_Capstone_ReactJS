@@ -1,4 +1,3 @@
-import React from 'react'
 import Header from '../components/Header'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import Footer from '../components/Footer'
@@ -12,7 +11,7 @@ const HomeLayout = () => {
   const isProfileRoute = location.pathname === '/profile' || location.pathname === '/thongtincanhan'
 
   if (user?.maLoaiNguoiDung === 'QuanTri' && !isProfileRoute) {
-    return <Navigate to="/admin" replace />
+    return <Navigate to="/admin/films" replace />
   }
 
   return (
@@ -27,3 +26,4 @@ const HomeLayout = () => {
 }
 
 export default HomeLayout
+

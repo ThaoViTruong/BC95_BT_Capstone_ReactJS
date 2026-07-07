@@ -1,4 +1,4 @@
-import React, { useCallback, memo } from 'react';
+import { useCallback, memo } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
 import { logout, selectorIsLoggedIn, selectorUser } from '../store/authSlice';
@@ -20,13 +20,6 @@ const Header = () => {
         dispatch(logout());
     }, [dispatch, queryClient]);
     const displayName = profile?.hoTen || user?.hoTen || user?.taiKhoan || 'Người dùng'
-    const avatarText = displayName
-        .split(' ')
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((word) => word[0]?.toUpperCase())
-        .join('') || 'U'
-
     return (
         // 2. UX: Thêm `sticky top-0 z-50` để header luôn ghim ở trên cùng khi cuộn trang
         <header className="bg-gray-900 text-white shadow-lg sticky top-0 z-50">
@@ -85,3 +78,5 @@ const Header = () => {
 // 7. Tối ưu: Dùng React.memo để ngăn Header re-render không cần thiết nếu props không đổi 
 // (đặc biệt hữu ích nếu Header nằm trong Layout bọc toàn bộ app)
 export default memo(Header);
+
+

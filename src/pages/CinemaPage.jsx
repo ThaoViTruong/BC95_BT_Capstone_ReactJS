@@ -1,5 +1,4 @@
-import React from "react";
-import Cinema from "../components/Cinema";
+﻿import Cinema from "../components/Cinema";
 
 const CinemaPage = () => {
   return (
@@ -12,3 +11,4 @@ const CinemaPage = () => {
 };
 
 export default CinemaPage;
+

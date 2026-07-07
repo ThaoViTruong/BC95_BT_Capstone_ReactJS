@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+﻿import { useState, useMemo } from 'react'
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSeatList, useBookTicket } from "../hooks/useBooking";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -285,3 +285,4 @@ const InfoRow = ({ label, value, small = false }) => (
 );
 
 export default BookingMovie;
+

@@ -1,7 +1,6 @@
-import React, { useMemo, useState } from 'react'
+﻿import { useMemo, useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { useProfile, useUpdateUser } from '../hooks/useUser'
@@ -11,6 +10,8 @@ const PROFILE_TABS = {
   info: 'info',
   tickets: 'tickets',
 }
+
+const TICKETS_PER_PAGE = 5
 
 const userInfoSchema = Yup.object({
   email: Yup.string().email('Email không hợp lệ').required('Email không được để trống'),
@@ -30,6 +31,13 @@ const userInfoSchema = Yup.object({
     otherwise: (schema) => schema.notRequired(),
   }),
 })
+
+const formLabelClassName = 'mb-2 block text-sm font-semibold text-white'
+const formInputClassName =
+  'w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20'
+const formInputDisabledClassName =
+  'w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/65 outline-none'
+const cardClassName = 'rounded-[28px] border border-white/10 bg-[#10151f]/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)]'
 
 const getApiMessage = (content, fallbackMessage) => {
   if (typeof content === 'string' && content.trim()) {
@@ -53,6 +61,24 @@ const getApiMessage = (content, fallbackMessage) => {
   }
 
   return fallbackMessage
+}
+
+const formatDate = (dateValue) => {
+  if (!dateValue) {
+    return 'Chưa có dữ liệu'
+  }
+
+  const date = new Date(dateValue)
+
+  if (Number.isNaN(date.getTime())) {
+    return dateValue
+  }
+
+  return new Intl.DateTimeFormat('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(date)
 }
 
 const formatDateTime = (dateValue) => {
@@ -83,12 +109,35 @@ const formatCurrency = (value = 0) => {
   }).format(value)
 }
 
-const formLabelClassName = 'mb-2 block text-sm font-medium text-white'
-const formInputClassName =
-  'w-full rounded-2xl border border-white/10 bg-gray-950 px-4 py-3 text-sm text-white outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20'
-const formInputDisabledClassName =
-  'w-full rounded-2xl border border-white/10 bg-gray-950/70 px-4 py-3 text-sm text-white/65 outline-none'
-const summaryCardClassName = 'rounded-2xl border border-white/10 bg-black/20 p-4'
+const getRoleLabel = (role) => {
+  return role === 'QuanTri' ? 'Quản trị' : 'Khách hàng'
+}
+
+const getTicketCinemaInfo = (ticket) => {
+  const firstSeat = ticket?.danhSachGhe?.[0]
+
+  return {
+    heThongRap: firstSeat?.tenHeThongRap || 'Chưa có thông tin',
+    cumRap: firstSeat?.tenCumRap || 'Chưa có cụm rạp',
+    rap: firstSeat?.tenRap || 'Chưa có rạp',
+  }
+}
+
+const getUniqueSeats = (ticket) => {
+  const seatMap = new Map()
+
+  ;(ticket?.danhSachGhe || []).forEach((seat) => {
+    const seatKey = seat?.maGhe || seat?.tenGhe
+
+    if (!seatKey || seatMap.has(seatKey)) {
+      return
+    }
+
+    seatMap.set(seatKey, seat)
+  })
+
+  return Array.from(seatMap.values())
+}
 
 const renderFieldError = (formik, fieldName) => {
   if (!formik.touched[fieldName] || !formik.errors[fieldName]) {
@@ -98,43 +147,416 @@ const renderFieldError = (formik, fieldName) => {
   return <p className="mt-2 text-sm text-red-400">{formik.errors[fieldName]}</p>
 }
 
-const getSeatRenderKey = (prefix, seat, index) => {
-  return `${prefix}-${seat?.maGhe || seat?.tenGhe || 'ghe'}-${index}`
+const SummaryCard = ({ label, value, className = '' }) => (
+  <div className={`rounded-2xl border border-white/10 bg-white/[0.03] p-4 ${className}`}>
+    <p className="text-xs uppercase tracking-[0.2em] text-white/40">{label}</p>
+    <div className="mt-2 text-sm font-medium text-white">{value}</div>
+  </div>
+)
+
+const SidebarTabButton = ({ isActive, label, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`w-full rounded-2xl border px-4 py-4 text-left text-sm font-semibold transition ${
+      isActive
+        ? 'border-yellow-400/30 bg-yellow-400/90 text-gray-950 shadow-[0_14px_30px_rgba(250,204,21,0.15)]'
+        : 'border-white/10 bg-white/[0.03] text-white/85 hover:border-yellow-400/20 hover:bg-white/[0.06]'
+    }`}
+  >
+    {label}
+  </button>
+)
+
+const ProfileSidebar = ({ profile, activeTab, setActiveTab, ticketCount, latestTicket }) => {
+  const avatar = profile?.hoTen?.[0]?.toUpperCase() || profile?.taiKhoan?.[0]?.toUpperCase() || 'U'
+
+  return (
+    <aside className="rounded-[28px] border border-white/10 bg-gradient-to-b from-[#0f1b34] via-[#10203b] to-[#12284a] p-6 text-white shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+      <div className="flex items-center gap-4">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/35 bg-white/[0.03] text-2xl font-bold">
+          {avatar}
+        </div>
+        <div className="min-w-0">
+          <p className="truncate text-xl font-bold">{profile.hoTen || 'Người dùng'}</p>
+          <p className="mt-2 inline-flex rounded-full border border-yellow-400/15 bg-yellow-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-200">
+            {getRoleLabel(profile.maLoaiNguoiDung)}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+        <div className="rounded-2xl border border-white/10 bg-[#162845]/85 p-4">
+          <p className="text-xs uppercase tracking-[0.2em] text-white/70">Tổng vé đã đặt</p>
+          <p className="mt-2 text-3xl font-extrabold text-yellow-200">{ticketCount}</p>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-[#162845]/85 p-4">
+          <p className="text-xs uppercase tracking-[0.2em] text-white/70">Nhóm người dùng</p>
+          <p className="mt-2 text-lg font-bold">{profile.maNhom || 'GP00'}</p>
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-white/10 bg-[#162845]/85 p-4">
+        <p className="text-xs uppercase tracking-[0.2em] text-white/70">Giao dịch gần nhất</p>
+        <p className="mt-2 text-sm font-semibold text-white">
+          {latestTicket ? latestTicket.tenPhim : 'Chưa có lịch sử đặt vé'}
+        </p>
+        <p className="mt-1 text-sm text-white/75">
+          {latestTicket ? formatDateTime(latestTicket.ngayDat) : 'Chưa có dữ liệu'}
+        </p>
+      </div>
+
+      <div className="mt-6 space-y-3 border-t border-white/10 pt-6">
+        <SidebarTabButton
+          isActive={activeTab === PROFILE_TABS.info}
+          label="Thông tin khách hàng"
+          onClick={() => setActiveTab(PROFILE_TABS.info)}
+        />
+        <SidebarTabButton
+          isActive={activeTab === PROFILE_TABS.tickets}
+          label="Lịch sử mua hàng"
+          onClick={() => setActiveTab(PROFILE_TABS.tickets)}
+        />
+      </div>
+
+    </aside>
+  )
 }
 
-const getSeatIdentity = (seat) => {
-  return [
-    seat?.maGhe,
-    seat?.tenGhe,
-    seat?.tenRap,
-    seat?.tenCumRap,
-    seat?.ngayChieu,
-    seat?.gioChieu,
-  ]
-    .map((value) => String(value || ''))
-    .join('-')
+const ProfileInfoTab = ({ formik, actionMessage, updateUserMutation }) => (
+  <div className="space-y-6">
+    <div>
+      <h1 className="text-3xl font-black uppercase tracking-tight text-white">Thông tin khách hàng</h1>
+    </div>
+
+    {actionMessage ? (
+      <div
+        className={`rounded-2xl border px-4 py-3 text-sm ${
+          actionMessage.type === 'success'
+            ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
+            : 'border-red-500/30 bg-red-500/10 text-red-300'
+        }`}
+      >
+        {actionMessage.text}
+      </div>
+    ) : null}
+
+    <form onSubmit={formik.handleSubmit} className="space-y-6">
+      <section className={cardClassName}>
+        <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-white">Thông tin cá nhân</h2>
+          </div>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          <div>
+            <label className={formLabelClassName}>Họ và tên</label>
+            <input
+              type="text"
+              {...formik.getFieldProps('hoTen')}
+              placeholder="Nhập họ và tên"
+              className={formInputClassName}
+            />
+            {renderFieldError(formik, 'hoTen')}
+          </div>
+
+          <div>
+            <label className={formLabelClassName}>Tài khoản</label>
+            <input type="text" value={formik.values.taiKhoan} disabled className={formInputDisabledClassName} />
+          </div>
+
+          <div>
+            <label className={formLabelClassName}>Số điện thoại</label>
+            <input
+              type="text"
+              {...formik.getFieldProps('soDt')}
+              placeholder="Nhập số điện thoại"
+              className={formInputClassName}
+            />
+            {renderFieldError(formik, 'soDt')}
+          </div>
+
+          <div>
+            <label className={formLabelClassName}>Email</label>
+            <input
+              type="email"
+              {...formik.getFieldProps('email')}
+              placeholder="Nhập email"
+              className={formInputClassName}
+            />
+            {renderFieldError(formik, 'email')}
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-end border-t border-white/10 pt-6">
+          <button
+            type="submit"
+            disabled={updateUserMutation.isPending}
+            className="rounded-xl bg-yellow-400 px-5 py-3 text-sm font-bold text-gray-900 transition hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {updateUserMutation.isPending ? 'Đang lưu thông tin...' : 'Lưu thông tin'}
+          </button>
+        </div>
+      </section>
+
+      <section className={cardClassName}>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-white">Đổi mật khẩu</h2>
+          <p className="mt-1 text-sm text-white/55">Chỉ nhập khi bạn muốn thay đổi mật khẩu hiện tại.</p>
+        </div>
+
+        <div className="grid gap-5">
+          <div>
+            <label className={formLabelClassName}>Mật khẩu mới</label>
+            <input
+              type="password"
+              {...formik.getFieldProps('matKhau')}
+              placeholder="Để trống nếu không muốn thay đổi"
+              className={formInputClassName}
+            />
+            {renderFieldError(formik, 'matKhau')}
+          </div>
+
+          {formik.values.matKhau.trim() ? (
+            <div>
+              <label className={formLabelClassName}>Xác nhận mật khẩu</label>
+              <input
+                type="password"
+                {...formik.getFieldProps('xacNhanMatKhau')}
+                placeholder="Nhập lại mật khẩu mới"
+                className={formInputClassName}
+              />
+              {renderFieldError(formik, 'xacNhanMatKhau')}
+            </div>
+          ) : null}
+        </div>
+      </section>
+    </form>
+  </div>
+)
+
+const TicketDetailModal = ({ selectedTicket, onClose }) => {
+  if (!selectedTicket) {
+    return null
+  }
+
+  const cinemaInfo = getTicketCinemaInfo(selectedTicket)
+  const uniqueSeats = getUniqueSeats(selectedTicket)
+  const seatLabels = uniqueSeats.map((seat) => `Ghế ${seat.tenGhe}`)
+  const roomName = cinemaInfo.rap !== 'Chưa có rạp' ? cinemaInfo.rap : 'Chưa có thông tin'
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 py-6 backdrop-blur-sm">
+      <div className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-[28px] border border-white/10 bg-gradient-to-br from-[#071227] via-[#08111f] to-[#050b17] p-6 shadow-[0_30px_100px_rgba(0,0,0,0.6)] sm:p-8">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-2xl text-white transition hover:border-red-500/50 hover:bg-red-500/15 hover:text-red-300"
+          aria-label="Đóng chi tiết vé"
+        >
+          ×
+        </button>
+
+        <div className="flex flex-col gap-6 lg:flex-row">
+          <div className="mx-auto w-full max-w-[220px] lg:mx-0">
+            <img
+              src={selectedTicket.hinhAnh}
+              alt={selectedTicket.tenPhim}
+              className="h-[320px] w-full rounded-[28px] object-cover shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
+            />
+          </div>
+
+          <div className="flex-1">
+            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-red-300/80">Chi tiết vé</p>
+            <h3 className="mt-3 text-3xl font-black text-white sm:text-4xl">{selectedTicket.tenPhim}</h3>
+            <p className="mt-3 text-3xl font-black text-yellow-300">{formatCurrency(selectedTicket.giaVe)}</p>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <SummaryCard label="Mã đặt vé" value={`#${selectedTicket.maVe}`} className="border-white/10 bg-white/[0.03]" />
+              <SummaryCard
+                label="Thời gian"
+                value={formatDateTime(selectedTicket.ngayDat)}
+                className="border-white/10 bg-white/[0.03]"
+              />
+              <SummaryCard
+                label="Phòng chiếu"
+                value={roomName}
+                className="border-white/10 bg-white/[0.03]"
+              />
+              <SummaryCard
+                label="Số vé"
+                value={`${uniqueSeats.length} vé`}
+                className="border-white/10 bg-white/[0.03]"
+              />
+              <SummaryCard
+                label="Rạp"
+                value={
+                  <>
+                    <p>{cinemaInfo.heThongRap}</p>
+                    <p className="mt-1 text-sm text-white/60">{cinemaInfo.cumRap}</p>
+                  </>
+                }
+                className="border-white/10 bg-white/[0.03] md:col-span-2"
+              />
+              <SummaryCard
+                label="Số ghế"
+                value={seatLabels.length ? seatLabels.join(', ') : 'Chưa có dữ liệu ghế'}
+                className="border-white/10 bg-white/[0.03] md:col-span-2"
+              />
+            </div>
+
+            <div className="mt-6 border-t border-dashed border-yellow-400/20 pt-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.25em] text-red-200/70">Tổng tiền</p>
+                  <p className="mt-2 text-4xl font-black text-yellow-300">{formatCurrency(selectedTicket.giaVe)}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-red-700"
+                >
+                  Đóng chi tiết vé
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
-const normalizeTicketSeats = (seats = []) => {
-  const uniqueSeats = new Map()
+const ProfileTicketsTab = ({
+  tickets,
+  ticketCount,
+  selectedTicket,
+  onSelectTicket,
+  activePage,
+  totalPages,
+  onPreviousPage,
+  onNextPage,
+  onSelectPage,
+}) => (
+  <div className="space-y-6">
+    <div>
+      <h1 className="text-3xl font-black uppercase tracking-tight text-white">Lịch sử mua hàng</h1>
+    </div>
 
-  seats.forEach((seat) => {
-    const identity = getSeatIdentity(seat)
+    <div className={cardClassName}>
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-white">Danh sách đơn đã mua</h2>
+        </div>
+        <span className="inline-flex rounded-full border border-yellow-400/20 bg-yellow-400/10 px-4 py-2 text-sm font-semibold text-yellow-300">
+          Hiển thị {tickets.length} / {ticketCount} đơn
+        </span>
+      </div>
 
-    if (!uniqueSeats.has(identity)) {
-      uniqueSeats.set(identity, seat)
-    }
-  })
+      {ticketCount === 0 ? (
+        <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 px-6 py-14 text-center text-white/55">
+          Bạn chưa có lịch sử mua hàng.
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="overflow-x-auto">
+            <table className="min-w-full overflow-hidden rounded-2xl">
+              <thead>
+                <tr className=" text-left text-sm font-bold text-white">
+                  <th className="px-5 py-4">Mã vé</th>
+                  <th className="px-5 py-4">Phim</th>
+                  <th className="px-5 py-4">Rạp</th>
+                  <th className="px-5 py-4">Ngày đặt</th>
+                  <th className="px-5 py-4">Tổng cộng</th>
+                  <th className="px-5 py-4 text-right">Chi tiết</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tickets.map((ticket) => {
+                  const cinemaInfo = getTicketCinemaInfo(ticket)
+                  const isActive = selectedTicket?.maVe === ticket.maVe
 
-  return Array.from(uniqueSeats.values())
-}
+                  return (
+                    <tr
+                      key={ticket.maVe}
+                      className={`border-t border-white/10 text-sm text-white/85 ${
+                        isActive ? 'bg-yellow-400/10' : 'bg-black/15'
+                      }`}
+                    >
+                      <td className="px-5 py-4 font-semibold">#{ticket.maVe}</td>
+                      <td className="px-5 py-4">
+                        <div className="font-semibold text-white">{ticket.tenPhim}</div>
+                        <div className="mt-1 text-xs text-white/50">{ticket.thoiLuongPhim || 0} phút</div>
+                      </td>
+                      <td className="px-5 py-4">{cinemaInfo.heThongRap}</td>
+                      <td className="px-5 py-4">{formatDate(ticket.ngayDat)}</td>
+                      <td className="px-5 py-4 font-semibold text-yellow-300">{formatCurrency(ticket.giaVe)}</td>
+                      <td className="px-5 py-4 text-right">
+                        <button
+                          type="button"
+                          onClick={() => onSelectTicket(ticket.maVe)}
+                          className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                            isActive
+                              ? 'bg-yellow-400 text-gray-900'
+                              : 'border border-white/10 bg-white/[0.05] text-white hover:bg-white/[0.12]'
+                          }`}
+                        >
+                          Xem vé
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
 
-const normalizeTickets = (tickets = []) => {
-  return tickets.map((ticket) => ({
-    ...ticket,
-    danhSachGhe: normalizeTicketSeats(ticket?.danhSachGhe || []),
-  }))
-}
+          <div className="flex flex-col gap-4 border-t border-white/10 pt-6 xl:flex-row xl:items-center xl:justify-between">
+            <p className="text-sm text-white/70">
+              Trang <span className="font-semibold text-white">{activePage}</span> / {totalPages} - tổng cộng {ticketCount} đơn
+            </p>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={onPreviousPage}
+                disabled={activePage === 1}
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/[0.1] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Trước
+              </button>
+
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                <button
+                  key={page}
+                  type="button"
+                  onClick={() => onSelectPage(page)}
+                  className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                    page === activePage
+                      ? 'bg-yellow-400 text-gray-900'
+                      : 'border border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.1]'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+
+              <button
+                type="button"
+                onClick={onNextPage}
+                disabled={activePage === totalPages}
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/[0.1] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Sau
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+)
 
 const ProfilePage = () => {
   const isLoggedIn = useSelector(selectorIsLoggedIn)
@@ -145,17 +567,33 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState(PROFILE_TABS.info)
   const [actionMessage, setActionMessage] = useState(null)
   const [selectedTicketId, setSelectedTicketId] = useState(null)
+  const [currentTicketPage, setCurrentTicketPage] = useState(1)
 
   const tickets = useMemo(() => {
-    return normalizeTickets(profile?.thongTinDatVe || [])
-  }, [profile?.thongTinDatVe])
-  const selectedTicket = useMemo(() => {
-    return tickets.find((ticket) => ticket.maVe === selectedTicketId) || tickets[0] || null
-  }, [selectedTicketId, tickets])
+    const ticketList = profile?.thongTinDatVe || []
 
-  const avatar = profile?.hoTen?.[0]?.toUpperCase() || profile?.taiKhoan?.[0]?.toUpperCase() || 'U'
+    return [...ticketList].sort((ticketA, ticketB) => {
+      const timeA = new Date(ticketA.ngayDat || 0).getTime()
+      const timeB = new Date(ticketB.ngayDat || 0).getTime()
+
+      if (timeA !== timeB) {
+        return timeB - timeA
+      }
+
+      return Number(ticketB.maVe || 0) - Number(ticketA.maVe || 0)
+    })
+  }, [profile?.thongTinDatVe])
   const ticketCount = tickets.length
-  const latestTicket = tickets[0]
+  const latestTicket = tickets[0] || null
+  const totalTicketPages = Math.max(1, Math.ceil(ticketCount / TICKETS_PER_PAGE))
+  const activeTicketPage = Math.min(currentTicketPage, totalTicketPages)
+  const paginatedTickets = useMemo(() => {
+    const startIndex = (activeTicketPage - 1) * TICKETS_PER_PAGE
+    return tickets.slice(startIndex, startIndex + TICKETS_PER_PAGE)
+  }, [activeTicketPage, tickets])
+  const selectedTicket = useMemo(() => {
+    return tickets.find((ticket) => ticket.maVe === selectedTicketId) || null
+  }, [selectedTicketId, tickets])
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -189,11 +627,13 @@ const ProfilePage = () => {
       try {
         await updateUserMutation.mutateAsync(payload)
 
-        dispatch(login({
-          ...(currentUser || {}),
-          ...payload,
-          soDT: payload.soDt,
-        }))
+        dispatch(
+          login({
+            ...(currentUser || {}),
+            ...payload,
+            soDT: payload.soDt,
+          })
+        )
 
         resetForm({
           values: {
@@ -226,8 +666,8 @@ const ProfilePage = () => {
 
   if (isError || !profile) {
     return (
-      <div className="min-h-screen bg-gray-950 px-4 py-16 text-white">
-        <div className="mx-auto max-w-3xl rounded-[28px] border border-gray-800 bg-gray-900/80 px-6 py-12 text-center">
+      <div className="min-h-screen bg-[#050d26] px-4 py-16 text-white">
+        <div className="mx-auto max-w-3xl rounded-[28px] border border-white/10 bg-[#10151f]/95 px-6 py-12 text-center">
           <h1 className="text-3xl font-bold">Không thể tải thông tin cá nhân</h1>
           <p className="mt-4 text-white/60">Vui lòng thử lại sau hoặc đăng nhập lại để tiếp tục.</p>
         </div>
@@ -236,348 +676,42 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <div className="mx-auto max-w-6xl px-4 py-10">
-        <div className="rounded-[28px] border border-gray-800 bg-gradient-to-br from-gray-900 to-gray-950 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-start gap-5">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-yellow-400 text-3xl font-bold text-gray-900">
-                {avatar}
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <h1 className="text-3xl font-bold text-white">{profile.hoTen}</h1>
-                  <span className="rounded-full border border-yellow-400/30 bg-yellow-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-300">
-                    {profile.maLoaiNguoiDung === 'QuanTri' ? 'Quản trị' : 'Khách hàng'}
-                  </span>
-                </div>
-                <p className="mt-2 text-base text-white/60">@{profile.taiKhoan}</p>
-                <div className="mt-5 grid gap-4 sm:grid-cols-3">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.25em] text-white/35">Email</p>
-                    <p className="mt-2 text-sm text-white/85">{profile.email || 'Chưa cập nhật'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.25em] text-white/35">Số điện thoại</p>
-                    <p className="mt-2 text-sm text-white/85">{profile.soDT || 'Chưa cập nhật'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.25em] text-white/35">Lần đặt vé gần nhất</p>
-                    <p className="mt-2 text-sm text-white/85">
-                      {latestTicket ? formatDateTime(latestTicket.ngayDat) : 'Chưa có lịch sử đặt vé'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_bottom,_rgba(99,70,178,0.45),_transparent_35%),linear-gradient(135deg,#041230_0%,#06153a_55%,#07132b_100%)] text-white">
+      <div className="mx-auto max-w-7xl px-4 py-10">
+        <div className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
+          <ProfileSidebar
+            profile={profile}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            ticketCount={ticketCount}
+            latestTicket={latestTicket}
+          />
 
-            <div className="flex flex-col items-start gap-3 sm:items-end">
-              <div className="rounded-2xl border border-white/10 bg-black/25 px-5 py-4">
-                <p className="text-xs uppercase tracking-[0.25em] text-white/40">Tổng vé đã đặt</p>
-                <p className="mt-2 text-3xl font-bold text-yellow-300">{ticketCount}</p>
-              </div>
-              <Link to="/" className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10">
-                ← Trở về trang chủ
-              </Link>
-              {profile.maLoaiNguoiDung === 'QuanTri' ? (
-                <Link to="/admin" className="inline-flex items-center gap-2 rounded-xl bg-yellow-400 px-5 py-3 text-sm font-bold text-gray-900 transition-colors hover:bg-yellow-500">
-                  ⚙️ Trang quản trị
-                </Link>
-              ) : null}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 overflow-hidden rounded-[28px] border border-gray-800 bg-gray-900/80 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
-          <div className="flex flex-wrap gap-2 border-b border-gray-800 p-4">
-            <button
-              type="button"
-              onClick={() => setActiveTab(PROFILE_TABS.info)}
-              className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
-                activeTab === PROFILE_TABS.info
-                  ? 'bg-yellow-400 text-gray-900'
-                  : 'bg-gray-800 text-white/75 hover:bg-gray-700 hover:text-white'
-              }`}
-            >
-              Thông tin cá nhân
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab(PROFILE_TABS.tickets)}
-              className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
-                activeTab === PROFILE_TABS.tickets
-                  ? 'bg-yellow-400 text-gray-900'
-                  : 'bg-gray-800 text-white/75 hover:bg-gray-700 hover:text-white'
-              }`}
-            >
-              Lịch sử đặt vé
-            </button>
-          </div>
-
-          <div className="p-6 sm:p-8">
+          <section className="min-w-0">
             {activeTab === PROFILE_TABS.info ? (
-              <div className="grid gap-8 xl:grid-cols-[1.2fr_0.8fr]">
-                <form onSubmit={formik.handleSubmit} className="space-y-5">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">Cập nhật thông tin</h2>
-                    <p className="mt-2 text-sm text-white/60">Bạn có thể chỉnh sửa thông tin cá nhân và cập nhật mật khẩu tại đây.</p>
-                  </div>
-
-                  {actionMessage ? (
-                    <div className={`rounded-2xl border px-4 py-3 text-sm ${
-                      actionMessage.type === 'success'
-                        ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
-                        : 'border-red-500/30 bg-red-500/10 text-red-300'
-                    }`}>
-                      {actionMessage.text}
-                    </div>
-                  ) : null}
-
-                  <div className="grid gap-5 md:grid-cols-2">
-                    <div>
-                      <label className={formLabelClassName}>Tài khoản</label>
-                      <input
-                        type="text"
-                        value={formik.values.taiKhoan}
-                        disabled
-                        className={formInputDisabledClassName}
-                      />
-                    </div>
-
-                    <div>
-                      <label className={formLabelClassName}>Họ tên</label>
-                      <input
-                        type="text"
-                        {...formik.getFieldProps('hoTen')}
-                        placeholder="Nhập họ tên"
-                        className={formInputClassName}
-                      />
-                      {renderFieldError(formik, 'hoTen')}
-                    </div>
-
-                    <div>
-                      <label className={formLabelClassName}>Email</label>
-                      <input
-                        type="email"
-                        {...formik.getFieldProps('email')}
-                        placeholder="Nhập email"
-                        className={formInputClassName}
-                      />
-                      {renderFieldError(formik, 'email')}
-                    </div>
-
-                    <div>
-                      <label className={formLabelClassName}>Số điện thoại</label>
-                      <input
-                        type="text"
-                        {...formik.getFieldProps('soDt')}
-                        placeholder="Nhập số điện thoại"
-                        className={formInputClassName}
-                      />
-                      {renderFieldError(formik, 'soDt')}
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <label className={formLabelClassName}>Mật khẩu mới</label>
-                      <input
-                        type="password"
-                        {...formik.getFieldProps('matKhau')}
-                        placeholder="Để trống nếu không muốn thay đổi"
-                        className={formInputClassName}
-                      />
-                      {renderFieldError(formik, 'matKhau')}
-                    </div>
-
-                    {formik.values.matKhau.trim() ? (
-                      <div className="md:col-span-2">
-                        <label className={formLabelClassName}>Xác nhận mật khẩu</label>
-                        <input
-                          type="password"
-                          {...formik.getFieldProps('xacNhanMatKhau')}
-                          placeholder="Nhập lại mật khẩu mới để xác nhận"
-                          className={formInputClassName}
-                        />
-                        {renderFieldError(formik, 'xacNhanMatKhau')}
-                      </div>
-                    ) : null}
-                  </div>
-
-                  <div className="flex justify-end border-t border-white/10 pt-5">
-                    <button
-                      type="submit"
-                      disabled={updateUserMutation.isPending}
-                      className="inline-flex items-center gap-2 rounded-xl bg-yellow-400 px-5 py-3 text-sm font-bold text-gray-900 transition-colors hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
-                    >
-                      {updateUserMutation.isPending ? 'Đang cập nhật...' : 'Cập nhật thông tin'}
-                    </button>
-                  </div>
-                </form>
-
-                <div className="space-y-4 rounded-[24px] border border-white/10 bg-gray-950/60 p-6">
-                  <div>
-                    <h3 className="text-2xl font-bold text-white">Tóm tắt tài khoản</h3>
-                    <p className="mt-2 text-sm text-white/60">Thông tin hiện tại của tài khoản đang đăng nhập.</p>
-                  </div>
-
-                  <div className={summaryCardClassName}>
-                    <p className="text-xs uppercase tracking-[0.2em] text-white/40">Họ tên</p>
-                    <p className="mt-2 text-sm font-medium text-white">{profile.hoTen || 'Chưa cập nhật'}</p>
-                  </div>
-
-                  <div className={summaryCardClassName}>
-                    <p className="text-xs uppercase tracking-[0.2em] text-white/40">Email</p>
-                    <p className="mt-2 text-sm font-medium text-white">{profile.email || 'Chưa cập nhật'}</p>
-                  </div>
-
-                  <div className={summaryCardClassName}>
-                    <p className="text-xs uppercase tracking-[0.2em] text-white/40">Số điện thoại</p>
-                    <p className="mt-2 text-sm font-medium text-white">{profile.soDT || 'Chưa cập nhật'}</p>
-                  </div>
-
-                  <div className={summaryCardClassName}>
-                    <p className="text-xs uppercase tracking-[0.2em] text-white/40">Nhóm / Loại người dùng</p>
-                    <p className="mt-2 text-sm font-medium text-white">
-                      {profile.maNhom || 'GP00'} / {profile.maLoaiNguoiDung || 'Khách hàng'}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <ProfileInfoTab
+                formik={formik}
+                actionMessage={actionMessage}
+                updateUserMutation={updateUserMutation}
+              />
             ) : (
-              <div className="grid gap-8 xl:grid-cols-[1.05fr_0.95fr]">
-                <div>
-                  <div className="mb-5 flex items-center justify-between gap-3">
-                    <div>
-                      <h2 className="text-2xl font-bold text-white">Lịch sử đặt vé</h2>
-                      <p className="mt-2 text-sm text-white/60">Chọn một vé để xem chi tiết rạp, ghế và thời gian đặt.</p>
-                    </div>
-                    <span className="rounded-full border border-yellow-400/20 bg-yellow-400/10 px-4 py-2 text-sm font-semibold text-yellow-300">
-                      {ticketCount} vé
-                    </span>
-                  </div>
-
-                  {ticketCount === 0 ? (
-                    <div className="rounded-[24px] border border-dashed border-white/10 bg-gray-950/45 px-6 py-12 text-center text-white/55">
-                      Bạn chưa có lịch sử đặt vé nào.
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {tickets.map((ticket) => {
-                        const firstSeat = ticket.danhSachGhe?.[0]
-                        const isActive = ticket.maVe === selectedTicket?.maVe
-
-                        return (
-                          <button
-                            key={ticket.maVe}
-                            type="button"
-                            onClick={() => setSelectedTicketId(ticket.maVe)}
-                            className={`w-full rounded-[24px] border p-4 text-left transition ${
-                              isActive
-                                ? 'border-yellow-400/45 bg-yellow-400/10'
-                                : 'border-white/10 bg-gray-950/50 hover:border-yellow-400/20'
-                            }`}
-                          >
-                            <div className="flex gap-4">
-                              <img
-                                src={ticket.hinhAnh}
-                                alt={ticket.tenPhim}
-                                className="h-28 w-20 rounded-2xl object-cover"
-                              />
-                              <div className="min-w-0 flex-1">
-                                <div className="flex flex-wrap items-start justify-between gap-3">
-                                  <div>
-                                    <h3 className="text-lg font-semibold text-white">{ticket.tenPhim}</h3>
-                                    <p className="mt-1 text-sm text-white/55">{firstSeat?.tenHeThongRap || 'Chưa có thông tin rạp'}</p>
-                                  </div>
-                                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/65">
-                                    Mã vé #{ticket.maVe}
-                                  </span>
-                                </div>
-                                <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/65">
-                                  <span>🗓 {formatDateTime(ticket.ngayDat)}</span>
-                                  <span>🎟 {formatCurrency(ticket.giaVe)}</span>
-                                  <span>⏱ {ticket.thoiLuongPhim || 0} phút</span>
-                                </div>
-                                <div className="mt-4 flex flex-wrap gap-2">
-                                  {(ticket.danhSachGhe || []).map((seat, index) => (
-                                    <span
-                                      key={getSeatRenderKey(ticket.maVe, seat, index)}
-                                      className="rounded-full border border-yellow-400/20 bg-yellow-400/10 px-2.5 py-1 text-xs font-medium text-yellow-300"
-                                    >
-                                      Ghế {seat.tenGhe}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                <div className="rounded-[24px] border border-white/10 bg-gray-950/60 p-6">
-                  <h3 className="text-2xl font-bold text-white">Chi tiết vé đã đặt</h3>
-
-                  {selectedTicket ? (
-                    <div className="mt-6 space-y-5">
-                      <div className="flex items-start gap-4">
-                        <img
-                          src={selectedTicket.hinhAnh}
-                          alt={selectedTicket.tenPhim}
-                          className="h-36 w-24 rounded-2xl object-cover"
-                        />
-                        <div>
-                          <p className="text-xs uppercase tracking-[0.25em] text-white/40">Bộ phim</p>
-                          <h4 className="mt-2 text-2xl font-bold text-white">{selectedTicket.tenPhim}</h4>
-                          <p className="mt-2 text-sm text-yellow-300">{formatCurrency(selectedTicket.giaVe)}</p>
-                        </div>
-                      </div>
-
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <div className={summaryCardClassName}>
-                          <p className="text-xs uppercase tracking-[0.2em] text-white/40">Ngày đặt</p>
-                          <p className="mt-2 text-sm font-medium text-white">{formatDateTime(selectedTicket.ngayDat)}</p>
-                        </div>
-                        <div className={summaryCardClassName}>
-                          <p className="text-xs uppercase tracking-[0.2em] text-white/40">Mã vé</p>
-                          <p className="mt-2 text-sm font-medium text-white">#{selectedTicket.maVe}</p>
-                        </div>
-                        <div className={`${summaryCardClassName} sm:col-span-2`}>
-                          <p className="text-xs uppercase tracking-[0.2em] text-white/40">Rạp chiếu</p>
-                          <p className="mt-2 text-sm font-medium text-white">
-                            {selectedTicket.danhSachGhe?.[0]?.tenHeThongRap || 'Chưa có thông tin'}
-                          </p>
-                          <p className="mt-1 text-sm text-white/60">
-                            {selectedTicket.danhSachGhe?.[0]?.tenCumRap || 'Chưa có cụm rạp'} — {selectedTicket.danhSachGhe?.[0]?.tenRap || 'Chưa có rạp'}
-                          </p>
-                        </div>
-                        <div className={`${summaryCardClassName} sm:col-span-2`}>
-                          <p className="text-xs uppercase tracking-[0.2em] text-white/40">Danh sách ghế</p>
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {(selectedTicket.danhSachGhe || []).map((seat, index) => (
-                              <span
-                                key={getSeatRenderKey(`${selectedTicket.maVe}-detail`, seat, index)}
-                                className="rounded-full border border-yellow-400/20 bg-yellow-400/10 px-3 py-1 text-xs font-medium text-yellow-300"
-                              >
-                                Ghế {seat.tenGhe}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-black/20 px-5 py-12 text-center text-white/50">
-                      Chọn một vé ở danh sách bên trái để xem chi tiết.
-                    </div>
-                  )}
-                </div>
-              </div>
+              <ProfileTicketsTab
+                tickets={paginatedTickets}
+                ticketCount={ticketCount}
+                selectedTicket={selectedTicket}
+                onSelectTicket={setSelectedTicketId}
+                activePage={activeTicketPage}
+                totalPages={totalTicketPages}
+                onPreviousPage={() => setCurrentTicketPage((prev) => Math.max(prev - 1, 1))}
+                onNextPage={() => setCurrentTicketPage((prev) => Math.min(prev + 1, totalTicketPages))}
+                onSelectPage={setCurrentTicketPage}
+              />
             )}
-          </div>
+          </section>
         </div>
       </div>
+
+      <TicketDetailModal selectedTicket={selectedTicket} onClose={() => setSelectedTicketId(null)} />
     </div>
   )
 }

@@ -1,10 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react'
+﻿import { useState, useMemo } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { movieApi } from '../../api/movieApi'
 import { useMovieList } from '../../hooks/useMovies'
-
-const MA_NHOM = 'GP01'
+import { buildMovieFormData, emptyMovieForm, getApiMessage, MA_NHOM } from '../../utils/admin/movieFormUtils'
 const ITEMS_PER_PAGE = 8
 
 const statusOptions = [
@@ -13,19 +12,6 @@ const statusOptions = [
   { value: 'sapChieu', label: 'Sắp chiếu' },
   { value: 'hot', label: 'Nổi bật' },
 ]
-
-const emptyMovieForm = {
-  maPhim: '',
-  tenPhim: '',
-  biDanh: '',
-  trailer: '',
-  moTa: '',
-  ngayKhoiChieu: '',
-  danhGia: 0,
-  hot: false,
-  dangChieu: false,
-  sapChieu: false,
-}
 
 const labelClassName = 'mb-3 block text-sm font-semibold uppercase tracking-[0.22em] text-white'
 const inputClassName =
@@ -44,32 +30,6 @@ const formatDate = (dateValue) => {
   return date.toLocaleDateString('vi-VN')
 }
 
-const formatDateForInput = (dateValue) => {
-  if (!dateValue) {
-    return ''
-  }
-
-  const date = new Date(dateValue)
-  if (Number.isNaN(date.getTime())) {
-    return ''
-  }
-
-  return date.toISOString().slice(0, 10)
-}
-
-const formatDateForApi = (dateValue) => {
-  if (!dateValue) {
-    return ''
-  }
-
-  const [year, month, day] = dateValue.split('-')
-  if (!year || !month || !day) {
-    return ''
-  }
-
-  return `${day}/${month}/${year}`
-}
-
 const truncateText = (text, maxLength = 140) => {
   if (!text) {
     return 'Chưa có mô tả.'
@@ -82,87 +42,83 @@ const truncateText = (text, maxLength = 140) => {
   return `${text.slice(0, maxLength).trim()}...`
 }
 
-const slugifyText = (text) => {
-  if (!text) {
-    return ''
+const matchesStatusFilter = (movie, statusFilter) => {
+  if (statusFilter === 'all') {
+    return true
   }
 
-  return text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
+  return Boolean(movie?.[statusFilter])
 }
 
-const getApiMessage = (content, fallbackMessage) => {
-  if (typeof content === 'string' && content.trim()) {
-    return content
-  }
+const filterMovies = (movies, searchValue, statusFilter) => {
+  const keyword = searchValue.trim().toLowerCase()
 
-  if (content && typeof content === 'object') {
-    if (typeof content.message === 'string' && content.message.trim()) {
-      return content.message
-    }
+  return movies.filter((movie) => {
+    const matchesKeyword =
+      keyword === '' ||
+      movie.tenPhim?.toLowerCase().includes(keyword) ||
+      String(movie.maPhim).includes(keyword)
 
-    if (typeof content.content === 'string' && content.content.trim()) {
-      return content.content
-    }
-
-    if (content.content && typeof content.content === 'object') {
-      if (typeof content.content.message === 'string' && content.content.message.trim()) {
-        return content.content.message
-      }
-    }
-  }
-
-  return fallbackMessage
+    return matchesKeyword && matchesStatusFilter(movie, statusFilter)
+  })
 }
 
-const buildMovieFormData = (movieForm, imageFile, includeMovieId) => {
-  const formData = new FormData()
+const getMovieStats = (movies) => ({
+  total: movies.length,
+  dangChieu: movies.filter((movie) => movie.dangChieu).length,
+  sapChieu: movies.filter((movie) => movie.sapChieu).length,
+  hot: movies.filter((movie) => movie.hot).length,
+})
 
-  if (includeMovieId) {
-    formData.append('maPhim', movieForm.maPhim)
+const getMovieTags = (movie) => {
+  const tags = []
+
+  if (movie.hot) {
+    tags.push({
+      label: 'Nổi bật',
+      className: 'border border-red-500/20 bg-red-500/10 text-red-300',
+    })
   }
 
-  formData.append('tenPhim', movieForm.tenPhim.trim())
-  formData.append('biDanh', movieForm.biDanh.trim() || slugifyText(movieForm.tenPhim))
-  formData.append('trailer', movieForm.trailer.trim())
-  formData.append('moTa', movieForm.moTa.trim())
-  formData.append('maNhom', MA_NHOM)
-  formData.append('ngayKhoiChieu', formatDateForApi(movieForm.ngayKhoiChieu))
-  formData.append('danhGia', String(Number(movieForm.danhGia) || 0))
-  formData.append('hot', String(movieForm.hot))
-  formData.append('dangChieu', String(movieForm.dangChieu))
-  formData.append('sapChieu', String(movieForm.sapChieu))
-
-  if (imageFile) {
-    formData.append('hinhAnh', imageFile, imageFile.name)
+  if (movie.dangChieu) {
+    tags.push({
+      label: 'Đang chiếu',
+      className: 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-300',
+    })
   }
 
-  return formData
+  if (movie.sapChieu) {
+    tags.push({
+      label: 'Sắp chiếu',
+      className: 'border border-sky-500/20 bg-sky-500/10 text-sky-300',
+    })
+  }
+
+  return tags
 }
 
-const buildMoviePayload = (movieForm, currentImage) => {
-  return {
-    maPhim: Number(movieForm.maPhim),
-    tenPhim: movieForm.tenPhim.trim(),
-    biDanh: movieForm.biDanh.trim() || slugifyText(movieForm.tenPhim),
-    trailer: movieForm.trailer.trim(),
-    moTa: movieForm.moTa.trim(),
-    maNhom: MA_NHOM,
-    ngayKhoiChieu: formatDateForApi(movieForm.ngayKhoiChieu),
-    danhGia: Number(movieForm.danhGia) || 0,
-    hot: movieForm.hot,
-    dangChieu: movieForm.dangChieu,
-    sapChieu: movieForm.sapChieu,
-    hinhAnh: currentImage || '',
+const renderMovieTags = (movie) => {
+  const tags = getMovieTags(movie)
+
+  if (tags.length === 0) {
+    return null
   }
+
+  return (
+    <div className="mt-4 flex flex-wrap gap-2.5">
+      {tags.map((tag) => (
+        <span
+          key={`${movie.maPhim}-${tag.label}`}
+          className={`rounded-full px-3 py-1.5 text-sm font-medium ${tag.className}`}
+        >
+          {tag.label}
+        </span>
+      ))}
+    </div>
+  )
 }
 
 const MovieFormModal = ({
-  mode,
   title,
   description,
   formState,
@@ -173,8 +129,6 @@ const MovieFormModal = ({
   onFieldChange,
   onImageChange,
 }) => {
-  const submitLabel = mode === 'add' ? 'Thêm phim' : 'Lưu thay đổi'
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-8 backdrop-blur-sm">
       <div className="max-h-[90vh] w-full max-w-5xl overflow-auto rounded-[32px] border border-white/10 bg-[#101010] p-8 shadow-[0_30px_80px_rgba(0,0,0,0.45)]">
@@ -183,9 +137,7 @@ const MovieFormModal = ({
             <p className="text-sm uppercase tracking-[0.3em] text-red-400">{title}</p>
             <h3 className="mt-3 text-4xl font-bold text-white">{description}</h3>
             <p className="mt-3 text-base leading-8 text-white/75">
-              {mode === 'add'
-                ? 'Tạo phim mới với poster, ngày phát hành, trailer và trạng thái trình chiếu.'
-                : 'Cập nhật thông tin phim và lưu nội dung mới nhất lên hệ thống quản trị.'}
+              Tạo phim mới với poster, ngày phát hành, trailer và trạng thái trình chiếu.
             </p>
           </div>
 
@@ -209,17 +161,6 @@ const MovieFormModal = ({
                 className={inputClassName}
                 placeholder="Nhập tên phim"
                 required
-              />
-            </div>
-
-            <div>
-              <label className={labelClassName}>Bí danh</label>
-              <input
-                name="biDanh"
-                value={formState.biDanh}
-                onChange={onFieldChange}
-                className={inputClassName}
-                placeholder="Nhập bí danh"
               />
             </div>
 
@@ -274,7 +215,7 @@ const MovieFormModal = ({
             </div>
 
             <div>
-              <label className={labelClassName}>{mode === 'add' ? 'Ảnh poster' : 'Ảnh poster mới'}</label>
+              <label className={labelClassName}>Ảnh poster</label>
               <input
                 type="file"
                 accept="image/*"
@@ -284,9 +225,7 @@ const MovieFormModal = ({
               <p className="mt-3 text-sm text-white/65">
                 {imageFile
                   ? `Đã chọn tệp: ${imageFile.name}`
-                  : mode === 'add'
-                    ? 'Vui lòng chọn ảnh poster trước khi tạo phim.'
-                    : 'Để trống nếu muốn giữ nguyên ảnh hiện tại.'}
+                  : 'Vui lòng chọn ảnh poster trước khi tạo phim.'}
               </p>
             </div>
 
@@ -319,7 +258,7 @@ const MovieFormModal = ({
               disabled={isSubmitting}
               className="rounded-2xl bg-gradient-to-b from-red-500 to-red-700 px-6 py-4 text-base font-semibold text-white transition hover:from-red-400 hover:to-red-600 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {isSubmitting ? 'Đang xử lý...' : submitLabel}
+              {isSubmitting ? 'Đang xử lý...' : 'Thêm phim'}
             </button>
           </div>
         </form>
@@ -408,7 +347,7 @@ const FilmPage = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { data, isLoading, isError, error } = useMovieList(MA_NHOM, 1, 1000)
-  const movies = data?.items || []
+  const movies = useMemo(() => data?.items || [], [data])
   const [searchValue, setSearchValue] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
@@ -416,58 +355,22 @@ const FilmPage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [addForm, setAddForm] = useState(emptyMovieForm)
   const [addImageFile, setAddImageFile] = useState(null)
-  const [editingMovie, setEditingMovie] = useState(null)
-  const [editForm, setEditForm] = useState(emptyMovieForm)
-  const [editImageFile, setEditImageFile] = useState(null)
-  const [pendingEditRequest, setPendingEditRequest] = useState(null)
   const [movieToDelete, setMovieToDelete] = useState(null)
   const [resultPopup, setResultPopup] = useState(null)
 
-  const movieStats = useMemo(
-    () => ({
-      total: movies.length,
-      dangChieu: movies.filter((movie) => movie.dangChieu).length,
-      sapChieu: movies.filter((movie) => movie.sapChieu).length,
-      hot: movies.filter((movie) => movie.hot).length,
-    }),
-    [movies]
+  const movieStats = useMemo(() => getMovieStats(movies), [movies])
+  const filteredMovies = useMemo(
+    () => filterMovies(movies, searchValue, statusFilter),
+    [movies, searchValue, statusFilter]
   )
 
-  const filteredMovies = useMemo(() => {
-    const normalizedKeyword = searchValue.trim().toLowerCase()
-
-    return movies.filter((movie) => {
-      const matchesKeyword =
-        normalizedKeyword === '' ||
-        movie.tenPhim?.toLowerCase().includes(normalizedKeyword) ||
-        String(movie.maPhim).includes(normalizedKeyword)
-
-      const matchesStatus =
-        statusFilter === 'all' ||
-        (statusFilter === 'dangChieu' && movie.dangChieu) ||
-        (statusFilter === 'sapChieu' && movie.sapChieu) ||
-        (statusFilter === 'hot' && movie.hot)
-
-      return matchesKeyword && matchesStatus
-    })
-  }, [movies, searchValue, statusFilter])
-
   const totalPages = Math.max(1, Math.ceil(filteredMovies.length / ITEMS_PER_PAGE))
+  const activePage = Math.min(currentPage, totalPages)
 
   const paginatedMovies = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+    const startIndex = (activePage - 1) * ITEMS_PER_PAGE
     return filteredMovies.slice(startIndex, startIndex + ITEMS_PER_PAGE)
-  }, [filteredMovies, currentPage])
-
-  useEffect(() => {
-    setCurrentPage(1)
-  }, [searchValue, statusFilter])
-
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages)
-    }
-  }, [currentPage, totalPages])
+  }, [activePage, filteredMovies])
 
   const refreshMovieList = () => {
     queryClient.invalidateQueries({ queryKey: ['movieList', MA_NHOM] })
@@ -477,13 +380,6 @@ const FilmPage = () => {
     setIsAddModalOpen(false)
     setAddForm(emptyMovieForm)
     setAddImageFile(null)
-  }
-
-  const resetEditState = () => {
-    setEditingMovie(null)
-    setEditForm(emptyMovieForm)
-    setEditImageFile(null)
-    setPendingEditRequest(null)
   }
 
   const handleFormFieldChange = (setter) => (event) => {
@@ -509,34 +405,6 @@ const FilmPage = () => {
       setActionMessage({
         type: 'error',
         text: getApiMessage(mutationError.response?.data, 'Thêm phim thất bại. Vui lòng thử lại.'),
-      })
-    },
-  })
-
-  const updateMovieMutation = useMutation({
-    mutationFn: ({ payload, requestType }) => {
-      if (requestType === 'upload') {
-        return movieApi.updateMovie(payload)
-      }
-
-      return movieApi.updateMovieInfo(payload)
-    },
-    onSuccess: () => {
-      setPendingEditRequest(null)
-      resetEditState()
-      refreshMovieList()
-      setResultPopup({
-        type: 'success',
-        title: 'Cập nhật phim thành công',
-        message: 'Thông tin phim đã được lưu thành công trên hệ thống.',
-      })
-    },
-    onError: (mutationError) => {
-      setPendingEditRequest(null)
-      setResultPopup({
-        type: 'error',
-        title: 'Cập nhật phim thất bại',
-        message: getApiMessage(mutationError.response?.data, 'Cập nhật phim thất bại. Vui lòng thử lại.'),
       })
     },
   })
@@ -572,6 +440,16 @@ const FilmPage = () => {
     navigate(`/admin/films/edit/${movie.maPhim}`)
   }
 
+  const handleSearchChange = (event) => {
+    setSearchValue(event.target.value)
+    setCurrentPage(1)
+  }
+
+  const handleStatusChange = (event) => {
+    setStatusFilter(event.target.value)
+    setCurrentPage(1)
+  }
+
   const handleOpenShowtime = (movie) => {
     setActionMessage(null)
     navigate(`/admin/films/showtime/${movie.maPhim}`)
@@ -591,34 +469,7 @@ const FilmPage = () => {
       return
     }
 
-    addMovieMutation.mutate(buildMovieFormData(addForm, addImageFile, false))
-  }
-
-  const handleSubmitEdit = (event) => {
-    event.preventDefault()
-    setActionMessage(null)
-
-    const requestType = editImageFile ? 'upload' : 'info'
-    const payload = editImageFile
-      ? buildMovieFormData(editForm, editImageFile, true)
-      : buildMoviePayload(editForm, editingMovie?.hinhAnh)
-
-    setPendingEditRequest({
-      requestType,
-      payload,
-      movieName: editForm.tenPhim.trim() || editingMovie?.tenPhim || 'bộ phim này',
-    })
-  }
-
-  const handleConfirmEdit = () => {
-    if (!pendingEditRequest) {
-      return
-    }
-
-    updateMovieMutation.mutate({
-      payload: pendingEditRequest.payload,
-      requestType: pendingEditRequest.requestType,
-    })
+    addMovieMutation.mutate(buildMovieFormData({ movieForm: addForm, imageFile: addImageFile }))
   }
 
   const handleConfirmDelete = () => {
@@ -628,48 +479,6 @@ const FilmPage = () => {
 
     setActionMessage(null)
     deleteMovieMutation.mutate(movieToDelete.maPhim)
-  }
-
-  const renderMovieTags = (movie) => {
-    const tags = []
-
-    if (movie.biDanh) {
-      tags.push({
-        label: movie.biDanh,
-        className: 'border border-yellow-500/20 bg-yellow-500/10 text-yellow-300',
-      })
-    }
-
-    if (movie.hot) {
-      tags.push({
-        label: 'Nổi bật',
-        className: 'border border-red-500/20 bg-red-500/10 text-red-300',
-      })
-    }
-
-    if (movie.dangChieu) {
-      tags.push({
-        label: 'Đang chiếu',
-        className: 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-300',
-      })
-    }
-
-    if (movie.sapChieu) {
-      tags.push({
-        label: 'Sắp chiếu',
-        className: 'border border-sky-500/20 bg-sky-500/10 text-sky-300',
-      })
-    }
-
-    return (
-      <div className="mt-4 flex flex-wrap gap-2.5">
-        {tags.map((tag) => (
-          <span key={`${movie.maPhim}-${tag.label}`} className={`rounded-full px-3 py-1.5 text-sm font-medium ${tag.className}`}>
-            {tag.label}
-          </span>
-        ))}
-      </div>
-    )
   }
 
   return (
@@ -718,7 +527,7 @@ const FilmPage = () => {
                 id="film-search"
                 type="text"
                 value={searchValue}
-                onChange={(event) => setSearchValue(event.target.value)}
+                onChange={handleSearchChange}
                 placeholder="Tìm kiếm bằng tên hoặc ID  của phim..."
                 className={inputClassName}
               />
@@ -729,7 +538,7 @@ const FilmPage = () => {
               <select
                 id="film-status"
                 value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value)}
+                onChange={handleStatusChange}
                 className={inputClassName}
               >
                 {statusOptions.map((option) => (
@@ -865,14 +674,14 @@ const FilmPage = () => {
               {filteredMovies.length > 0 ? (
                 <div className="flex flex-col gap-5 border-t border-white/10 px-8 py-6 xl:flex-row xl:items-center xl:justify-between">
                   <p className="text-base text-white/75">
-                    Trang <span className="font-semibold text-white">{currentPage}</span> / {totalPages} - tổng cộng {filteredMovies.length} phim
+                    Trang <span className="font-semibold text-white">{activePage}</span> / {totalPages} - tổng cộng {filteredMovies.length} phim
                   </p>
 
                   <div className="flex flex-wrap items-center gap-3">
                     <button
                       type="button"
                       onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                      disabled={currentPage === 1}
+                      disabled={activePage === 1}
                       className="rounded-2xl border border-white/10 px-4 py-3 text-base text-white transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Trước
@@ -884,7 +693,7 @@ const FilmPage = () => {
                         type="button"
                         onClick={() => setCurrentPage(page)}
                         className={`rounded-2xl px-4 py-3 text-base font-semibold transition ${
-                          currentPage === page
+                          activePage === page
                             ? 'bg-red-600 text-white'
                             : 'border border-white/10 text-white hover:bg-white/5'
                         }`}
@@ -896,7 +705,7 @@ const FilmPage = () => {
                     <button
                       type="button"
                       onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                      disabled={currentPage === totalPages}
+                      disabled={activePage === totalPages}
                       className="rounded-2xl border border-white/10 px-4 py-3 text-base text-white transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Sau
@@ -911,47 +720,17 @@ const FilmPage = () => {
 
       {isAddModalOpen ? (
         <MovieFormModal
-          mode="add"
-          title="Thêm phim"
-          description="Tạo phim mới"
-          formState={addForm}
-          imageFile={addImageFile}
-          isSubmitting={addMovieMutation.isPending}
-          onClose={resetAddState}
-          onSubmit={handleSubmitAdd}
-          onFieldChange={handleFormFieldChange(setAddForm)}
-          onImageChange={handleFileChange(setAddImageFile)}
+            title="Thêm phim"
+            description="Tạo phim mới"
+            formState={addForm}
+            imageFile={addImageFile}
+            isSubmitting={addMovieMutation.isPending}
+            onClose={resetAddState}
+            onSubmit={handleSubmitAdd}
+            onFieldChange={handleFormFieldChange(setAddForm)}
+            onImageChange={handleFileChange(setAddImageFile)}
         />
       ) : null}
-
-      {editingMovie ? (
-        <MovieFormModal
-          mode="edit"
-          title="Sửa phim"
-          description={editingMovie.tenPhim}
-          formState={editForm}
-          imageFile={editImageFile}
-          isSubmitting={updateMovieMutation.isPending}
-          onClose={resetEditState}
-          onSubmit={handleSubmitEdit}
-          onFieldChange={handleFormFieldChange(setEditForm)}
-          onImageChange={handleFileChange(setEditImageFile)}
-        />
-      ) : null}
-
-      <ConfirmActionModal
-        isOpen={Boolean(pendingEditRequest)}
-        title="Xác nhận cập nhật phim"
-        description={
-          pendingEditRequest
-            ? `Bạn có chắc chắn muốn cập nhật thông tin của phim "${pendingEditRequest.movieName}" không?`
-            : ''
-        }
-        confirmLabel="Xác nhận cập nhật"
-        isSubmitting={updateMovieMutation.isPending}
-        onCancel={() => setPendingEditRequest(null)}
-        onConfirm={handleConfirmEdit}
-      />
 
       <ConfirmActionModal
         isOpen={Boolean(movieToDelete)}
@@ -969,3 +748,5 @@ const FilmPage = () => {
 }
 
 export default FilmPage
+
+
