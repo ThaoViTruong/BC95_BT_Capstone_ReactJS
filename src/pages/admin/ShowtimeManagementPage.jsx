@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import { Fragment, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import { useMovieList } from '../../hooks/useMovies'
@@ -137,7 +137,7 @@ const ShowtimeCard = ({ entry, onOpenCreate }) => {
 const ShowtimeManagementPage = () => {
   const navigate = useNavigate()
   const { data, isLoading } = useMovieList(MA_NHOM)
-  const movies = data?.items || []
+  const movies = useMemo(() => data?.items || [], [data])
   const dateOptions = useMemo(() => createDateOptions(), [])
   const [activeDate, setActiveDate] = useState(dateOptions[0]?.value || '')
   const [keyword, setKeyword] = useState('')
@@ -284,7 +284,7 @@ const ShowtimeManagementPage = () => {
               ))}
 
               {HALLS.map((hall) => (
-                <React.Fragment key={hall.id}>
+                <Fragment key={hall.id}>
                   <div className="flex min-h-[132px] flex-col justify-center rounded-[24px] border border-white/5 bg-white/[0.015] px-5">
                     <p className="text-3xl font-black text-white">{hall.name}</p>
                     <p className="mt-2 text-sm font-medium uppercase tracking-[0.18em] text-white/35">{hall.format}</p>
@@ -310,7 +310,7 @@ const ShowtimeManagementPage = () => {
                       ))}
                     </div>
                   </div>
-                </React.Fragment>
+                </Fragment>
               ))}
             </div>
           </div>
@@ -321,3 +321,5 @@ const ShowtimeManagementPage = () => {
 }
 
 export default ShowtimeManagementPage
+
+

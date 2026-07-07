@@ -1,106 +1,32 @@
-import React, { useEffect, useMemo, useState } from 'react'
+﻿import { useState, useEffect, useMemo } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { movieApi } from '../../api/movieApi'
 import { useMovieDetail } from '../../hooks/useMovies'
-
-const MA_NHOM = 'GP01'
-
-const emptyMovieForm = {
-  maPhim: '',
-  tenPhim: '',
-  biDanh: '',
-  trailer: '',
-  moTa: '',
-  ngayKhoiChieu: '',
-  danhGia: 0,
-  hot: false,
-  dangChieu: false,
-  sapChieu: false,
-}
+import {
+  buildMovieFormData,
+  emptyMovieForm,
+  formatDateForInput,
+  getApiMessage,
+  MA_NHOM,
+} from '../../utils/admin/movieFormUtils'
 
 const inputClassName =
   'w-full rounded-2xl border border-white/10 bg-[#181818] px-5 py-4 text-base text-white outline-none transition placeholder:text-white/40 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
 
 const labelClassName = 'mb-3 block text-sm font-semibold uppercase tracking-[0.22em] text-white'
 
-const formatDateForInput = (dateValue) => {
-  if (!dateValue) {
-    return ''
-  }
-
-  const date = new Date(dateValue)
-  if (Number.isNaN(date.getTime())) {
-    return ''
-  }
-
-  return date.toISOString().slice(0, 10)
-}
-
-const formatDateForApi = (dateValue) => {
-  if (!dateValue) {
-    return ''
-  }
-
-  const [year, month, day] = dateValue.split('-')
-  if (!year || !month || !day) {
-    return ''
-  }
-
-  return `${day}/${month}/${year}`
-}
-
-const slugifyText = (text) => {
-  if (!text) {
-    return ''
-  }
-
-  return text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+const getImageFileName = (imageUrl, movieName) => {
+  const sanitizedMovieName = String(movieName || 'poster-phim')
+    .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
-}
 
-const getApiMessage = (content, fallbackMessage) => {
-  if (typeof content === 'string' && content.trim()) {
-    return content
-  }
+  const matchedExtension = String(imageUrl || '').match(/\.(jpg|jpeg|png|webp|gif)(\?|$)/i)
+  const fileExtension = matchedExtension?.[1]?.toLowerCase() || 'jpg'
 
-  if (content && typeof content === 'object') {
-    if (typeof content.message === 'string' && content.message.trim()) {
-      return content.message
-    }
-
-    if (typeof content.content === 'string' && content.content.trim()) {
-      return content.content
-    }
-  }
-
-  return fallbackMessage
-}
-
-const buildMovieFormData = (movieForm, imageFile) => {
-  const formData = new FormData()
-
-  formData.append('maPhim', String(movieForm.maPhim))
-  formData.append('tenPhim', movieForm.tenPhim.trim())
-  formData.append('biDanh', movieForm.biDanh.trim() || slugifyText(movieForm.tenPhim))
-  formData.append('trailer', movieForm.trailer.trim())
-  formData.append('moTa', movieForm.moTa.trim())
-  formData.append('maNhom', MA_NHOM)
-  formData.append('ngayKhoiChieu', formatDateForApi(movieForm.ngayKhoiChieu))
-  formData.append('sapChieu', String(movieForm.sapChieu))
-  formData.append('dangChieu', String(movieForm.dangChieu))
-  formData.append('hot', String(movieForm.hot))
-  formData.append('danhGia', String(Number(movieForm.danhGia) || 0))
-
-  if (imageFile) {
-    formData.append('hinhAnh', imageFile, imageFile.name)
-  }
-
-  return formData
+  return `${sanitizedMovieName || 'poster-phim'}.${fileExtension}`
 }
 
 const ResultPopup = ({ result, onClose }) => {
@@ -150,20 +76,23 @@ const FilmEditPage = () => {
       return
     }
 
-    setFormState({
-      maPhim: movieDetail.maPhim || '',
-      tenPhim: movieDetail.tenPhim || '',
-      biDanh: movieDetail.biDanh || '',
-      trailer: movieDetail.trailer || '',
-      moTa: movieDetail.moTa || '',
-      ngayKhoiChieu: formatDateForInput(movieDetail.ngayKhoiChieu),
-      danhGia: movieDetail.danhGia ?? 0,
-      hot: Boolean(movieDetail.hot),
-      dangChieu: Boolean(movieDetail.dangChieu),
-      sapChieu: Boolean(movieDetail.sapChieu),
-    })
-    setCurrentImage(movieDetail.hinhAnh || '')
-    setImageFile(null)
+    const timeoutId = setTimeout(() => {
+      setFormState({
+        maPhim: movieDetail.maPhim || '',
+        tenPhim: movieDetail.tenPhim || '',
+        trailer: movieDetail.trailer || '',
+        moTa: movieDetail.moTa || '',
+        ngayKhoiChieu: formatDateForInput(movieDetail.ngayKhoiChieu),
+        danhGia: movieDetail.danhGia ?? 0,
+        hot: Boolean(movieDetail.hot),
+        dangChieu: Boolean(movieDetail.dangChieu),
+        sapChieu: Boolean(movieDetail.sapChieu),
+      })
+      setCurrentImage(movieDetail.hinhAnh || '')
+      setImageFile(null)
+    }, 0)
+
+    return () => clearTimeout(timeoutId)
   }, [movieDetail])
 
   const previewImage = useMemo(() => {
@@ -182,8 +111,57 @@ const FilmEditPage = () => {
     }
   }, [previewImage, imageFile])
 
+  const getUpdateMovieErrorMessage = (mutationError) => {
+    const rawMessage = getApiMessage(
+      mutationError.response?.data?.content || mutationError.response?.data,
+      'Không thể cập nhật phim. Vui lòng thử lại.'
+    )
+
+    return rawMessage.toLowerCase().includes('xóa')
+      ? 'Không thể cập nhật phim. Vui lòng kiểm tra lại thông tin hoặc ảnh poster.'
+      : rawMessage
+  }
+
+  const ensureMovieImageFile = async (nextImageFile, imageUrl, movieName) => {
+    if (nextImageFile) {
+      return nextImageFile
+    }
+
+    if (!imageUrl) {
+      return null
+    }
+
+    try {
+      const response = await fetch(imageUrl)
+
+      if (!response.ok) {
+        return null
+      }
+
+      const imageBlob = await response.blob()
+      return new File([imageBlob], getImageFileName(imageUrl, movieName), { type: imageBlob.type || 'image/jpeg' })
+    } catch {
+      return null
+    }
+  }
+
   const updateMovieMutation = useMutation({
-    mutationFn: (payload) => movieApi.updateMovie(payload),
+    mutationFn: async ({ movieForm, nextImageFile, fallbackAlias, nextCurrentImage }) => {
+      const resolvedImageFile = await ensureMovieImageFile(
+        nextImageFile,
+        nextCurrentImage,
+        movieForm.tenPhim
+      )
+
+      return movieApi.updateMovie(
+        buildMovieFormData({
+          movieForm,
+          imageFile: resolvedImageFile,
+          includeMovieId: true,
+          fallbackAlias,
+        })
+      )
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['movieList', MA_NHOM] })
       queryClient.invalidateQueries({ queryKey: ['movieDetail', idFilm] })
@@ -197,7 +175,7 @@ const FilmEditPage = () => {
       setResultPopup({
         type: 'error',
         title: 'Cập nhật phim thất bại',
-        message: getApiMessage(mutationError.response?.data?.content, 'Không thể cập nhật phim. Vui lòng thử lại.'),
+        message: getUpdateMovieErrorMessage(mutationError),
       })
     },
   })
@@ -216,7 +194,12 @@ const FilmEditPage = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    updateMovieMutation.mutate(buildMovieFormData(formState, imageFile))
+    updateMovieMutation.mutate({
+      movieForm: formState,
+      nextImageFile: imageFile,
+      nextCurrentImage: currentImage,
+      fallbackAlias: movieDetail?.biDanh || '',
+    })
   }
 
   if (isLoading) {
@@ -244,9 +227,6 @@ const FilmEditPage = () => {
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-400">Chỉnh sửa phim</p>
           <h1 className="mt-3 text-4xl font-bold text-white">Cập nhật phim #{formState.maPhim}</h1>
-          <p className="mt-3 text-base leading-8 text-white/70">
-            Cập nhật thông tin phim tại trang quản trị và gửi dữ liệu bằng `FormData` qua API `CapNhatPhimUpload`.
-          </p>
         </div>
         <button
           type="button"
@@ -269,17 +249,6 @@ const FilmEditPage = () => {
                 className={inputClassName}
                 placeholder="Nhập tên phim"
                 required
-              />
-            </div>
-
-            <div>
-              <label className={labelClassName}>Bí danh</label>
-              <input
-                name="biDanh"
-                value={formState.biDanh}
-                onChange={handleFieldChange}
-                className={inputClassName}
-                placeholder="Nhập bí danh"
               />
             </div>
 
@@ -397,3 +366,5 @@ const FilmEditPage = () => {
 }
 
 export default FilmEditPage
+
+

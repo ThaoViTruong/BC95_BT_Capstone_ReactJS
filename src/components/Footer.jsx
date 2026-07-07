@@ -1,5 +1,4 @@
-import React from "react";
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 
 const iconClassName = "h-4 w-4 text-yellow-400";
 
@@ -172,3 +171,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

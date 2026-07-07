@@ -1,6 +1,4 @@
-import React from "react";
-
-/**
+﻿/**
  * LoadingSpinner Component
  * @param {string} size - "sm" | "md" | "lg" - kích thước spinner
  * @param {string} text - Text hiển thị

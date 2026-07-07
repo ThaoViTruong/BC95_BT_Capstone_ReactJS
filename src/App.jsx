@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom"
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
 import LoginPage from "./pages/LoginPage"
 import HomeLayout from "./Layout/HomeLayout"
 import MovieListPage from "./pages/MovieListPage"
@@ -66,7 +66,7 @@ function App() {
                 <AdminLayout />
               </ProtectedAdminRoute>
             }>
-              <Route index element={<FilmPage />} />
+              <Route index element={<Navigate to="films" replace />} />
               <Route path="profile" element={<ProfilePage />} />
               <Route path="users" element={<UserPage />} />
               <Route path="films" element={<FilmPage />} />

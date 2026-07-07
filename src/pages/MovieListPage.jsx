@@ -1,5 +1,5 @@
 // src/pages/MovieListPage.jsx
-import React, { useState, useEffect } from "react";
+import { useState } from 'react'
 import { useMovieList } from "../hooks/useMovies";
 import { useDebounce } from "../hooks/useDebounce";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -13,10 +13,6 @@ const MovieListPage = () => {
   const pageSize = 10;
 
   const debouncedSearch = useDebounce(search, 500);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearch]);
 
   // ⭐ Khi search: lấy nhiều phim để filter. Không search: phân trang bình thường
   const { data, isLoading, isError, error, isFetching } = useMovieList(
@@ -46,6 +42,11 @@ const MovieListPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Banner />
@@ -67,7 +68,7 @@ const MovieListPage = () => {
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={handleSearchChange}
             placeholder="Tìm kiếm tên phim..."
             className="w-full rounded-full border border-gray-700 bg-gray-800 py-3 pl-12 pr-12 text-white placeholder-gray-400 outline-none transition-all focus:ring-2 focus:ring-yellow-400"
           />
@@ -75,7 +76,10 @@ const MovieListPage = () => {
           {search && (
             <button
               type="button"
-              onClick={() => setSearch("")}
+              onClick={() => {
+                setSearch("");
+                setCurrentPage(1);
+              }}
               className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-white"
             >
               ✕
@@ -189,3 +193,4 @@ const MovieListPage = () => {
 };
 
 export default MovieListPage;
+

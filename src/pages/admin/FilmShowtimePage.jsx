@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { cinemaApi } from '../../api/cinemaApi'
@@ -105,26 +105,16 @@ const FilmShowtimePage = () => {
   const [ngayChieuGioChieu, setNgayChieuGioChieu] = useState('')
   const [giaVe, setGiaVe] = useState(75000)
   const [resultPopup, setResultPopup] = useState(null)
-  const { data: cumRapTheoHeThong = [], isLoading: isLoadingCumRap } = useCumRapTheoHeThong(selectedHeThongRap)
-
-  useEffect(() => {
-    if (heThongRap.length > 0 && !selectedHeThongRap) {
-      setSelectedHeThongRap(heThongRap[0].maHeThongRap)
-    }
-  }, [heThongRap, selectedHeThongRap])
-
-  useEffect(() => {
-    if (cumRapTheoHeThong.length > 0) {
-      setSelectedCumRap(cumRapTheoHeThong[0].maCumRap)
-      return
-    }
-
-    setSelectedCumRap('')
-  }, [cumRapTheoHeThong])
+  const activeHeThongRap = selectedHeThongRap || heThongRap[0]?.maHeThongRap || ''
+  const { data: cumRapTheoHeThong = [], isLoading: isLoadingCumRap } = useCumRapTheoHeThong(activeHeThongRap)
+  const activeCumRap =
+    cumRapTheoHeThong.find((cumRap) => cumRap.maCumRap === selectedCumRap)?.maCumRap ||
+    cumRapTheoHeThong[0]?.maCumRap ||
+    ''
 
   const selectedCumRapData = useMemo(
-    () => cumRapTheoHeThong.find((cumRap) => cumRap.maCumRap === selectedCumRap),
-    [cumRapTheoHeThong, selectedCumRap]
+    () => cumRapTheoHeThong.find((cumRap) => cumRap.maCumRap === activeCumRap),
+    [activeCumRap, cumRapTheoHeThong]
   )
 
   const createShowtimeMutation = useMutation({
@@ -222,7 +212,7 @@ const FilmShowtimePage = () => {
               <div>
                 <label className={labelClassName}>Hệ thống rạp</label>
                 <select
-                  value={selectedHeThongRap}
+                  value={activeHeThongRap}
                   onChange={(event) => setSelectedHeThongRap(event.target.value)}
                   className={inputClassName}
                   disabled={isLoadingHeThongRap || heThongRap.length === 0}
@@ -242,10 +232,10 @@ const FilmShowtimePage = () => {
               <div>
                 <label className={labelClassName}>Cụm rạp</label>
                 <select
-                  value={selectedCumRap}
+                  value={activeCumRap}
                   onChange={(event) => setSelectedCumRap(event.target.value)}
                   className={inputClassName}
-                  disabled={!selectedHeThongRap || isLoadingCumRap || cumRapTheoHeThong.length === 0}
+                  disabled={!activeHeThongRap || isLoadingCumRap || cumRapTheoHeThong.length === 0}
                 >
                   {cumRapTheoHeThong.length === 0 ? (
                     <option value="">Không có cụm rạp</option>
@@ -335,3 +325,5 @@ const FilmShowtimePage = () => {
 }
 
 export default FilmShowtimePage
+
+

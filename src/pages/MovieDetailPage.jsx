@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+﻿import { useState, useRef } from 'react'
 import { Link, useParams } from "react-router-dom";
 import { useMovieDetail, useMovieShowtimes } from "../hooks/useMovies";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -402,3 +402,4 @@ const MovieDetailPage = () => {
 };
 
 export default MovieDetailPage;
+

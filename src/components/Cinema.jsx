@@ -1,5 +1,5 @@
-// src/components/Cinema.jsx
-import React, { useState } from "react";
+﻿// src/components/Cinema.jsx
+import { useState } from 'react'
 import { Link } from "react-router-dom";
 import { useHeThongRap, useLichChieuHeThongRap } from "../hooks/useCinema";
 import LoadingSpinner from "./LoadingSpinner";
@@ -229,3 +229,5 @@ const Cinema = () => {
 };
 
 export default Cinema;
+
+

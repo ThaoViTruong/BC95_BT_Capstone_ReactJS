@@ -1,4 +1,4 @@
-import React from 'react'
+import { memo } from 'react'
 import { Link } from 'react-router-dom'
 
 // Ảnh fallback khi load lỗi
@@ -85,4 +85,4 @@ const MovieCard = ({ movie }) => {
 }
 
 // Tránh re-render không cần thiết
-export default React.memo(MovieCard)
+export default memo(MovieCard)
