@@ -245,8 +245,6 @@ const FilmPage = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { data, isLoading, isError, error } = useMovieList(MA_NHOM)
-
-  // ✅ FIX: Đảm bảo movies luôn là array
   const movies = useMemo(() => {
     if (Array.isArray(data)) return data
     if (Array.isArray(data?.items)) return data.items

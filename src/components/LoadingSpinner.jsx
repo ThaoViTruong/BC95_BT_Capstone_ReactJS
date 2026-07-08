@@ -1,12 +1,11 @@
 import React from "react";
 
 /**
- * LoadingSpinner Component - Tối ưu tốc độ hiển thị
- * @param {string} size - "sm" | "md" | "lg"
- * @param {string} text - Text hiển thị (để "" nếu không muốn hiện)
- * @param {boolean} fullScreen - Full màn hình hay inline
- * @param {boolean} overlay - Nền mờ overlay
- * @param {number} delay - Delay ms trước khi hiện spinner (tránh flash khi load nhanh)
+ * @param {string} size 
+ * @param {string} text
+ * @param {boolean} fullScreen 
+ * @param {boolean} overlay
+ * @param {number} delay 
  */
 const LoadingSpinner = ({
   size = "md",
@@ -17,8 +16,6 @@ const LoadingSpinner = ({
 }) => {
   const [show, setShow] = React.useState(delay === 0);
 
-  // Delay hiển thị: nếu API trả về < 200ms thì KHÔNG hiện spinner
-  // → Tránh cảm giác "chớp tắt" khó chịu
   React.useEffect(() => {
     if (delay === 0) return;
     const timer = setTimeout(() => setShow(true), delay);

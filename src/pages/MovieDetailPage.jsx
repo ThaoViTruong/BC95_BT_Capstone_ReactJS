@@ -78,7 +78,6 @@ const MovieDetailPage = () => {
             </div>
 
             <div className="flex-1 flex flex-col justify-end">
-              {/* Badges */}
               <div className="flex flex-wrap gap-2 mb-4">
                 {movie?.hot && (
                   <span
@@ -105,8 +104,6 @@ const MovieDetailPage = () => {
                   </span>
                 )}
               </div>
-
-              {/* Title */}
               <h1
                 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 
                               bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent 
@@ -250,7 +247,6 @@ const MovieDetailPage = () => {
             </div>
           ) : showtimes?.heThongRapChieu?.length > 0 ? (
             <div className="flex min-h-[500px]">
-              {/* Sidebar */}
               <div className="w-20 sm:w-24 border-r border-gray-800 bg-gray-900/50 flex-shrink-0">
                 {showtimes.heThongRapChieu.map((heThong, index) => (
                   <button
@@ -293,7 +289,6 @@ const MovieDetailPage = () => {
                         </div>
                       </div>
 
-                      {/* Lịch chiếu */}
                       <div className="flex flex-wrap gap-2 sm:gap-3 ml-5">
                         {cumRap.lichChieuPhim.slice(0, 12).map((lich) => {
                           const date = new Date(lich.ngayChieuGioChieu);

@@ -1,10 +1,8 @@
-﻿// src/components/Cinema.jsx
-import { useState, useMemo, useEffect } from "react";
+﻿import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useHeThongRap, useLichChieuHeThongRap } from "../hooks/useCinema";
 import LoadingSpinner from "./LoadingSpinner";
 
-// ===== HÀM FORMAT =====
 const formatTimeOnly = (isoString) => {
   if (!isoString) return "";
   const d = new Date(isoString);
@@ -19,7 +17,6 @@ const formatPrice = (price) => {
   return `${price}đ`;
 };
 
-// So sánh 2 ngày có cùng năm/tháng/ngày không
 const isSameDay = (d1, d2) => {
   return (
     d1.getFullYear() === d2.getFullYear() &&
@@ -28,7 +25,6 @@ const isSameDay = (d1, d2) => {
   );
 };
 
-// Chuyển Date -> key dạng "YYYY-MM-DD"
 const dateToKey = (date) => {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -36,7 +32,6 @@ const dateToKey = (date) => {
   return `${y}-${m}-${d}`;
 };
 
-// Lấy label thứ trong tuần
 const getDayLabel = (date) => {
   const today = new Date();
   if (isSameDay(date, today)) return "Hôm nay";
@@ -71,7 +66,6 @@ const Cinema = () => {
     danhSachCumRap.find((c) => c.maCumRap === selectedCumRap) ||
     danhSachCumRap[0];
 
-  // ===== LẤY DANH SÁCH NGÀY CÓ LỊCH CHIẾU (SẮP XẾP TĂNG DẦN) =====
   const availableDates = useMemo(() => {
     if (!currentCumRap?.danhSachPhim) return [];
 
@@ -80,13 +74,11 @@ const Cinema = () => {
       phim.lstLichChieuTheoPhim?.forEach((lich) => {
         const d = new Date(lich.ngayChieuGioChieu);
         if (isNaN(d.getTime())) return;
-        // Loại bỏ giờ, chỉ giữ ngày
         d.setHours(0, 0, 0, 0);
         dateSet.add(d.getTime());
       });
     });
 
-    // Chuyển về mảng Date và sắp xếp tăng dần theo thời gian
     const sortedDates = Array.from(dateSet)
       .sort((a, b) => a - b)
       .map((timestamp) => {
@@ -103,7 +95,6 @@ const Cinema = () => {
     return sortedDates;
   }, [currentCumRap]);
 
-  // ===== TỰ ĐỘNG CHỌN NGÀY ĐẦU TIÊN KHI ĐỔI CỤM RẠP =====
   useEffect(() => {
     if (availableDates.length > 0) {
       const isCurrentValid = availableDates.some(
@@ -117,7 +108,6 @@ const Cinema = () => {
     }
   }, [availableDates, selectedDate]);
 
-  // ===== LỌC PHIM & SUẤT CHIẾU THEO NGÀY ĐÃ CHỌN =====
   const filteredPhimByDate = useMemo(() => {
     if (!currentCumRap?.danhSachPhim || !selectedDate) return [];
 
@@ -139,7 +129,6 @@ const Cinema = () => {
 
   return (
     <div>
-      {/* Tiêu đề section */}
       <div className="text-center mb-8">
         <h2 className="text-3xl md:text-4xl font-bold mb-2">
           Lịch chiếu theo <span className="text-yellow-400">Rạp</span>
@@ -152,7 +141,6 @@ const Cinema = () => {
       {isLoadingHeThongRap && <LoadingSpinner />}
 
       <div className="flex flex-col md:flex-row gap-6">
-        {/* CỘT 1: HỆ THỐNG RẠP */}
         <div className="md:w-64 flex-shrink-0">
           <h3 className="text-gray-400 text-xs uppercase tracking-widest mb-4 font-medium">
             Chuỗi rạp
@@ -186,7 +174,6 @@ const Cinema = () => {
           </div>
         </div>
 
-        {/* CỘT 2+3: CỤM RẠP & LỊCH CHIẾU */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-6">
             <img
@@ -207,7 +194,6 @@ const Cinema = () => {
 
           {!isLoadingLichChieu && danhSachCumRap.length > 0 && (
             <div className="grid grid-cols-12 gap-0 bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-              {/* DANH SÁCH CỤM RẠP */}
               <div className="col-span-12 md:col-span-5 border-r border-gray-800 max-h-[750px] overflow-y-auto">
                 {danhSachCumRap.map((cumRap) => (
                   <button
@@ -232,9 +218,7 @@ const Cinema = () => {
                 ))}
               </div>
 
-              {/* DANH SÁCH PHIM + SUẤT CHIẾU */}
               <div className="col-span-12 md:col-span-7 max-h-[750px] overflow-y-auto">
-                {/* ===== THANH CHỌN NGÀY (CHỈ HIỂN THỊ NGÀY CÓ LỊCH CHIẾU) ===== */}
                 {availableDates.length > 0 && (
                   <div className="sticky top-0 z-10 bg-gray-900 border-b border-gray-800 px-3 py-3">
                     <div className="flex gap-1 overflow-x-auto scrollbar-hide">
@@ -267,13 +251,11 @@ const Cinema = () => {
                   </div>
                 )}
 
-                {/* Banner thông báo */}
                 <div className="mx-4 mt-4 bg-yellow-400/10 border border-yellow-400/40 text-yellow-400 text-sm px-4 py-2.5 rounded-lg flex items-center gap-2">
                   <span>ⓘ</span>
                   <span>Nhấn vào suất chiếu để tiến hành mua vé</span>
                 </div>
 
-                {/* Thông tin cụm rạp đang chọn */}
                 {currentCumRap && (
                   <div className="px-4 py-3 border-b border-gray-800">
                     <p className="text-white font-semibold text-sm">
@@ -285,7 +267,6 @@ const Cinema = () => {
                   </div>
                 )}
 
-                {/* Danh sách phim theo ngày */}
                 {filteredPhimByDate.length ? (
                   filteredPhimByDate.map((phim) => (
                     <div

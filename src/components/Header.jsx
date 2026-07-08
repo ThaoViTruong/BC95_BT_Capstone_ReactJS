@@ -30,7 +30,6 @@ const Header = () => {
             .join('') || 'U';
 
     return (
-        // ⭐ SỬA: Bỏ "sticky top-0 z-50" → header sẽ cuộn theo trang
         <header className="bg-gray-900 text-white shadow-lg">
             <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
                 <Link

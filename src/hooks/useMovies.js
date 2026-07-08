@@ -32,7 +32,6 @@ export const useMovieDetail = (maPhim) => {
   });
 };
 
-// lấy tên cho banner
 export const useMovieDetails = (maPhimList = []) => {
   return useQueries({
     queries: maPhimList.map((maPhim) => ({

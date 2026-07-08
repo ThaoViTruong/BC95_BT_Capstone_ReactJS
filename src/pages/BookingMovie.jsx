@@ -5,7 +5,6 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import BookingSuccessModal from "../components/BookingSuccessModal";
 
 const BookingMovie = () => {
-  /* ============ 1. HOOKS ============ */
   const { maLichChieu } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, isError } = useSeatList(maLichChieu);
@@ -19,7 +18,6 @@ const BookingMovie = () => {
     [selectedSeats]
   );
 
-  /* ============ 2. HANDLERS ============ */
   const handleSelectSeat = (ghe) => {
     if (ghe.daDat) return;
     setSelectedSeats((prev) => {
@@ -62,7 +60,6 @@ const BookingMovie = () => {
     navigate("/profile", { state: { activeTab: "history" } });
   };
 
-  /* ============ 3. EARLY RETURN ============ */
   if (isLoading) return <LoadingSpinner />;
 
   if (isError || !data) {
@@ -80,13 +77,10 @@ const BookingMovie = () => {
     );
   }
 
-  /* ============ 4. DESTRUCTURE DATA ============ */
   const { thongTinPhim, danhSachGhe } = data;
 
-  /* ============ 5. RENDER ============ */
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      {/* ⭐ Back button - Dùng navigate(-1) giống nút back trình duyệt */}
       <div className="max-w-7xl mx-auto px-4 pt-6">
         <button
           onClick={() => navigate(-1)}
@@ -100,17 +94,13 @@ const BookingMovie = () => {
         </button>
       </div>
 
-      {/* Main grid: SEATS + INFO */}
       <div className="max-w-7xl mx-auto px-4 pb-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* ============ LEFT: SƠ ĐỒ GHẾ ============ */}
         <div className="lg:col-span-2">
-          {/* Màn hình */}
           <div className="mb-8">
             <div className="mx-auto w-4/5 h-2 bg-gradient-to-r from-transparent via-yellow-400 to-transparent rounded-full mb-2 shadow-[0_0_30px_5px_rgba(250,204,21,0.4)]" />
             <p className="text-center text-gray-400 text-sm">MÀN HÌNH</p>
           </div>
 
-          {/* Grid ghế */}
           <div className="bg-gray-900/60 rounded-2xl p-4 sm:p-6 border border-gray-800">
             <div className="grid grid-cols-8 sm:grid-cols-10 md:grid-cols-16 gap-2 justify-center">
               {danhSachGhe?.map((ghe) => {
@@ -150,7 +140,6 @@ const BookingMovie = () => {
               })}
             </div>
 
-            {/* Chú thích */}
             <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-6 pt-4 border-t border-gray-800 text-xs sm:text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 bg-gray-700 rounded flex items-center justify-center text-gray-500 text-[10px] font-bold">
@@ -174,10 +163,8 @@ const BookingMovie = () => {
           </div>
         </div>
 
-        {/* ============ RIGHT: THÔNG TIN VÉ ============ */}
         <div className="lg:col-span-1">
           <div className="bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden sticky top-6">
-            {/* Poster */}
             {thongTinPhim?.hinhAnh && (
               <div className="relative h-40 overflow-hidden">
                 <img
@@ -205,7 +192,6 @@ const BookingMovie = () => {
                 }`}
               />
 
-              {/* Ghế đã chọn */}
               <div className="pt-3 border-t border-gray-800">
                 <p className="text-gray-500 text-xs uppercase tracking-wider mb-2">
                   Ghế đã chọn
@@ -234,7 +220,6 @@ const BookingMovie = () => {
                 )}
               </div>
 
-              {/* Tổng tiền */}
               <div className="pt-3 border-t border-gray-800 flex items-center justify-between">
                 <span className="text-gray-400">Tổng tiền</span>
                 <span className="text-2xl font-bold text-yellow-400">
@@ -242,7 +227,6 @@ const BookingMovie = () => {
                 </span>
               </div>
 
-              {/* Nút đặt vé */}
               <button
                 onClick={handleBooking}
                 disabled={
@@ -263,7 +247,6 @@ const BookingMovie = () => {
         </div>
       </div>
 
-      {/* MODAL THÀNH CÔNG */}
       <BookingSuccessModal
         isOpen={showSuccessModal}
         onConfirm={handleConfirmSuccess}

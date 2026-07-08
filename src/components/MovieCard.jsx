@@ -63,7 +63,7 @@ const MovieCard = ({ movie }) => {
         </div>
       </div>
 
-      {/* Phần thông tin */}
+    
       <div className="p-4">
         <h3 className="text-white font-semibold text-lg mb-1 line-clamp-2 min-h-3.5rem group-hover:text-yellow-400 transition-colors">
           {movie.tenPhim}
@@ -76,5 +76,5 @@ const MovieCard = ({ movie }) => {
   )
 }
 
-// Tránh re-render không cần thiết
+
 export default memo(MovieCard)

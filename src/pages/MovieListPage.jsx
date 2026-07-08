@@ -118,24 +118,16 @@ const MovieListPage = () => {
     <div className="min-h-screen bg-gray-950 text-white">
       <Banner />
 
-      {/* ===== HERO SECTION ===== */}
       <div className="relative bg-gradient-to-b from-gray-900 via-gray-950 to-gray-950 py-16 px-4 overflow-hidden">
-        {/* Decorative glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-yellow-400/10 blur-[120px] rounded-full pointer-events-none" />
-
         <div className="relative max-w-4xl mx-auto text-center">
-          {/* Title */}
-          giug
           <h1 className="text-4xl md:text-5xl font-bold mb-3">
             Danh sách <span className="text-yellow-400">Phim</span>
           </h1>
           <p className="text-gray-400 text-lg mb-10">
             Khám phá hàng trăm bộ phim hấp dẫn đang chờ bạn
           </p>
-
-          {/* ===== UNIFIED SEARCH + FILTER CARD ===== */}
           <div className="bg-gray-800/40 backdrop-blur-xl rounded-2xl border border-gray-700/60 shadow-2xl overflow-hidden">
-            {/* Search Bar */}
             <div className="p-5 border-b border-gray-700/60">
               <div className="relative">
                 <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-xl text-gray-400">
@@ -164,8 +156,6 @@ const MovieListPage = () => {
                 )}
               </div>
             </div>
-
-            {/* Divider label */}
             <div className="flex items-center gap-3 px-5 pt-5">
               <div className="h-px flex-1 bg-gray-700/60" />
               <span className="text-xs text-gray-400 font-medium uppercase tracking-widest flex items-center gap-2">
@@ -173,8 +163,6 @@ const MovieListPage = () => {
               </span>
               <div className="h-px flex-1 bg-gray-700/60" />
             </div>
-
-            {/* Date Filter */}
             <div className="p-5">
               <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-end">
                 <div className="flex flex-col text-left">
@@ -240,7 +228,6 @@ const MovieListPage = () => {
         </div>
       </div>
 
-      {/* ===== DANH SÁCH PHIM ===== */}
       <div
         ref={movieListRef}
         className="max-w-7xl mx-auto px-4 py-8 scroll-mt-20"
@@ -313,7 +300,6 @@ const MovieListPage = () => {
           ))}
         </div>
 
-        {/* Pagination */}
         {!isLoading && !isError && totalPages > 1 && !debouncedSearch && (
           <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">
             <button
@@ -356,7 +342,6 @@ const MovieListPage = () => {
         )}
       </div>
 
-      {/* ===== SECTION LỊCH CHIẾU THEO RẠP ===== */}
       <section
         id="cinema-section"
         className="max-w-7xl mx-auto px-4 py-16 border-t border-gray-800 mt-10 scroll-mt-20"
