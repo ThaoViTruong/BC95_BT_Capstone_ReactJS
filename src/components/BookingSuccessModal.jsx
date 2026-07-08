@@ -25,10 +25,8 @@ const BookingSuccessModal = ({ isOpen, onConfirm, onClose }) => {
                    rounded-3xl shadow-2xl max-w-md w-full 
                    overflow-hidden animate-scaleIn"
       >
-        {/* ============ TOP DECORATION - Dải màu gradient ============ */}
         <div className="h-2 bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500" />
 
-        {/* ============ CLOSE BUTTON ============ */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center 
@@ -42,14 +40,10 @@ const BookingSuccessModal = ({ isOpen, onConfirm, onClose }) => {
         </button>
 
         <div className="p-8 pt-10">
-          {/* ============ ICON CHECK ANIMATION ============ */}
           <div className="flex justify-center mb-6">
             <div className="relative">
-              {/* Vòng tròn ping */}
               <div className="absolute inset-0 rounded-full bg-green-400/30 animate-ping" />
               <div className="absolute inset-0 rounded-full bg-green-400/20 animate-pulse" />
-              
-              {/* Vòng tròn chính */}
               <div className="relative w-24 h-24 rounded-full 
                               bg-gradient-to-br from-green-400 to-emerald-500 
                               flex items-center justify-center 
@@ -67,7 +61,6 @@ const BookingSuccessModal = ({ isOpen, onConfirm, onClose }) => {
             </div>
           </div>
 
-          {/* ============ TITLE + DESCRIPTION ============ */}
           <div className="text-center mb-8">
             <h2 className="text-3xl font-extrabold text-gray-800 mb-3 
                            bg-gradient-to-r from-green-600 to-emerald-600 
@@ -84,7 +77,6 @@ const BookingSuccessModal = ({ isOpen, onConfirm, onClose }) => {
             </p>
           </div>
 
-          {/* ============ INFO CARD - Thông báo nhỏ ============ */}
           <div className="mb-6 p-4 rounded-2xl bg-blue-50 border border-blue-100 
                           flex items-start gap-3">
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 
@@ -101,7 +93,6 @@ const BookingSuccessModal = ({ isOpen, onConfirm, onClose }) => {
             </p>
           </div>
 
-          {/* ============ BUTTONS ============ */}
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={onClose}

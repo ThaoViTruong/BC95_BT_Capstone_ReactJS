@@ -40,7 +40,7 @@ const ResultPopup = ({ result, onClose }) => {
       : 'border-red-500/30 bg-red-500/10 text-red-300'
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 px-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/75 px-4 backdrop-blur-sm">
       <div className={`w-full max-w-md rounded-[28px] border p-8 shadow-[0_30px_80px_rgba(0,0,0,0.45)] ${accentClassName}`}>
         <p className="text-sm font-semibold uppercase tracking-[0.3em]">
           {result.type === 'success' ? 'Hoàn tất' : 'Thất bại'}
@@ -237,7 +237,7 @@ const FilmEditPage = () => {
         </button>
       </div>
 
-      <div className="rounded-[32px] border border-white/10 bg-[#101010] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.2)]">
+      <div className="rounded-32px border border-white/10 bg-[#101010] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.2)]">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-6 xl:grid-cols-2">
             <div>
@@ -331,9 +331,9 @@ const FilmEditPage = () => {
 
             <div>
               <label className={labelClassName}>Xem trước hiện tại</label>
-              <div className="flex min-h-[250px] items-center justify-center rounded-2xl border border-white/10 bg-[#181818] p-4">
+              <div className="flex min-h-250px items-center justify-center rounded-2xl border border-white/10 bg-[#181818] p-4">
                 {previewImage ? (
-                  <img src={previewImage} alt={formState.tenPhim} className="max-h-[220px] rounded-2xl object-cover" />
+                  <img src={previewImage} alt={formState.tenPhim} className="max-h-220px rounded-2xl object-cover" />
                 ) : (
                   <span className="text-sm text-white/50">Chưa có poster</span>
                 )}
@@ -352,7 +352,7 @@ const FilmEditPage = () => {
             <button
               type="submit"
               disabled={updateMovieMutation.isPending}
-              className="rounded-2xl bg-gradient-to-b from-red-500 to-red-700 px-6 py-4 text-base font-semibold text-white transition hover:from-red-400 hover:to-red-600 disabled:cursor-not-allowed disabled:opacity-70"
+              className="rounded-2xl bg-gradient-to-black from-red-500 to-red-700 px-6 py-4 text-base font-semibold text-white transition hover:from-red-400 hover:to-red-600 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {updateMovieMutation.isPending ? 'Đang cập nhật...' : 'Cập nhật phim'}
             </button>

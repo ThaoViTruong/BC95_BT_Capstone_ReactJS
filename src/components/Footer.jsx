@@ -3,20 +3,38 @@
 const iconClassName = "h-4 w-4 text-yellow-400";
 
 const MapPinIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={iconClassName}>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className={iconClassName}
+  >
     <path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z" />
     <circle cx="12" cy="11" r="2.5" />
   </svg>
 );
 
 const PhoneIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={iconClassName}>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className={iconClassName}
+  >
     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.86 19.86 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.63 2.62a2 2 0 0 1-.45 2.11L8 9.91a16 16 0 0 0 6 6l1.46-1.29a2 2 0 0 1 2.11-.45c.84.3 1.72.51 2.62.63A2 2 0 0 1 22 16.92z" />
   </svg>
 );
 
 const MailIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={iconClassName}>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className={iconClassName}
+  >
     <path d="M4 4h16v16H4z" />
     <path d="m4 7 8 6 8-6" />
   </svg>
@@ -35,7 +53,13 @@ const YoutubeIcon = () => (
 );
 
 const InstagramIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className="h-4 w-4"
+  >
     <rect x="3" y="3" width="18" height="18" rx="5" />
     <circle cx="12" cy="12" r="4" />
     <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
@@ -51,37 +75,41 @@ const TikTokIcon = () => (
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-gray-300 border-t border-gray-800">
-      {/* Phần nội dung chính */}
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
-        {/* Cột 1: Logo + giới thiệu */}
-       <div>
-          <h2 className="text-2xl font-extrabold uppercase tracking-tight text-white mb-4">
+        <div>
+          <h2 className="text-3xl font-extrabold uppercase tracking-tight text-white mb-4">
             CINE<span className="text-red-500">FLEX</span>
           </h2>
           <p className="text-sm leading-relaxed text-gray-400">
             Hệ thống đặt vé xem phim trực tuyến hàng đầu Việt Nam. Khám phá hàng
             trăm bộ phim hấp dẫn và đặt vé chỉ trong vài giây.
           </p>
+
+         
         </div>
 
-        {/* Cột 2: Liên kết nhanh */}
         <div>
           <h3 className="text-lg font-semibold text-white mb-4">
             Liên kết nhanh
           </h3>
           <ul className="space-y-2 text-sm">
             <li>
-              <Link to="/" className="hover:text-yellow-400 transition">
+              <Link to="/" 
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="hover:text-yellow-400 transition">
                 Trang chủ
               </Link>
             </li>
             <li>
-              <Link to="/movie" className="hover:text-yellow-400 transition">
+              <Link
+                to="/movie#flim"
+                className="hover:text-yellow-400 transition"
+              >
                 Phim
               </Link>
             </li>
             <li>
-              <Link to="/cinema" className="hover:text-yellow-400 transition">
+              <Link to="/movie#cinema-section" className="hover:text-yellow-400 transition">
                 Cụm rạp
               </Link>
             </li>
@@ -93,56 +121,84 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Cột 3: Liên hệ */}
         <div>
           <h3 className="text-lg font-semibold text-white mb-4">Liên hệ</h3>
           <ul className="space-y-3 text-sm">
-            <li className="flex items-center gap-2">
-              <MapPinIcon />
-              123 Nguyễn Văn Cừ, Q.5, TP.HCM
-            </li>
-            <li className="flex items-center gap-2">
-              <PhoneIcon />
-              0123 456 789
-            </li>
-            <li className="flex items-center gap-2">
-              <MailIcon />
-              support@movieapp.vn
-            </li>
-          </ul>
+  <li className="flex items-center gap-2">
+    <MapPinIcon />
+    <a
+      href="https://www.google.com/maps/search/?api=1&query=123+Nguyễn+Văn+Cừ,+Quận+5,+TP.HCM"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="hover:text-yellow-400 transition"
+    >
+      123 Nguyễn Văn Cừ, Q.5, TP.HCM
+    </a>
+  </li>
+
+  <li className="flex items-center gap-2">
+    <PhoneIcon />
+    <a
+      href="tel:0123456789"
+      className="hover:text-yellow-400 transition"
+    >
+      0123 456 789
+    </a>
+  </li>
+
+  <li className="flex items-center gap-2">
+    <MailIcon />
+    <a
+      href="mailto:support@movieapp.vn"
+      className="hover:text-yellow-400 transition"
+    >
+      support@movieapp.vn
+    </a>
+  </li>
+</ul>
         </div>
 
-        {/* Cột 4: Mạng xã hội */}
         <div>
           <h3 className="text-lg font-semibold text-white mb-4">
             Kết nối với chúng tôi
           </h3>
           <div className="flex gap-3">
-            <a
-              href="#"
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-yellow-400 hover:text-black transition"
-            >
-              <FacebookIcon />
-            </a>
-            <a
-              href="#"
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-yellow-400 hover:text-black transition"
-            >
-              <YoutubeIcon />
-            </a>
-            <a
-              href="#"
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-yellow-400 hover:text-black transition"
-            >
-              <InstagramIcon />
-            </a>
-            <a
-              href="#"
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-yellow-400 hover:text-black transition"
-            >
-              <TikTokIcon />
-            </a>
-          </div>
+  <a
+    href="https://www.facebook.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-yellow-400 hover:text-black transition"
+  >
+    <FacebookIcon />
+  </a>
+
+  <a
+    href="https://www.youtube.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-yellow-400 hover:text-black transition"
+  >
+    <YoutubeIcon />
+  </a>
+
+  <a
+    href="https://www.instagram.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-yellow-400 hover:text-black transition"
+  >
+    <InstagramIcon />
+  </a>
+
+  <a
+    href="https://www.tiktok.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-yellow-400 hover:text-black transition"
+  >
+    <TikTokIcon />
+  </a>
+</div>
 
           <p className="text-sm text-gray-400 mt-5">
             Đăng ký nhận tin mới nhất về phim hot!
@@ -160,11 +216,11 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Dòng bản quyền */}
       <div className="border-t border-gray-800 py-4 text-center text-sm text-gray-500">
         © {new Date().getFullYear()}{" "}
-        <span className="font-semibold text-white">CINE</span><span className="font-semibold text-red-500">FLEX</span>. Bảo
-        lưu mọi quyền.
+        <span className="font-semibold text-white">CINE</span>
+        <span className="font-semibold text-red-500">FLEX</span>. Bảo lưu mọi
+        quyền.
       </div>
     </footer>
   );

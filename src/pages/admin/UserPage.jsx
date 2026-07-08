@@ -215,7 +215,7 @@ const ConfirmActionModal = ({
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 px-4">
+    <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 px-4">
       <div className="w-full max-w-md rounded-2xl border border-white/10 bg-gray-900 shadow-2xl">
         <div className="border-b border-white/10 px-6 py-5">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-yellow-400">Xác nhận</p>
@@ -255,7 +255,7 @@ const ResultPopup = ({ result, onClose }) => {
       : 'border-red-500/30 bg-red-500/10'
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/75 px-4">
+    <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/75 px-4">
       <div className={`w-full max-w-md rounded-2xl border px-6 py-5 shadow-2xl ${accentClassName}`}>
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/70">
           {result.type === 'success' ? 'Hoàn tất' : 'Thất bại'}
