@@ -1,23 +1,48 @@
 // src/components/Banner.jsx
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useBanners } from '../hooks/useMovies'
+import { useBanners, useMovieDetails } from '../hooks/useMovies'
 
 const Banner = () => {
     const [currentSlide, setCurrentSlide] = useState(0)
     const [isPaused, setIsPaused] = useState(false)
     const navigate = useNavigate()
 
-    // ⭐ Fetch banner từ API
+    // 1. API banner
     const { data: banners = [], isLoading, isError } = useBanners()
 
+    // 2. Lấy maPhim từ banner
+    const maPhimList = useMemo(
+        () => banners.map((b) => b.maPhim),
+        [banners]
+    )
+
+    // 3. Gọi song song getMovieDetail cho từng maPhim
+    const movieDetailQueries = useMovieDetails(maPhimList)
+
+    // 4. Ghép banner với thông tin phim
+    const bannersWithMovieInfo = useMemo(() => {
+        return banners.map((banner, index) => {
+            const movie = movieDetailQueries[index]?.data
+            return {
+                ...banner,
+                tenPhim: movie?.tenPhim || 'Đang cập nhật',
+                moTa: movie?.moTa || '',
+            }
+        })
+    }, [banners, movieDetailQueries])
+
     const nextSlide = useCallback(() => {
-        setCurrentSlide((prev) => (prev + 1) % banners.length)
-    }, [banners.length])
+        setCurrentSlide((prev) => (prev + 1) % bannersWithMovieInfo.length)
+    }, [bannersWithMovieInfo.length])
 
     const prevSlide = useCallback(() => {
-        setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length)
-    }, [banners.length])
+        setCurrentSlide(
+            (prev) =>
+                (prev - 1 + bannersWithMovieInfo.length) %
+                bannersWithMovieInfo.length
+        )
+    }, [bannersWithMovieInfo.length])
 
     const goToSlide = (index) => setCurrentSlide(index)
 
@@ -25,21 +50,18 @@ const Banner = () => {
         navigate(`/movie/${maPhim}`)
     }
 
-    // Auto play
     useEffect(() => {
-        if (isPaused || banners.length === 0) return
+        if (isPaused || bannersWithMovieInfo.length === 0) return
         const interval = setInterval(nextSlide, 5000)
         return () => clearInterval(interval)
-    }, [isPaused, nextSlide, banners.length])
+    }, [isPaused, nextSlide, bannersWithMovieInfo.length])
 
-    // Reset slide nếu banner thay đổi
     useEffect(() => {
-        if (currentSlide >= banners.length) {
+        if (currentSlide >= bannersWithMovieInfo.length) {
             setCurrentSlide(0)
         }
-    }, [banners.length, currentSlide])
+    }, [bannersWithMovieInfo.length, currentSlide])
 
-    // ⭐ Loading skeleton
     if (isLoading) {
         return (
             <div className="relative w-full h-[45vh] md:h-[55vh] lg:h-[65vh] max-h-[600px] bg-gray-900 flex items-center justify-center overflow-hidden">
@@ -52,8 +74,7 @@ const Banner = () => {
         )
     }
 
-    // ⭐ Error state
-    if (isError || banners.length === 0) {
+    if (isError || bannersWithMovieInfo.length === 0) {
         return (
             <div className="relative w-full h-[45vh] md:h-[55vh] lg:h-[65vh] max-h-[600px] bg-gradient-to-r from-gray-900 to-gray-800 flex items-center justify-center">
                 <div className="text-center text-gray-400">
@@ -74,14 +95,14 @@ const Banner = () => {
                 className="flex w-full h-full transition-transform duration-700 ease-in-out"
                 style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
-                {banners.map((banner) => (
+                {bannersWithMovieInfo.map((banner) => (
                     <div
                         key={banner.maBanner}
                         className="relative w-full h-full flex-shrink-0"
                     >
                         <img
                             src={banner.hinhAnh}
-                            alt={`Banner ${banner.maBanner}`}
+                            alt={banner.tenPhim}
                             className="w-full h-full object-cover"
                             loading="lazy"
                             onError={(e) => {
@@ -90,21 +111,21 @@ const Banner = () => {
                             }}
                         />
 
-                        {/* Overlay gradient */}
                         <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/30 to-transparent" />
                         <div className="absolute inset-0 bg-gradient-to-r from-gray-950/70 via-gray-950/20 to-transparent" />
 
-                        {/* Nội dung banner */}
                         <div className="absolute bottom-16 md:bottom-20 left-6 md:left-16 max-w-xl text-white animate-fadeIn">
-                           
-                            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-3 drop-shadow-lg">
-                                Khám phá bộ phim hot nhất
+                            {/* ⭐ Tên phim */}
+                            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-3 drop-shadow-lg line-clamp-2">
+                                {banner.tenPhim}
                             </h2>
+
+                            {/* Mô tả phim */}
                             <p className="text-sm md:text-base lg:text-lg mb-3 md:mb-5 text-gray-200 drop-shadow line-clamp-2">
-                                Đặt vé ngay hôm nay để trải nghiệm những bộ phim
-                                bom tấn với chất lượng hình ảnh và âm thanh tuyệt
-                                đỉnh
+                                {banner.moTa ||
+                                    'Đặt vé ngay hôm nay để trải nghiệm những bộ phim bom tấn với chất lượng hình ảnh và âm thanh tuyệt đỉnh'}
                             </p>
+
                             <button
                                 onClick={() => handleViewDetail(banner.maPhim)}
                                 className="cursor-pointer px-4 md:px-6 py-2 md:py-2.5 bg-red-600 hover:bg-red-700 rounded-md font-semibold text-sm md:text-base transition-all duration-300 hover:scale-105 shadow-lg shadow-red-600/30"
@@ -116,8 +137,7 @@ const Banner = () => {
                 ))}
             </div>
 
-            {/* Prev/Next buttons - chỉ hiện khi có > 1 banner */}
-            {banners.length > 1 && (
+            {bannersWithMovieInfo.length > 1 && (
                 <>
                     <button
                         onClick={prevSlide}
@@ -135,9 +155,8 @@ const Banner = () => {
                         ❯
                     </button>
 
-                    {/* Dots indicator */}
                     <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                        {banners.map((_, index) => (
+                        {bannersWithMovieInfo.map((_, index) => (
                             <button
                                 key={index}
                                 onClick={() => goToSlide(index)}
@@ -151,7 +170,6 @@ const Banner = () => {
                         ))}
                     </div>
 
-                    {/* Progress bar */}
                     <div className="absolute bottom-0 left-0 w-full h-0.5 bg-white/20 z-10">
                         <div
                             key={currentSlide}
@@ -191,4 +209,3 @@ const Banner = () => {
 }
 
 export default Banner
-

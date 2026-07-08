@@ -11,24 +11,20 @@ import Cinema from "../components/Cinema";
 const MovieListPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
-
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [isDateFilterActive, setIsDateFilterActive] = useState(false);
   const [appliedFromDate, setAppliedFromDate] = useState("");
   const [appliedToDate, setAppliedToDate] = useState("");
-
   const pageSize = 10;
   const movieListRef = useRef(null);
   const location = useLocation();
   const debouncedSearch = useDebounce(search, 500);
-
- 
-const formatDateForApi = (date) => {
-  if (!date) return "";
-  const [y, m, d] = date.split("-");
-  return `${d}-${m}-${y}`;  // ✅ dấu "-"
-};
+  const formatDateForApi = (date) => {
+    if (!date) return "";
+    const [y, m, d] = date.split("-");
+    return `${d}-${m}-${y}`;
+  };
 
   useEffect(() => {
     setCurrentPage(1);
@@ -38,7 +34,7 @@ const formatDateForApi = (date) => {
     "GP01",
     debouncedSearch ? 1 : currentPage,
     debouncedSearch ? 999 : pageSize,
-    ""
+    "",
   );
 
   const dateQuery = useMovieListByDate(
@@ -47,7 +43,7 @@ const formatDateForApi = (date) => {
     pageSize,
     "",
     isDateFilterActive ? formatDateForApi(appliedFromDate) : "",
-    isDateFilterActive ? formatDateForApi(appliedToDate) : ""
+    isDateFilterActive ? formatDateForApi(appliedToDate) : "",
   );
 
   const activeQuery = isDateFilterActive ? dateQuery : normalQuery;
@@ -111,8 +107,7 @@ const formatDateForApi = (date) => {
       const el = document.getElementById(id);
       if (el) {
         const yOffset = -80;
-        const y =
-          el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
         window.scrollTo({ top: y, behavior: "smooth" });
       }
     }, 300);
@@ -377,4 +372,3 @@ const formatDateForApi = (date) => {
 };
 
 export default MovieListPage;
-

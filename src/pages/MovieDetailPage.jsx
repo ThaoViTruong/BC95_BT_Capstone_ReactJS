@@ -1,4 +1,4 @@
-﻿import { useState, useRef } from 'react'
+﻿import { useState, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useMovieDetail, useMovieShowtimes } from "../hooks/useMovies";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -42,15 +42,7 @@ const MovieDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-
-      {/* ============================================= */}
-      {/* 🔄 TỐI ƯU 1: HERO SECTION - Bố cục lại hoàn toàn */}
-      {/* - Thêm min-h để hero có chiều cao cố định đẹp hơn */}
-      {/* - Poster: thêm hover scale, border glow */}
-      {/* - Back button nhúng vào trong hero thay vì tách riêng */}
-      {/* ============================================= */}
       <div className="relative min-h-[70vh] flex items-end">
-        {/* Background blur */}
         <div
           className="absolute inset-0 bg-cover bg-center blur-sm scale-105"
           style={{
@@ -61,7 +53,6 @@ const MovieDetailPage = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/90 to-gray-950/40" />
 
         <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Back button nằm trong hero */}
           <Link
             to="/movie"
             className="inline-flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition-colors mb-8 group"
@@ -73,13 +64,6 @@ const MovieDetailPage = () => {
           </Link>
 
           <div className="flex flex-col lg:flex-row gap-10">
-            {/* ============================================= */}
-            {/* 🔄 TỐI ƯU 2: POSTER */}
-            {/* - Tăng width từ w-64 lên w-72 */}
-            {/* - Thêm hover:scale-105 */}
-            {/* - Thêm ring glow khi hover */}
-            {/* - Thêm aspect-[2/3] để poster luôn đúng tỷ lệ */}
-            {/* ============================================= */}
             <div className="flex-shrink-0 mx-auto lg:mx-0">
               <div className="relative group">
                 <img
@@ -90,19 +74,9 @@ const MovieDetailPage = () => {
                              group-hover:ring-yellow-400/30 group-hover:scale-[1.02] 
                              transition-all duration-500"
                 />
-                
               </div>
             </div>
 
-            {/* ============================================= */}
-            {/* 🔄 TỐI ƯU 3: INFO SECTION */}
-            {/* - Tên phim: thêm text-5xl, gradient text */}
-            {/* - Badges: icon + text rõ hơn, spacing tốt hơn */}
-            {/* - Rating stars: gọn hơn, bỏ duplicate với poster badge */}
-            {/* - Info grid: 2 cột trên mobile, icon cho mỗi item */}
-            {/* - Mô tả: giới hạn 4 dòng, thêm line-clamp */}
-            {/* - Buttons: kích thước lớn hơn, thêm icon rõ hơn */}
-            {/* ============================================= */}
             <div className="flex-1 flex flex-col justify-end">
               {/* Badges */}
               <div className="flex flex-wrap gap-2 mb-4">
@@ -111,7 +85,7 @@ const MovieDetailPage = () => {
                     className="bg-red-500/20 text-red-400 border border-red-500/30 
                                   text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide"
                   >
-                     Hot
+                    Hot
                   </span>
                 )}
                 {movie?.dangChieu && (
@@ -119,7 +93,7 @@ const MovieDetailPage = () => {
                     className="bg-green-500/20 text-green-400 border border-green-500/30 
                                   text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide"
                   >
-                     Đang chiếu
+                    Đang chiếu
                   </span>
                 )}
                 {movie?.sapChieu && (
@@ -127,7 +101,7 @@ const MovieDetailPage = () => {
                     className="bg-blue-500/20 text-blue-400 border border-blue-500/30 
                                   text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide"
                   >
-                     Sắp chiếu
+                    Sắp chiếu
                   </span>
                 )}
               </div>
@@ -141,7 +115,6 @@ const MovieDetailPage = () => {
                 {movie?.tenPhim || "Tên phim không xác định"}
               </h1>
 
-              {/* Star rating - dạng compact hơn */}
               <div className="flex items-center gap-3 mb-6">
                 <div className="flex gap-0.5">
                   {Array.from({ length: 10 }).map((_, index) => (
@@ -162,19 +135,13 @@ const MovieDetailPage = () => {
                 </span>
               </div>
 
-              {/* ============================================= */}
-              {/* 🔄 TỐI ƯU 4: INFO GRID */}
-              {/* - Thêm emoji icon cho mỗi mục */}
-              {/* - Bo tròn, nền mờ thay vì gray-800 cứng */}
-              {/* - responsive: 2 cột trên mọi kích thước */}
-              {/* ============================================= */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3">
                   <p className="text-gray-500 text-xs mb-1">📅 Khởi chiếu</p>
                   <p className="text-white font-medium text-sm truncate">
                     {movie?.ngayKhoiChieu
                       ? new Date(movie.ngayKhoiChieu).toLocaleDateString(
-                          "vi-VN"
+                          "vi-VN",
                         )
                       : "—"}
                   </p>
@@ -199,27 +166,15 @@ const MovieDetailPage = () => {
                 </div>
               </div>
 
-              {/* ============================================= */}
-              {/* 🔄 TỐI ƯU 5: MÔ TẢ */}
-              {/* - Giới hạn 3 dòng bằng line-clamp-3 */}
-              {/* - Màu text sáng hơn để dễ đọc */}
-              {/* ============================================= */}
               <div className="mb-8">
                 <p className="text-gray-300 leading-relaxed line-clamp-3">
                   {movie?.moTa || "Chưa có mô tả cho phim này."}
                 </p>
               </div>
 
-              {/* ============================================= */}
-              {/* 🔄 TỐI ƯU 6: BUTTONS */}
-              {/* - Kích thước lớn hơn, full-width trên mobile */}
-              {/* - Thêm icon SVG thay vì text thuần */}
-              {/* - Đặt vé: nổi bật hơn với gradient + shadow */}
-              {/* ============================================= */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
                   href="#trailer"
-                  
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 
                              bg-white/10 hover:bg-white/20 border border-white/20 
@@ -244,8 +199,6 @@ const MovieDetailPage = () => {
                              transition-all duration-300 shadow-lg shadow-yellow-500/25 
                              hover:shadow-yellow-500/40 cursor-pointer"
                 >
-                  
-                   
                   Đặt vé ngay
                 </button>
               </div>
@@ -254,16 +207,11 @@ const MovieDetailPage = () => {
         </div>
       </div>
 
-      {/* ============================================= */}
-      {/* 🔄 TỐI ƯU 7: TRAILER SECTION */}
-      {/* - Thêm max-w-5xl để iframe không quá rộng */}
-      {/* - Thêm border ring cho iframe */}
-      {/* - Center layout */}
-      {/* ============================================= */}
       {movie?.trailer && (
-        <div 
-        id="trailer"
-        className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div
+          id="trailer"
+          className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+        >
           <h2 className="text-2xl font-bold mb-8 text-center">
             <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
               Trailer
@@ -274,7 +222,6 @@ const MovieDetailPage = () => {
                           shadow-2xl shadow-black/50 ring-1 ring-white/10"
           >
             <iframe
-              
               src={getYoutubeEmbedUrl(movie.trailer)}
               title="Movie Trailer"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -285,16 +232,10 @@ const MovieDetailPage = () => {
         </div>
       )}
 
-      {/* ============================================= */}
-      {/* 🔄 TỐI ƯU 8: LỊCH CHIẾU SECTION */}
-      {/* - Sidebar: thêm tooltip tên hệ thống rạp */}
-      {/* - Sidebar: active state rõ hơn với bg gradient */}
-      {/* - Content: cụm rạp có icon địa chỉ */}
-      {/* - Lịch chiếu: tách ngày/giờ rõ hơn, hover effect mượt */}
-      {/* - Thêm padding, rounded cho toàn bộ section */}
-      {/* - Dark theme cho section thay vì white (đồng bộ với page) */}
-      {/* ============================================= */}
-      <div ref={showtimeRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div
+        ref={showtimeRef}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+      >
         <h2 className="text-2xl font-bold mb-8 text-center">
           <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
             Lịch chiếu & Đặt vé
@@ -333,7 +274,6 @@ const MovieDetailPage = () => {
                 ))}
               </div>
 
-              {/* Content */}
               <div className="flex-1 p-4 sm:p-6 overflow-y-auto max-h-[600px] custom-scrollbar">
                 {showtimes.heThongRapChieu[activeSystem]?.cumRapChieu.map(
                   (cumRap) => (
@@ -341,7 +281,6 @@ const MovieDetailPage = () => {
                       key={cumRap.maCumRap}
                       className="mb-8 pb-8 border-b border-gray-800 last:border-b-0 last:mb-0 last:pb-0"
                     >
-                      {/* Tên cụm rạp + địa chỉ */}
                       <div className="flex items-start gap-3 mb-4">
                         <div className="w-2 h-2 rounded-full bg-green-400 mt-2 flex-shrink-0" />
                         <div>
@@ -387,7 +326,7 @@ const MovieDetailPage = () => {
                         })}
                       </div>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </div>
@@ -405,4 +344,3 @@ const MovieDetailPage = () => {
 };
 
 export default MovieDetailPage;
-

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery,useQueries } from "@tanstack/react-query";
 import { movieApi } from "../api/movieApi";
 
 export const useMovieList = (
@@ -29,6 +29,21 @@ export const useMovieDetail = (maPhim) => {
       return response.data.content;
     },
     enabled: maPhim !== undefined && maPhim !== null && maPhim !== "",
+  });
+};
+
+// lấy tên cho banner
+export const useMovieDetails = (maPhimList = []) => {
+  return useQueries({
+    queries: maPhimList.map((maPhim) => ({
+      queryKey: ["movieDetail", maPhim],
+      queryFn: async () => {
+        const response = await movieApi.getMovieDetail(maPhim);
+        return response.data.content;
+      },
+      enabled: !!maPhim,
+      staleTime: 5 * 60 * 1000,
+    })),
   });
 };
 

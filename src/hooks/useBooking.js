@@ -1,8 +1,6 @@
-// src/hooks/useBooking.js
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { bookingApi } from '../api/bookingApi'
 
-/* ============ HOOK 1: LẤY DANH SÁCH GHẾ ============ */
 export const useSeatList = (maLichChieu) => {
   return useQuery({
     queryKey: ['seatList', String(maLichChieu)],
@@ -13,7 +11,6 @@ export const useSeatList = (maLichChieu) => {
   })
 }
 
-/* ============ HOOK 2: ĐẶT VÉ ============ */
 export const useBookTicket = () => {
   const queryClient = useQueryClient()
 

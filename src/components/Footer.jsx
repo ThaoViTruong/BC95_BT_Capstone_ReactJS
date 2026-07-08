@@ -97,7 +97,9 @@ const Footer = () => {
           </h3>
           <ul className="space-y-2 text-sm">
             <li>
-              <Link to="/" className="hover:text-yellow-400 transition">
+              <Link to="/" 
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="hover:text-yellow-400 transition">
                 Trang chủ
               </Link>
             </li>

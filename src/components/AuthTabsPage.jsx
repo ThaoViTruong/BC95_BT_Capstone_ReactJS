@@ -114,7 +114,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
         const loggedInUser = response.data.content
 
         dispatch(login(loggedInUser))
-        navigate(loggedInUser?.maLoaiNguoiDung === 'QuanTri' ? '/admin/films' : '/', { replace: true })
+        navigate('/', { replace: true })
       } catch (error) {
         setLoginError(getApiMessage(error.response?.data?.content, 'Đăng nhập thất bại. Vui lòng thử lại.'))
       } finally {
