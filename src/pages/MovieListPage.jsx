@@ -125,11 +125,7 @@ const MovieListPage = () => {
 
         <div className="relative max-w-4xl mx-auto text-center">
           {/* Title */}
-          <div className="inline-block mb-3 px-4 py-1.5 rounded-full bg-yellow-400/10 border border-yellow-400/30">
-            <span className="text-yellow-400 text-sm font-medium">
-              🎬 KHO PHIM HOT NHẤT
-            </span>
-          </div>
+          giug
           <h1 className="text-4xl md:text-5xl font-bold mb-3">
             Danh sách <span className="text-yellow-400">Phim</span>
           </h1>
