@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux'
 import { authApi } from '../api/authApi'
 import { login } from '../store/authSlice'
 import registerBackground from '../assets/bg-register.jpg'
+import { FontAwesomeIcon, faEye, faEyeSlash } from '../utils/fontAwesome'
 
 const MA_NHOM = 'GP01'
 
@@ -95,6 +96,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
   const [loginError, setLoginError] = useState('')
   const [registerError, setRegisterError] = useState('')
   const [registerSuccess, setRegisterSuccess] = useState('')
+  const [isLoginPasswordVisible, setIsLoginPasswordVisible] = useState(false)
 
   const loginFormik = useFormik({
     initialValues: {
@@ -114,10 +116,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
         const loggedInUser = response.data.content
 
         dispatch(login(loggedInUser))
-        navigate(
-          loggedInUser?.maLoaiNguoiDung === 'QuanTri' ? '/admin' : '/',
-          { replace: true }
-        )
+        navigate('/movie', { replace: true })
       } catch (error) {
         setLoginError(getApiMessage(error.response?.data?.content, 'Đăng nhập thất bại. Vui lòng thử lại.'))
       } finally {
@@ -267,14 +266,24 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                           <label htmlFor="login-matKhau" className="mb-2 block text-sm font-medium text-white">
                             Mật khẩu <span className="text-red-400">*</span>
                           </label>
-                          <input
-                            id="login-matKhau"
-                            type="password"
-                            placeholder="Nhập mật khẩu"
-                            autoComplete="new-password"
-                            className={inputClassName}
-                            {...loginFormik.getFieldProps('matKhau')}
-                          />
+                          <div className="relative">
+                            <input
+                              id="login-matKhau"
+                              type={isLoginPasswordVisible ? 'text' : 'password'}
+                              placeholder="Nhập mật khẩu"
+                              autoComplete="new-password"
+                              className={`${inputClassName} pr-12`}
+                              {...loginFormik.getFieldProps('matKhau')}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setIsLoginPasswordVisible((prevState) => !prevState)}
+                              className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-gray-400 transition hover:text-yellow-400 focus:outline-none focus:text-yellow-400"
+                              aria-label={isLoginPasswordVisible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                            >
+                              <FontAwesomeIcon icon={isLoginPasswordVisible ? faEyeSlash : faEye} />
+                            </button>
+                          </div>
                           {renderError(loginFormik, 'matKhau')}
                         </div>
 
