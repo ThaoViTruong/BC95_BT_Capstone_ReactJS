@@ -1,7 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit"
 
+const USER_STORAGE_KEY = "user"
+
+const clearLegacyUserStorage = () => {
+    localStorage.removeItem(USER_STORAGE_KEY)
+}
+
 const getStoredUser = () => {
-    const rawUser = localStorage.getItem("user")
+    clearLegacyUserStorage()
+
+    const rawUser = sessionStorage.getItem(USER_STORAGE_KEY)
 
     if (!rawUser) {
         return null
@@ -10,7 +18,7 @@ const getStoredUser = () => {
     try {
         return JSON.parse(rawUser)
     } catch {
-        localStorage.removeItem("user")
+        sessionStorage.removeItem(USER_STORAGE_KEY)
         return null
     }
 }

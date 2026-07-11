@@ -1,17 +1,18 @@
-﻿import { useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { FontAwesomeIcon, faArrowLeft } from "../utils/fontAwesome";
 import { useSeatList, useBookTicket } from "../hooks/useBooking";
+import { useToast } from "../components/ToastProvider";
 import LoadingSpinner from "../components/LoadingSpinner";
-import BookingSuccessModal from "../components/BookingSuccessModal";
 
 const BookingMovie = () => {
   const { maLichChieu } = useParams();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const { data, isLoading, isError } = useSeatList(maLichChieu);
   const bookTicketMutation = useBookTicket();
 
   const [selectedSeats, setSelectedSeats] = useState([]);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const totalPrice = useMemo(
     () => selectedSeats.reduce((sum, s) => sum + s.giaVe, 0),
@@ -29,7 +30,11 @@ const BookingMovie = () => {
 
   const handleBooking = () => {
     if (selectedSeats.length === 0) {
-      alert("Vui lòng chọn ít nhất 1 ghế!");
+      showToast({
+        type: "error",
+        title: "Thiếu thông tin",
+        message: "Vui lòng chọn ít nhất 1 ghế!",
+      });
       return;
     }
 
@@ -43,21 +48,24 @@ const BookingMovie = () => {
 
     bookTicketMutation.mutate(payload, {
       onSuccess: () => {
-        setShowSuccessModal(true);
         setSelectedSeats([]);
+        showToast({
+          type: "success",
+          title: "Đặt vé thành công",
+          message: "Bạn đã đặt vé thành công.",
+        });
+        navigate("/profile", { state: { activeTab: "history" } });
       },
       onError: (error) => {
-        alert(
-          error?.response?.data?.content ||
-            "Đặt vé thất bại, vui lòng thử lại!"
-        );
+        showToast({
+          type: "error",
+          title: "Đặt vé thất bại",
+          message:
+            error?.response?.data?.content ||
+            "Đặt vé thất bại, vui lòng thử lại!",
+        });
       },
     });
-  };
-
-  const handleConfirmSuccess = () => {
-    setShowSuccessModal(false);
-    navigate("/profile", { state: { activeTab: "history" } });
   };
 
   if (isLoading) return <LoadingSpinner />;
@@ -70,7 +78,10 @@ const BookingMovie = () => {
             Không tìm thấy thông tin lịch chiếu
           </p>
           <Link to="/movie" className="text-yellow-400 hover:underline">
-            ← Quay lại danh sách phim
+            <span className="inline-flex items-center gap-2">
+              <FontAwesomeIcon icon={faArrowLeft} />
+              <span>Quay lại danh sách phim</span>
+            </span>
           </Link>
         </div>
       </div>
@@ -87,9 +98,10 @@ const BookingMovie = () => {
           className="inline-flex items-center gap-2 text-gray-400 hover:text-yellow-400 
                      transition-colors mb-6 group cursor-pointer bg-transparent border-0"
         >
-          <span className="group-hover:-translate-x-1 transition-transform">
-            ←
-          </span>
+          <FontAwesomeIcon
+            icon={faArrowLeft}
+            className="group-hover:-translate-x-1 transition-transform"
+          />
           Quay lại chọn suất chiếu
         </button>
       </div>
@@ -246,12 +258,6 @@ const BookingMovie = () => {
           </div>
         </div>
       </div>
-
-      <BookingSuccessModal
-        isOpen={showSuccessModal}
-        onConfirm={handleConfirmSuccess}
-        onClose={() => setShowSuccessModal(false)}
-      />
     </div>
   );
 };

@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  FontAwesomeIcon,
+  faArrowRight,
+  faChevronLeft,
+  faChevronRight,
+  faClapperboard,
+} from "../utils/fontAwesome";
 import { useBanners, useMovieDetails } from "../hooks/useMovies";
 
 const Banner = () => {
@@ -68,7 +75,7 @@ const Banner = () => {
     return (
       <div className="relative w-full h-[45vh] md:h-[55vh] lg:h-[65vh] max-h-[600px] bg-gradient-to-r from-gray-900 to-gray-800 flex items-center justify-center">
         <div className="text-center text-gray-400">
-          <p className="text-4xl mb-2">🎬</p>
+          <FontAwesomeIcon icon={faClapperboard} className="mb-2 text-4xl" />
           <p>Không tải được banner</p>
         </div>
       </div>
@@ -115,9 +122,10 @@ const Banner = () => {
 
               <button
                 onClick={() => handleViewDetail(banner.maPhim)}
-                className="cursor-pointer px-4 md:px-6 py-2 md:py-2.5 bg-red-600 hover:bg-red-700 rounded-md font-semibold text-sm md:text-base transition-all duration-300 hover:scale-105 shadow-lg shadow-red-600/30"
+                className="cursor-pointer inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 bg-red-600 hover:bg-red-700 rounded-md font-semibold text-sm md:text-base transition-all duration-300 hover:scale-105 shadow-lg shadow-red-600/30"
               >
-                Xem Chi Tiết →
+                <span>Xem Chi Tiết</span>
+                <FontAwesomeIcon icon={faArrowRight} />
               </button>
             </div>
           </div>
@@ -131,7 +139,7 @@ const Banner = () => {
             className="cursor-pointer absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 text-white text-lg md:text-xl transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 z-10"
             aria-label="Previous slide"
           >
-            ❮
+            <FontAwesomeIcon icon={faChevronLeft} />
           </button>
 
           <button
@@ -139,7 +147,7 @@ const Banner = () => {
             className="cursor-pointer absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 text-white text-lg md:text-xl transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 z-10"
             aria-label="Next slide"
           >
-            ❯
+            <FontAwesomeIcon icon={faChevronRight} />
           </button>
 
           <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">

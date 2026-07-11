@@ -21,6 +21,16 @@ export const useMovieList = (
   });
 };
 
+export const useAdminMovieList = (maNhom = "GP01", tenPhim = "") => {
+  return useQuery({
+    queryKey: ["adminMovieList", maNhom, tenPhim],
+    queryFn: async () => {
+      const response = await movieApi.getMovieManagementList(maNhom, tenPhim);
+      return response.data.content;
+    },
+  });
+};
+
 export const useMovieDetail = (maPhim) => {
   return useQuery({
     queryKey: ["movieDetail", maPhim],

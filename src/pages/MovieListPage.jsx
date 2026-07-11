@@ -1,6 +1,15 @@
 // src/pages/MovieListPage.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
+import {
+  FontAwesomeIcon,
+  faCalendarDays,
+  faChevronLeft,
+  faChevronRight,
+  faFilter,
+  faMagnifyingGlass,
+  faXmark,
+} from "../utils/fontAwesome";
 import { useMovieList, useMovieListByDate } from "../hooks/useMovies";
 import { useDebounce } from "../hooks/useDebounce";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -54,10 +63,7 @@ const MovieListPage = () => {
   const movies = debouncedSearch
     ? allMovies.filter((movie) => {
         const keyword = debouncedSearch.toLowerCase();
-        return (
-          movie.tenPhim?.toLowerCase().includes(keyword) ||
-          movie.biDanh?.toLowerCase().includes(keyword)
-        );
+        return movie.tenPhim?.toLowerCase().includes(keyword);
       })
     : allMovies;
 
@@ -130,9 +136,10 @@ const MovieListPage = () => {
           <div className="bg-gray-800/40 backdrop-blur-xl rounded-2xl border border-gray-700/60 shadow-2xl overflow-hidden">
             <div className="p-5 border-b border-gray-700/60">
               <div className="relative">
-                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-xl text-gray-400">
-                  🔍
-                </span>
+                <FontAwesomeIcon
+                  icon={faMagnifyingGlass}
+                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                />
                 <input
                   type="text"
                   value={search}
@@ -151,7 +158,7 @@ const MovieListPage = () => {
                     onClick={() => setSearch("")}
                     className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white transition"
                   >
-                    ✕
+                    <FontAwesomeIcon icon={faXmark} />
                   </button>
                 )}
               </div>
@@ -159,7 +166,8 @@ const MovieListPage = () => {
             <div className="flex items-center gap-3 px-5 pt-5">
               <div className="h-px flex-1 bg-gray-700/60" />
               <span className="text-xs text-gray-400 font-medium uppercase tracking-widest flex items-center gap-2">
-                📅 Lọc theo khoảng thời gian
+                <FontAwesomeIcon icon={faCalendarDays} />
+                <span>Lọc theo khoảng thời gian</span>
               </span>
               <div className="h-px flex-1 bg-gray-700/60" />
             </div>
@@ -202,7 +210,7 @@ const MovieListPage = () => {
                       className="h-11 px-4 rounded-xl bg-gray-700 text-white hover:bg-gray-600 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
                       title="Xóa bộ lọc"
                     >
-                      ✕
+                      <FontAwesomeIcon icon={faXmark} />
                     </button>
                   )}
                 </div>
@@ -210,7 +218,7 @@ const MovieListPage = () => {
 
               {isDateFilterActive && (
                 <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/10 border border-yellow-400/30 text-sm">
-                  <span className="text-yellow-400">🎯</span>
+                  <FontAwesomeIcon icon={faFilter} className="text-yellow-400" />
                   <span className="text-gray-300">
                     Đang lọc:{" "}
                     <b className="text-yellow-400">
@@ -305,9 +313,10 @@ const MovieListPage = () => {
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-yellow-400 hover:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-yellow-400 hover:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
-              ← Trước
+              <FontAwesomeIcon icon={faChevronLeft} />
+              <span>Trước</span>
             </button>
 
             {Array.from({ length: totalPages }).map((_, idx) => {
@@ -330,9 +339,10 @@ const MovieListPage = () => {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-yellow-400 hover:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-yellow-400 hover:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
-              Sau →
+              <span>Sau</span>
+              <FontAwesomeIcon icon={faChevronRight} />
             </button>
           </div>
         )}

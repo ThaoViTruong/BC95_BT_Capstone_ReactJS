@@ -22,6 +22,18 @@ export const movieApi = {
     });
   },
 
+  getMovieManagementList: (maNhom = "GP01", tenPhim = "") => {
+    const params = { maNhom };
+
+    if (tenPhim && tenPhim.trim() !== "") {
+      params.tenPhim = tenPhim;
+    }
+
+    return axiosInstance.get("/QuanLyPhim/LayDanhSachPhim", {
+      params,
+    });
+  },
+
   getMovieDetail: (maPhim) => {
     return axiosInstance.get(`/QuanLyPhim/LayThongTinPhim?maPhim=${maPhim}`);
   },
@@ -59,8 +71,24 @@ export const movieApi = {
     return axiosInstance.post("/QuanLyPhim/ThemPhimUploadHinh", formData);
   },
 
+  updateMovieMetadata: (movieData) => {
+    return axiosInstance.post("/QuanLyPhim/CapNhatPhim", movieData, {
+      headers: {
+        "Content-Type": "application/json-patch+json",
+      },
+    });
+  },
+
+  updateMovieWithImage: (formData) => {
+    return axiosInstance.post("/QuanLyPhim/CapNhatPhimUpload", formData);
+  },
+
   updateMovieInfo: (movieData) => {
-    return axiosInstance.post("/QuanLyPhim/CapNhatPhim", movieData);
+    return axiosInstance.post("/QuanLyPhim/CapNhatPhim", movieData, {
+      headers: {
+        "Content-Type": "application/json-patch+json",
+      },
+    });
   },
 
   deleteMovie: (maPhim) => {

@@ -1,7 +1,10 @@
-﻿import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { FontAwesomeIcon, faCircleInfo, faLocationDot } from "../utils/fontAwesome";
 import { useHeThongRap, useLichChieuHeThongRap } from "../hooks/useCinema";
 import LoadingSpinner from "./LoadingSpinner";
+
+const NEXT_SEVEN_DAYS = 7;
 
 const formatTimeOnly = (isoString) => {
   if (!isoString) return "";
@@ -39,6 +42,67 @@ const getDayLabel = (date) => {
   return days[date.getDay()];
 };
 
+const createNextSevenDateOptions = () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return Array.from({ length: NEXT_SEVEN_DAYS }, (_, index) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() + index);
+
+    return {
+      date,
+      day: date.getDate(),
+      month: date.getMonth() + 1,
+      label: getDayLabel(date),
+      key: dateToKey(date),
+    };
+  });
+};
+
+const isShowtimeWithinNextSevenDays = (dateValue) => {
+  if (!dateValue) return false;
+
+  const showtimeDate = new Date(dateValue);
+  if (Number.isNaN(showtimeDate.getTime())) return false;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const endDate = new Date(today);
+  endDate.setDate(today.getDate() + NEXT_SEVEN_DAYS - 1);
+  endDate.setHours(23, 59, 59, 999);
+
+  return showtimeDate >= today && showtimeDate <= endDate;
+};
+
+const isMatchingSelectedDate = (dateValue, selectedDateObj) => {
+  const showtimeDate = new Date(dateValue);
+
+  if (Number.isNaN(showtimeDate.getTime())) {
+    return false;
+  }
+
+  if (!isSameDay(showtimeDate, selectedDateObj)) {
+    return false;
+  }
+
+  const now = new Date();
+  if (isSameDay(selectedDateObj, now) && showtimeDate < now) {
+    return false;
+  }
+
+  return true;
+};
+
+const countMoviesWithShowtimeInNextSevenDays = (movies = []) => {
+  return movies.filter((phim) =>
+    (phim.lstLichChieuTheoPhim || []).some((lich) =>
+      isShowtimeWithinNextSevenDays(lich.ngayChieuGioChieu),
+    ),
+  ).length;
+};
+
 const Cinema = () => {
   const [selectedCinema, setSelectedCinema] = useState("BHDStar");
   const [selectedCumRap, setSelectedCumRap] = useState(null);
@@ -67,33 +131,8 @@ const Cinema = () => {
     danhSachCumRap[0];
 
   const availableDates = useMemo(() => {
-    if (!currentCumRap?.danhSachPhim) return [];
-
-    const dateSet = new Set();
-    currentCumRap.danhSachPhim.forEach((phim) => {
-      phim.lstLichChieuTheoPhim?.forEach((lich) => {
-        const d = new Date(lich.ngayChieuGioChieu);
-        if (isNaN(d.getTime())) return;
-        d.setHours(0, 0, 0, 0);
-        dateSet.add(d.getTime());
-      });
-    });
-
-    const sortedDates = Array.from(dateSet)
-      .sort((a, b) => a - b)
-      .map((timestamp) => {
-        const d = new Date(timestamp);
-        return {
-          date: d,
-          day: d.getDate(),
-          month: d.getMonth() + 1,
-          label: getDayLabel(d),
-          key: dateToKey(d),
-        };
-      });
-
-    return sortedDates;
-  }, [currentCumRap]);
+    return createNextSevenDateOptions();
+  }, []);
 
   useEffect(() => {
     if (availableDates.length > 0) {
@@ -117,10 +156,9 @@ const Cinema = () => {
     return currentCumRap.danhSachPhim
       .map((phim) => {
         const lichChieuTrongNgay = (phim.lstLichChieuTheoPhim || []).filter(
-          (lich) => {
-            const dt = new Date(lich.ngayChieuGioChieu);
-            return isSameDay(dt, selectedDateObj);
-          },
+          (lich) =>
+            isShowtimeWithinNextSevenDays(lich.ngayChieuGioChieu) &&
+            isMatchingSelectedDate(lich.ngayChieuGioChieu, selectedDateObj),
         );
         return { ...phim, lstLichChieuTheoPhim: lichChieuTrongNgay };
       })
@@ -209,10 +247,11 @@ const Cinema = () => {
                       {cumRap.tenCumRap}
                     </p>
                     <p className="text-gray-400 text-xs line-clamp-2 mb-1">
-                      📍 {cumRap.diaChi}
+                      <FontAwesomeIcon icon={faLocationDot} className="mr-1" />
+                      {cumRap.diaChi}
                     </p>
                     <p className="text-gray-500 text-xs">
-                      {cumRap.danhSachPhim?.length || 0} phim đang chiếu
+                      {countMoviesWithShowtimeInNextSevenDays(cumRap.danhSachPhim)} phim có suất chiếu
                     </p>
                   </button>
                 ))}
@@ -252,7 +291,7 @@ const Cinema = () => {
                 )}
 
                 <div className="mx-4 mt-4 bg-yellow-400/10 border border-yellow-400/40 text-yellow-400 text-sm px-4 py-2.5 rounded-lg flex items-center gap-2">
-                  <span>ⓘ</span>
+                  <FontAwesomeIcon icon={faCircleInfo} />
                   <span>Nhấn vào suất chiếu để tiến hành mua vé</span>
                 </div>
 
@@ -262,7 +301,8 @@ const Cinema = () => {
                       {currentCumRap.tenCumRap}
                     </p>
                     <p className="text-gray-400 text-xs mt-1">
-                      📍 {currentCumRap.diaChi}
+                      <FontAwesomeIcon icon={faLocationDot} className="mr-1" />
+                      {currentCumRap.diaChi}
                     </p>
                   </div>
                 )}
@@ -297,7 +337,7 @@ const Cinema = () => {
                         </Link>
 
                         <p className="text-gray-500 text-xs mb-3">
-                          Suất chiếu trong ngày
+                          Suất chiếu trong 7 ngày kế tiếp
                         </p>
 
                         <div className="flex flex-wrap gap-2">
@@ -323,15 +363,11 @@ const Cinema = () => {
                 ) : (
                   <div className="text-center py-16 px-4">
                     <p className="text-gray-400 mb-1">
-                      {availableDates.length === 0
-                        ? "Cụm rạp này chưa có lịch chiếu"
-                        : "Không có suất chiếu nào trong ngày này"}
+                      Không có suất chiếu nào trong ngày đã chọn
                     </p>
-                    {availableDates.length > 0 && (
-                      <p className="text-gray-500 text-sm">
-                        Vui lòng chọn ngày khác
-                      </p>
-                    )}
+                    <p className="text-gray-500 text-sm">
+                      Vui lòng chọn ngày khác trong 7 ngày kế tiếp
+                    </p>
                   </div>
                 )}
               </div>

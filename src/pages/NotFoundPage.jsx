@@ -1,4 +1,5 @@
-﻿import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { FontAwesomeIcon, faArrowLeft, faClapperboard, faHouse } from '../utils/fontAwesome'
 
 const NotFoundPage = () => {
   const navigate = useNavigate()
@@ -11,7 +12,7 @@ const NotFoundPage = () => {
 
       <div className="relative z-10 max-w-lg w-full text-center bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-10 shadow-2xl">
         
-        <div className="text-6xl mb-4 animate-bounce">🎬</div>
+        <FontAwesomeIcon icon={faClapperboard} className="mb-4 text-6xl animate-bounce text-yellow-400" />
 
         <h1 className="text-8xl md:text-9xl font-extrabold bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent leading-none">
           404
@@ -29,16 +30,18 @@ const NotFoundPage = () => {
         <div className="mt-8 flex gap-3 justify-center flex-wrap">
           <Link
             to="/"
-            className="px-6 py-3 rounded-xl bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold transition-all hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/30"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold transition-all hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/30"
           >
-            🏠 Về trang chủ
+            <FontAwesomeIcon icon={faHouse} />
+            <span>Về trang chủ</span>
           </Link>
 
           <button
             onClick={() => navigate(-1)}
-            className="px-6 py-3 rounded-xl bg-transparent border border-white/20 text-white hover:bg-white/10 font-semibold transition-all hover:scale-105"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-transparent border border-white/20 text-white hover:bg-white/10 font-semibold transition-all hover:scale-105"
           >
-            ← Quay lại
+            <FontAwesomeIcon icon={faArrowLeft} />
+            <span>Quay lại</span>
           </button>
         </div>
 

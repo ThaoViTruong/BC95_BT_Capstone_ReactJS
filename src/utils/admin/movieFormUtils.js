@@ -62,6 +62,10 @@ export const getApiMessage = (content, fallbackMessage) => {
   return fallbackMessage
 }
 
+const normalizeMovieTitle = (movieName = '') => {
+  return String(movieName || '').trim().replace(/\s+/g, ' ')
+}
+
 const createMovieAlias = (movieName = '', fallbackAlias = '') => {
   const normalizedFallbackAlias = String(fallbackAlias || '').trim()
 
@@ -86,13 +90,14 @@ export const buildMovieFormData = ({
   fallbackAlias = '',
 }) => {
   const formData = new FormData()
+  const movieTitleToSubmit = normalizeMovieTitle(movieForm.tenPhim)
 
   if (includeMovieId) {
     formData.append('maPhim', String(movieForm.maPhim))
   }
 
-  formData.append('tenPhim', movieForm.tenPhim.trim())
-  formData.append('biDanh', createMovieAlias(movieForm.tenPhim, fallbackAlias))
+  formData.append('tenPhim', movieTitleToSubmit)
+  formData.append('biDanh', createMovieAlias(movieTitleToSubmit, fallbackAlias))
   formData.append('trailer', movieForm.trailer.trim())
   formData.append('moTa', movieForm.moTa.trim())
   formData.append('maNhom', MA_NHOM)
@@ -103,7 +108,7 @@ export const buildMovieFormData = ({
   formData.append('sapChieu', String(movieForm.sapChieu))
 
   if (imageFile) {
-    formData.append('hinhAnh', imageFile, imageFile.name)
+    formData.append(includeMovieId ? 'File' : 'hinhAnh', imageFile, imageFile.name)
   }
 
   return formData

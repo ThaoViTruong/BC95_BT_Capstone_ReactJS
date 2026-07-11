@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, NavLink, Outlet } from 'react-router-dom'
+import { FontAwesomeIcon, faClapperboard, faClock, faUsers } from '../utils/fontAwesome'
 import { logout, selectorIsLoggedIn, selectorUser } from '../store/authSlice'
 import { useProfile } from '../hooks/useUser'
 
@@ -38,15 +39,15 @@ const AdminLayout = () => {
                 <nav className="flex-1 px-4 py-5 space-y-2">
                     <p className="text-white text-sm uppercase tracking-widest px-5 mb-4">Quản lý</p>
                     <NavLink to="/admin/users" className={navLinkClassName}>
-                        <span className="text-2xl">👥</span>
+                        <FontAwesomeIcon icon={faUsers} className="text-xl" />
                         Người dùng
                     </NavLink>
                     <NavLink to="/admin/films" className={navLinkClassName}>
-                        <span className="text-2xl">🎬</span>
+                        <FontAwesomeIcon icon={faClapperboard} className="text-xl" />
                         Phim
                     </NavLink>
                     <NavLink to="/admin/showtimes" className={navLinkClassName}>
-                        <span className="text-2xl">🕐</span>
+                        <FontAwesomeIcon icon={faClock} className="text-xl" />
                         Lịch chiếu
                     </NavLink>
                 </nav>

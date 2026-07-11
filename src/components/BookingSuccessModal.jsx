@@ -1,4 +1,5 @@
-﻿import { useEffect } from 'react'
+import { useEffect } from 'react'
+import { FontAwesomeIcon, faArrowRight, faClapperboard, faCircleInfo, faXmark } from '../utils/fontAwesome'
 const BookingSuccessModal = ({ isOpen, onConfirm, onClose }) => {
   useEffect(() => {
     if (!isOpen) return;
@@ -34,9 +35,7 @@ const BookingSuccessModal = ({ isOpen, onConfirm, onClose }) => {
                      transition-all hover:rotate-90 duration-300 z-10"
           aria-label="Đóng"
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
         </button>
 
         <div className="p-8 pt-10">
@@ -68,7 +67,7 @@ const BookingSuccessModal = ({ isOpen, onConfirm, onClose }) => {
               Đặt vé thành công!
             </h2>
             <p className="text-gray-500 text-sm leading-relaxed">
-              🎉 Cảm ơn bạn đã đặt vé. <br />
+              Cảm ơn bạn đã đặt vé. <br />
               Bạn có thể kiểm tra thông tin trong{" "}
               <span className="font-semibold text-gray-700">
                 lịch sử đặt vé
@@ -81,11 +80,7 @@ const BookingSuccessModal = ({ isOpen, onConfirm, onClose }) => {
                           flex items-start gap-3">
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 
                             flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" 
-                   stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" 
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <FontAwesomeIcon icon={faCircleInfo} className="w-5 h-5 text-white" />
             </div>
             <p className="text-xs text-blue-900 leading-relaxed">
               Vé điện tử đã được lưu vào tài khoản. Vui lòng đến rạp trước 
@@ -102,7 +97,10 @@ const BookingSuccessModal = ({ isOpen, onConfirm, onClose }) => {
                          hover:bg-gray-50 hover:border-gray-300 
                          active:scale-95 transition-all duration-200"
             >
-              🎬 Tiếp tục đặt vé
+              <span className="inline-flex items-center gap-2">
+                <FontAwesomeIcon icon={faClapperboard} />
+                <span>Tiếp tục đặt vé</span>
+              </span>
             </button>
             <button
               onClick={onConfirm}
@@ -115,11 +113,7 @@ const BookingSuccessModal = ({ isOpen, onConfirm, onClose }) => {
                          flex items-center justify-center gap-2"
             >
               Xem lịch sử
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" 
-                   stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" 
-                      d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              <FontAwesomeIcon icon={faArrowRight} className="w-4 h-4" />
             </button>
           </div>
         </div>
