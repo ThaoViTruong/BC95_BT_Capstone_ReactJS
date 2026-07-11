@@ -41,7 +41,7 @@ const tabClassName =
 
 const navLinks = [
   { label: 'Phim', to: '/movie' },
-  { label: 'Rạp', to: '/cinema' },
+  { label: 'Rạp', to: '/movie#cinema-section' },
   { label: 'Ưu đãi', to: '#' },
 ]
 
@@ -114,7 +114,10 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
         const loggedInUser = response.data.content
 
         dispatch(login(loggedInUser))
-        navigate('/', { replace: true })
+        navigate(
+          loggedInUser?.maLoaiNguoiDung === 'QuanTri' ? '/admin' : '/',
+          { replace: true }
+        )
       } catch (error) {
         setLoginError(getApiMessage(error.response?.data?.content, 'Đăng nhập thất bại. Vui lòng thử lại.'))
       } finally {

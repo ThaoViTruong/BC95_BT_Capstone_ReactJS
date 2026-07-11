@@ -1,0 +1,21 @@
+export { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+export {
+  faArrowLeft,
+  faArrowRight,
+  faCalendarDays,
+  faChevronLeft,
+  faChevronRight,
+  faCircleInfo,
+  faClapperboard,
+  faClock,
+  faFilter,
+  faHouse,
+  faLocationDot,
+  faMagnifyingGlass,
+  faPlay,
+  faPlus,
+  faStar,
+  faTicket,
+  faUsers,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";

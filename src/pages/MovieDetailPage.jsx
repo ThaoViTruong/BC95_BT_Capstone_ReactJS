@@ -1,5 +1,16 @@
-﻿import { useState, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import {
+  FontAwesomeIcon,
+  faArrowLeft,
+  faCalendarDays,
+  faClapperboard,
+  faLocationDot,
+  faPlay,
+  faStar,
+  faTicket,
+  faUsers,
+} from "../utils/fontAwesome";
 import { useMovieDetail, useMovieShowtimes } from "../hooks/useMovies";
 import LoadingSpinner from "../components/LoadingSpinner";
 
@@ -12,6 +23,44 @@ const getYoutubeEmbedUrl = (url) => {
   return url;
 };
 
+const isAvailableTodayShowtime = (dateValue) => {
+  if (!dateValue) return false;
+
+  const targetDate = new Date(dateValue);
+  const today = new Date();
+
+  if (Number.isNaN(targetDate.getTime())) {
+    return false;
+  }
+
+  return (
+    targetDate.getFullYear() === today.getFullYear() &&
+    targetDate.getMonth() === today.getMonth() &&
+    targetDate.getDate() === today.getDate() &&
+    targetDate.getTime() >= today.getTime()
+  );
+};
+
+const getTodayShowtimeSystems = (showtimeData) => {
+  if (!Array.isArray(showtimeData?.heThongRapChieu)) {
+    return [];
+  }
+
+  return showtimeData.heThongRapChieu
+    .map((heThong) => ({
+      ...heThong,
+      cumRapChieu: (heThong.cumRapChieu || [])
+        .map((cumRap) => ({
+          ...cumRap,
+          lichChieuPhim: (cumRap.lichChieuPhim || []).filter((lich) =>
+            isAvailableTodayShowtime(lich.ngayChieuGioChieu),
+          ),
+        }))
+        .filter((cumRap) => cumRap.lichChieuPhim.length > 0),
+    }))
+    .filter((heThong) => heThong.cumRapChieu.length > 0);
+};
+
 const MovieDetailPage = () => {
   const { maPhim } = useParams();
   const { data: movie, isLoading, isError } = useMovieDetail(maPhim);
@@ -20,6 +69,16 @@ const MovieDetailPage = () => {
 
   const showtimeRef = useRef(null);
   const [activeSystem, setActiveSystem] = useState(0);
+  const todayShowtimeSystems = useMemo(
+    () => getTodayShowtimeSystems(showtimes),
+    [showtimes],
+  );
+
+  useEffect(() => {
+    if (activeSystem >= todayShowtimeSystems.length) {
+      setActiveSystem(0);
+    }
+  }, [activeSystem, todayShowtimeSystems.length]);
 
   const handleBooking = () => {
     showtimeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -32,8 +91,9 @@ const MovieDetailPage = () => {
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-400 text-xl mb-4">Không tìm thấy phim</p>
-          <Link to="/movie" className="text-yellow-400 hover:underline">
-            ← Quay lại danh sách
+          <Link to="/movie" className="inline-flex items-center gap-2 text-yellow-400 hover:underline">
+            <FontAwesomeIcon icon={faArrowLeft} />
+            <span>Quay lại danh sách</span>
           </Link>
         </div>
       </div>
@@ -57,9 +117,10 @@ const MovieDetailPage = () => {
             to="/movie"
             className="inline-flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition-colors mb-8 group"
           >
-            <span className="group-hover:-translate-x-1 transition-transform">
-              ←
-            </span>
+            <FontAwesomeIcon
+              icon={faArrowLeft}
+              className="group-hover:-translate-x-1 transition-transform"
+            />
             Quay lại danh sách
           </Link>
 
@@ -115,16 +176,15 @@ const MovieDetailPage = () => {
               <div className="flex items-center gap-3 mb-6">
                 <div className="flex gap-0.5">
                   {Array.from({ length: 10 }).map((_, index) => (
-                    <span
+                    <FontAwesomeIcon
                       key={index}
+                      icon={faStar}
                       className={`text-2xl ${
                         index < (movie?.danhGia || 0)
                           ? "text-yellow-400"
                           : "text-gray-700"
                       }`}
-                    >
-                      ★
-                    </span>
+                    />
                   ))}
                 </div>
                 <span className="text-gray-400 text-sm">
@@ -132,9 +192,12 @@ const MovieDetailPage = () => {
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3">
-                  <p className="text-gray-500 text-xs mb-1">📅 Khởi chiếu</p>
+                  <p className="text-gray-500 text-xs mb-1 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faCalendarDays} />
+                    <span>Khởi chiếu</span>
+                  </p>
                   <p className="text-white font-medium text-sm truncate">
                     {movie?.ngayKhoiChieu
                       ? new Date(movie.ngayKhoiChieu).toLocaleDateString(
@@ -144,21 +207,21 @@ const MovieDetailPage = () => {
                   </p>
                 </div>
                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3">
-                  <p className="text-gray-500 text-xs mb-1">🎬 Mã phim</p>
+                  <p className="text-gray-500 text-xs mb-1 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faClapperboard} />
+                    <span>Mã phim</span>
+                  </p>
                   <p className="text-white font-medium text-sm">
                     #{movie?.maPhim}
                   </p>
                 </div>
                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3">
-                  <p className="text-gray-500 text-xs mb-1">👥 Nhóm</p>
+                  <p className="text-gray-500 text-xs mb-1 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faUsers} />
+                    <span>Nhóm</span>
+                  </p>
                   <p className="text-white font-medium text-sm">
                     {movie?.maNhom}
-                  </p>
-                </div>
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3">
-                  <p className="text-gray-500 text-xs mb-1">🏷️ Bí danh</p>
-                  <p className="text-white font-medium text-sm truncate">
-                    {movie?.biDanh}
                   </p>
                 </div>
               </div>
@@ -178,13 +241,7 @@ const MovieDetailPage = () => {
                              text-white font-semibold px-8 py-3.5 rounded-xl 
                              transition-all duration-300"
                 >
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                  </svg>
+                  <FontAwesomeIcon icon={faPlay} />
                   Xem Trailer
                 </a>
                 <button
@@ -196,6 +253,7 @@ const MovieDetailPage = () => {
                              transition-all duration-300 shadow-lg shadow-yellow-500/25 
                              hover:shadow-yellow-500/40 cursor-pointer"
                 >
+                  <FontAwesomeIcon icon={faTicket} />
                   Đặt vé ngay
                 </button>
               </div>
@@ -245,10 +303,10 @@ const MovieDetailPage = () => {
               <div className="inline-block w-8 h-8 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin mb-4" />
               <p className="text-gray-400">Đang tải lịch chiếu...</p>
             </div>
-          ) : showtimes?.heThongRapChieu?.length > 0 ? (
+          ) : todayShowtimeSystems.length > 0 ? (
             <div className="flex min-h-[500px]">
               <div className="w-20 sm:w-24 border-r border-gray-800 bg-gray-900/50 flex-shrink-0">
-                {showtimes.heThongRapChieu.map((heThong, index) => (
+                {todayShowtimeSystems.map((heThong, index) => (
                   <button
                     key={heThong.maHeThongRap}
                     onClick={() => setActiveSystem(index)}
@@ -271,7 +329,7 @@ const MovieDetailPage = () => {
               </div>
 
               <div className="flex-1 p-4 sm:p-6 overflow-y-auto max-h-[600px] custom-scrollbar">
-                {showtimes.heThongRapChieu[activeSystem]?.cumRapChieu.map(
+                {todayShowtimeSystems[activeSystem]?.cumRapChieu.map(
                   (cumRap) => (
                     <div
                       key={cumRap.maCumRap}
@@ -284,7 +342,8 @@ const MovieDetailPage = () => {
                             {cumRap.tenCumRap}
                           </h3>
                           <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                            📍 {cumRap.diaChi}
+                            <FontAwesomeIcon icon={faLocationDot} className="mr-1" />
+                            {cumRap.diaChi}
                           </p>
                         </div>
                       </div>
@@ -328,7 +387,8 @@ const MovieDetailPage = () => {
           ) : (
             <div className="p-16 text-center">
               <p className="text-gray-500 text-lg">
-                🎬 Hiện chưa có lịch chiếu cho phim này
+                <FontAwesomeIcon icon={faClapperboard} className="mr-2" />
+                Hiện chưa có lịch chiếu khả dụng trong ngày cho phim này
               </p>
             </div>
           )}

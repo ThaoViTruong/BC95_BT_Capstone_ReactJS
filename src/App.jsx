@@ -14,10 +14,11 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import FilmPage from "./pages/admin/FilmPage";
 import RegisterPage from "./pages/RegisterPage";
-import BookingMovie from "./pages/BookingMovie"; // ⭐ THÊM IMPORT
+import BookingMovie from "./pages/BookingMovie";
 import FilmEditPage from "./pages/admin/FilmEditPage";
 import FilmShowtimePage from "./pages/admin/FilmShowtimePage";
 import ShowtimeManagementPage from "./pages/admin/ShowtimeManagementPage";
+import { ToastProvider } from "./components/ToastProvider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,56 +33,58 @@ function App() {
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/" element={<HomeLayout />}>
-              <Route index element={<MovieListPage />} />
-              <Route path="movie" element={<MovieListPage />} />
-              <Route path="movie/:maPhim" element={<MovieDetailPage />} />
-              <Route
-                path="profile"
-                element={
-                  <ProtectedRoute>
-                    <ProfilePage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="booking/:maLichChieu"
-                element={
-                  <ProtectedRoute>
-                    <BookingMovie />
-                  </ProtectedRoute>
-                }
-              />
-            </Route>
+        <ToastProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/" element={<HomeLayout />}>
+                <Route index element={<MovieListPage />} />
+                <Route path="movie" element={<MovieListPage />} />
+                <Route path="movie/:maPhim" element={<MovieDetailPage />} />
+                <Route
+                  path="profile"
+                  element={
+                    <ProtectedRoute>
+                      <ProfilePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="booking/:maLichChieu"
+                  element={
+                    <ProtectedRoute>
+                      <BookingMovie />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
 
-            {/* admin routes */}
-            <Route
-              path="/admin"
-              element={
-                <ProtectedAdminRoute>
-                  <AdminLayout />
-                </ProtectedAdminRoute>
-              }
-            >
-              <Route index element={<FilmPage />} />
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="users" element={<UserPage />} />
-              <Route path="films" element={<FilmPage />} />
-              <Route path="films/edit/:idFilm" element={<FilmEditPage />} />
+              {/* admin routes */}
               <Route
-                path="films/showtime/:idFilm"
-                element={<FilmShowtimePage />}
-              />
-              <Route path="showtimes" element={<ShowtimeManagementPage />} />
-            </Route>
+                path="/admin"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminLayout />
+                  </ProtectedAdminRoute>
+                }
+              >
+                <Route index element={<FilmPage />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="users" element={<UserPage />} />
+                <Route path="films" element={<FilmPage />} />
+                <Route path="films/edit/:idFilm" element={<FilmEditPage />} />
+                <Route
+                  path="films/showtime/:idFilm"
+                  element={<FilmShowtimePage />}
+                />
+                <Route path="showtimes" element={<ShowtimeManagementPage />} />
+              </Route>
 
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </BrowserRouter>
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </BrowserRouter>
+        </ToastProvider>
       </QueryClientProvider>
     </Provider>
   );

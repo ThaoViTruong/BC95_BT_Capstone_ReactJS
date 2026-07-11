@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import { Link } from 'react-router-dom'
+import { FontAwesomeIcon, faCalendarDays, faStar } from '../utils/fontAwesome'
 
 const FALLBACK_IMG = "https://placehold.co/300x450/1f2937/facc15?text=No+Image"
 const formatDate = (dateString) => {
@@ -50,7 +51,7 @@ const MovieCard = ({ movie }) => {
         </div>
 
         <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-lg">
-          <span className="text-yellow-400 text-sm">⭐</span>
+          <FontAwesomeIcon icon={faStar} className="text-sm text-yellow-400" />
           <span className="text-white text-sm font-medium">
             {movie.danhGia ?? "N/A"}/10
           </span>
@@ -69,7 +70,8 @@ const MovieCard = ({ movie }) => {
           {movie.tenPhim}
         </h3>
         <p className="text-gray-400 text-sm flex items-center gap-1">
-          📅 {formatDate(movie.ngayKhoiChieu)}
+          <FontAwesomeIcon icon={faCalendarDays} className="text-xs" />
+          <span>{formatDate(movie.ngayKhoiChieu)}</span>
         </p>
       </div>
     </Link>

@@ -1,6 +1,64 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { userApi } from "../api/userApi"
 
+const USER_GROUP_CODES = ['GP00', 'GP01']
+
+const fetchUsersByGroups = async () => {
+    const responses = await Promise.all(
+        USER_GROUP_CODES.map((groupCode) => userApi.getUserList(groupCode))
+    )
+
+    return responses.flatMap((response) => response.data.content || [])
+}
+
+const mergeUsersByAccount = (users) => {
+    const mergedUsersMap = new Map()
+
+    users.forEach((user) => {
+        if (user?.taiKhoan) {
+            mergedUsersMap.set(user.taiKhoan, user)
+        }
+    })
+
+    return Array.from(mergedUsersMap.values())
+}
+
+const sortUsersByAccount = (users) => {
+    return [...users].sort((userA, userB) =>
+        (userA.taiKhoan || '').localeCompare(userB.taiKhoan || '')
+    )
+}
+
+const normalizeUserKeyword = (keyword = '') => {
+    return keyword.trim().toLowerCase()
+}
+
+const filterUsersByKeyword = (users, keyword) => {
+    if (!keyword) {
+        return users
+    }
+
+    return users.filter((user) =>
+        [user.taiKhoan, user.hoTen, user.email, user.soDT, user.maLoaiNguoiDung]
+            .some((value) => String(value || '').toLowerCase().includes(keyword))
+    )
+}
+
+const paginateUsers = (users, currentPage, pageSize) => {
+    const totalCount = users.length
+    const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
+    const safePage = Math.min(Math.max(currentPage, 1), totalPages)
+    const startIndex = (safePage - 1) * pageSize
+
+    return {
+        currentPage: safePage,
+        count: pageSize,
+        totalPages,
+        totalCount,
+        items: users.slice(startIndex, startIndex + pageSize),
+    }
+}
+
 export const useProfile = (isLoggedIn) => {
     return useQuery({
         queryKey: ['profile'],
@@ -18,43 +76,13 @@ export const useUsers = (soTrang = 1, soPhanTuTrenTrang = 10, tuKhoa = '') => {
         queryKey: ['users', soTrang, soPhanTuTrenTrang, tuKhoa],
         placeholderData: keepPreviousData,
         queryFn: async () => {
-            const [gp00Response, gp01Response] = await Promise.all([
-                userApi.getUserList('GP00'),
-                userApi.getUserList('GP01')
-            ])
+            const fetchedUsers = await fetchUsersByGroups()
+            const mergedUsers = mergeUsersByAccount(fetchedUsers)
+            const sortedUsers = sortUsersByAccount(mergedUsers)
+            const normalizedKeyword = normalizeUserKeyword(tuKhoa)
+            const filteredUsers = filterUsersByKeyword(sortedUsers, normalizedKeyword)
 
-            const mergedUsersMap = new Map()
-
-            ;[...(gp00Response.data.content || []), ...(gp01Response.data.content || [])].forEach((user) => {
-                if (user?.taiKhoan) {
-                    mergedUsersMap.set(user.taiKhoan, user)
-                }
-            })
-
-            const normalizedKeyword = tuKhoa.trim().toLowerCase()
-            const mergedUsers = Array.from(mergedUsersMap.values()).sort((userA, userB) =>
-                (userA.taiKhoan || '').localeCompare(userB.taiKhoan || '')
-            )
-
-            const filteredUsers = normalizedKeyword
-                ? mergedUsers.filter((user) =>
-                    [user.taiKhoan, user.hoTen, user.email, user.soDT, user.maLoaiNguoiDung]
-                        .some((value) => String(value || '').toLowerCase().includes(normalizedKeyword))
-                )
-                : mergedUsers
-
-            const totalCount = filteredUsers.length
-            const totalPages = Math.max(1, Math.ceil(totalCount / soPhanTuTrenTrang))
-            const safePage = Math.min(Math.max(soTrang, 1), totalPages)
-            const startIndex = (safePage - 1) * soPhanTuTrenTrang
-
-            return {
-                currentPage: safePage,
-                count: soPhanTuTrenTrang,
-                totalPages,
-                totalCount,
-                items: filteredUsers.slice(startIndex, startIndex + soPhanTuTrenTrang),
-            }
+            return paginateUsers(filteredUsers, soTrang, soPhanTuTrenTrang)
         }
     })
 }

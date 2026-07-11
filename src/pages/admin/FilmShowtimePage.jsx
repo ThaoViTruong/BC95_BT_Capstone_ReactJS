@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import ConfirmActionModal from '../../components/admin/film-management/ConfirmActionModal'
+import { useToast } from '../../components/ToastProvider'
 import { cinemaApi } from '../../api/cinemaApi'
 import { useCumRapTheoHeThong, useHeThongRap } from '../../hooks/useCinema'
 import { useMovieDetail } from '../../hooks/useMovies'
@@ -63,40 +65,39 @@ const buildShowtimePayload = (movieId, dateTimeValue, clusterCode, ticketPrice) 
   }
 }
 
-const ResultPopup = ({ result, onClose }) => {
-  if (!result) {
-    return null
-  }
+const getActiveHeThongRap = (selectedHeThongRap, heThongRap) => {
+  return selectedHeThongRap || heThongRap[0]?.maHeThongRap || ''
+}
 
-  const accentClassName =
-    result.type === 'success'
-      ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
-      : 'border-red-500/30 bg-red-500/10 text-red-300'
-
+const getActiveCumRap = (selectedCumRap, cumRapTheoHeThong) => {
   return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/75 px-4 backdrop-blur-sm">
-      <div className={`w-full max-w-md rounded-[28px] border p-8 shadow-[0_30px_80px_rgba(0,0,0,0.45)] ${accentClassName}`}>
-        <p className="text-sm font-semibold uppercase tracking-[0.3em]">
-          {result.type === 'success' ? 'Hoàn tất' : 'Không thành công'}
-        </p>
-        <h3 className="mt-3 text-3xl font-bold text-white">{result.title}</h3>
-        <p className="mt-4 text-base leading-8 text-white/85">{result.message}</p>
-        <div className="mt-8 flex justify-end">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-2xl border border-white/10 px-5 py-3 text-base font-medium text-white transition hover:bg-white/5"
-          >
-            Đóng
-          </button>
-        </div>
-      </div>
-    </div>
+    cumRapTheoHeThong.find((cumRap) => cumRap.maCumRap === selectedCumRap)?.maCumRap ||
+    cumRapTheoHeThong[0]?.maCumRap ||
+    ''
   )
+}
+
+const getSelectedCumRapData = (cumRapTheoHeThong, activeCumRap) => {
+  return cumRapTheoHeThong.find((cumRap) => cumRap.maCumRap === activeCumRap) || null
+}
+
+const isShowtimeFormInvalid = ({ movieId, clusterCode, dateTimeValue }) => {
+  return !movieId || !clusterCode || !dateTimeValue
+}
+
+const buildCreateShowtimeVariables = ({ movieId, dateTimeValue, ticketPrice, clusterCode }) => {
+  return {
+    movieId,
+    dateTimeValue,
+    ticketPrice,
+    clusterCode,
+  }
 }
 
 const FilmShowtimePage = () => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const { showToast } = useToast()
   const { idFilm } = useParams()
   const { data: movieDetail, isLoading, isError, error } = useMovieDetail(idFilm)
   const { data: heThongRap = [], isLoading: isLoadingHeThongRap } = useHeThongRap()
@@ -104,16 +105,13 @@ const FilmShowtimePage = () => {
   const [selectedCumRap, setSelectedCumRap] = useState('')
   const [ngayChieuGioChieu, setNgayChieuGioChieu] = useState('')
   const [giaVe, setGiaVe] = useState(75000)
-  const [resultPopup, setResultPopup] = useState(null)
-  const activeHeThongRap = selectedHeThongRap || heThongRap[0]?.maHeThongRap || ''
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
+  const activeHeThongRap = getActiveHeThongRap(selectedHeThongRap, heThongRap)
   const { data: cumRapTheoHeThong = [], isLoading: isLoadingCumRap } = useCumRapTheoHeThong(activeHeThongRap)
-  const activeCumRap =
-    cumRapTheoHeThong.find((cumRap) => cumRap.maCumRap === selectedCumRap)?.maCumRap ||
-    cumRapTheoHeThong[0]?.maCumRap ||
-    ''
+  const activeCumRap = getActiveCumRap(selectedCumRap, cumRapTheoHeThong)
 
   const selectedCumRapData = useMemo(
-    () => cumRapTheoHeThong.find((cumRap) => cumRap.maCumRap === activeCumRap),
+    () => getSelectedCumRapData(cumRapTheoHeThong, activeCumRap),
     [activeCumRap, cumRapTheoHeThong]
   )
 
@@ -121,14 +119,19 @@ const FilmShowtimePage = () => {
     mutationFn: ({ movieId, dateTimeValue, ticketPrice, clusterCode }) =>
       cinemaApi.createShowtime(buildShowtimePayload(movieId, dateTimeValue, clusterCode, ticketPrice)),
     onSuccess: () => {
-      setResultPopup({
+      setIsConfirmModalOpen(false)
+      queryClient.invalidateQueries({ queryKey: ['lichChieuHeThongRap'] })
+      queryClient.invalidateQueries({ queryKey: ['adminShowtimeSystem'] })
+      queryClient.invalidateQueries({ queryKey: ['movieShowtimes', movieDetail?.maPhim] })
+      showToast({
         type: 'success',
         title: 'Tạo lịch chiếu thành công',
         message: 'Lịch chiếu mới đã được tạo cho bộ phim này.',
       })
+      navigate('/admin/showtimes')
     },
     onError: (mutationError) => {
-      setResultPopup({
+      showToast({
         type: 'error',
         title: 'Tạo lịch chiếu thất bại',
         message: getApiMessage(mutationError.response?.data, 'Không thể tạo lịch chiếu. Vui lòng thử lại.'),
@@ -139,8 +142,14 @@ const FilmShowtimePage = () => {
   const handleSubmit = (event) => {
     event.preventDefault()
 
-    if (!movieDetail?.maPhim || !selectedCumRapData?.maCumRap || !ngayChieuGioChieu) {
-      setResultPopup({
+    if (
+      isShowtimeFormInvalid({
+        movieId: movieDetail?.maPhim,
+        clusterCode: selectedCumRapData?.maCumRap,
+        dateTimeValue: ngayChieuGioChieu,
+      })
+    ) {
+      showToast({
         type: 'error',
         title: 'Thiếu thông tin',
         message: 'Vui lòng chọn đầy đủ hệ thống rạp, cụm rạp, ngày chiếu giờ chiếu và giá vé.',
@@ -148,12 +157,21 @@ const FilmShowtimePage = () => {
       return
     }
 
-    createShowtimeMutation.mutate({
+    setIsConfirmModalOpen(true)
+  }
+
+  const handleConfirmCreateShowtime = () => {
+    if (!movieDetail?.maPhim || !selectedCumRapData?.maCumRap || !ngayChieuGioChieu) {
+      setIsConfirmModalOpen(false)
+      return
+    }
+
+    createShowtimeMutation.mutate(buildCreateShowtimeVariables({
       movieId: movieDetail.maPhim,
       dateTimeValue: ngayChieuGioChieu,
       ticketPrice: giaVe,
       clusterCode: selectedCumRapData.maCumRap,
-    })
+    }))
   }
 
   if (isLoading) {
@@ -310,7 +328,7 @@ const FilmShowtimePage = () => {
               <button
                 type="submit"
                 disabled={createShowtimeMutation.isPending}
-                className="rounded-2xl bg-gradient-to-black from-red-500 to-red-700 px-6 py-4 text-base font-semibold text-white transition hover:from-red-400 hover:to-red-600 disabled:cursor-not-allowed disabled:opacity-70"
+                className="rounded-2xl border border-red-300/30 bg-gradient-to-r from-red-500 via-red-600 to-rose-600 px-7 py-4 text-base font-semibold text-white shadow-[0_16px_40px_rgba(239,68,68,0.35)] transition hover:-translate-y-0.5 hover:from-red-400 hover:via-red-500 hover:to-rose-500 hover:shadow-[0_20px_50px_rgba(239,68,68,0.45)] focus:outline-none focus:ring-2 focus:ring-red-400/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0"
               >
                 {createShowtimeMutation.isPending ? 'Đang tạo...' : 'Tạo lịch chiếu'}
               </button>
@@ -318,8 +336,15 @@ const FilmShowtimePage = () => {
           </form>
         </div>
       </div>
-
-      <ResultPopup result={resultPopup} onClose={() => setResultPopup(null)} />
+      <ConfirmActionModal
+        isOpen={isConfirmModalOpen}
+        title="Xác nhận tạo lịch chiếu"
+        description={`Bạn có chắc muốn tạo lịch chiếu cho phim "${movieDetail?.tenPhim}" tại cụm rạp "${selectedCumRapData?.tenCumRap || 'Chưa chọn'}" vào lúc "${formatDateTimeForApi(ngayChieuGioChieu) || 'Chưa chọn'}" với giá vé ${Number(giaVe || 0).toLocaleString('vi-VN')} VNĐ không?`}
+        confirmLabel="Xác nhận tạo"
+        isSubmitting={createShowtimeMutation.isPending}
+        onCancel={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleConfirmCreateShowtime}
+      />
     </div>
   )
 }

@@ -1,6 +1,8 @@
 
 import axios from 'axios'
 
+const USER_STORAGE_KEY = "user"
+
 const axiosInstance = axios.create({
     baseURL: "https://movienew.cybersoft.edu.vn/api",
 
@@ -10,7 +12,9 @@ const axiosInstance = axios.create({
 })
 
 axiosInstance.interceptors.request.use((config) => {
-    const user = localStorage.getItem("user")
+    localStorage.removeItem(USER_STORAGE_KEY)
+
+    const user = sessionStorage.getItem(USER_STORAGE_KEY)
 
     if (user) {
         try {
@@ -20,7 +24,7 @@ axiosInstance.interceptors.request.use((config) => {
                 config.headers.Authorization = `Bearer ${accessToken}`
             }
         } catch {
-            localStorage.removeItem("user")
+            sessionStorage.removeItem(USER_STORAGE_KEY)
         }
     }
 
