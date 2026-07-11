@@ -8,6 +8,8 @@ export {
   faCircleInfo,
   faClapperboard,
   faClock,
+  faEye,
+  faEyeSlash,
   faFilter,
   faHouse,
   faLocationDot,

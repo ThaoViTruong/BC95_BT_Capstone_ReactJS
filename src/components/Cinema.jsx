@@ -2,9 +2,15 @@ import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon, faCircleInfo, faLocationDot } from "../utils/fontAwesome";
 import { useHeThongRap, useLichChieuHeThongRap } from "../hooks/useCinema";
+import { useAdminMovieList } from "../hooks/useMovies";
 import LoadingSpinner from "./LoadingSpinner";
+import {
+  createAvailableMovieIdSet,
+  filterCinemaClustersByAvailableMovies,
+} from "../utils/showtimeFilterUtils";
 
 const NEXT_SEVEN_DAYS = 7;
+const MA_NHOM = "GP01";
 
 const formatTimeOnly = (isoString) => {
   if (!isoString) return "";
@@ -113,6 +119,8 @@ const Cinema = () => {
 
   const { data: lichChieuData, isLoading: isLoadingLichChieu } =
     useLichChieuHeThongRap(selectedCinema);
+  const { data: availableMovies = [], isLoading: isLoadingMovies } =
+    useAdminMovieList(MA_NHOM);
 
   const handleSelectCinema = (maHeThongRap) => {
     setSelectedCinema(maHeThongRap);
@@ -124,7 +132,16 @@ const Cinema = () => {
     (h) => h.maHeThongRap === selectedCinema,
   );
 
-  const danhSachCumRap = lichChieuData?.[0]?.lstCumRap || [];
+  const availableMovieIds = useMemo(
+    () => createAvailableMovieIdSet(availableMovies),
+    [availableMovies],
+  );
+  const danhSachCumRap = useMemo(() => {
+    return filterCinemaClustersByAvailableMovies(
+      lichChieuData?.[0]?.lstCumRap || [],
+      availableMovieIds,
+    );
+  }, [lichChieuData, availableMovieIds]);
 
   const currentCumRap =
     danhSachCumRap.find((c) => c.maCumRap === selectedCumRap) ||
@@ -140,10 +157,18 @@ const Cinema = () => {
         (d) => d.key === selectedDate,
       );
       if (!isCurrentValid) {
-        setSelectedDate(availableDates[0].key);
+        const timeoutId = setTimeout(() => {
+          setSelectedDate(availableDates[0].key);
+        }, 0);
+
+        return () => clearTimeout(timeoutId);
       }
     } else {
-      setSelectedDate(null);
+      const timeoutId = setTimeout(() => {
+        setSelectedDate(null);
+      }, 0);
+
+      return () => clearTimeout(timeoutId);
     }
   }, [availableDates, selectedDate]);
 
@@ -176,7 +201,7 @@ const Cinema = () => {
         </p>
       </div>
 
-      {isLoadingHeThongRap && <LoadingSpinner />}
+      {(isLoadingHeThongRap || isLoadingMovies) && <LoadingSpinner />}
 
       <div className="flex flex-col md:flex-row gap-6">
         <div className="md:w-64 flex-shrink-0">

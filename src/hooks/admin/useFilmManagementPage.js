@@ -47,6 +47,9 @@ export const useFilmManagementPage = () => {
   const refreshMovieList = () => {
     queryClient.invalidateQueries({ queryKey: ["adminMovieList", MA_NHOM] });
     queryClient.invalidateQueries({ queryKey: ["movieList", MA_NHOM] });
+    queryClient.invalidateQueries({ queryKey: ["lichChieuHeThongRap"] });
+    queryClient.invalidateQueries({ queryKey: ["adminShowtimeSystem"] });
+    queryClient.invalidateQueries({ queryKey: ["movieShowtimes"] });
   };
 
   const resetAddState = () => {

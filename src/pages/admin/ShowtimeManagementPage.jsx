@@ -14,6 +14,11 @@ import {
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { cinemaApi } from "../../api/cinemaApi";
 import { useHeThongRap } from "../../hooks/useCinema";
+import { useAdminMovieList } from "../../hooks/useMovies";
+import {
+  createAvailableMovieIdSet,
+  filterScheduleSystemsByAvailableMovies,
+} from "../../utils/showtimeFilterUtils";
 
 const MA_NHOM = "GP01";
 const TIME_SLOTS = [
@@ -95,12 +100,6 @@ const getShortTitle = (title) => {
   }
 
   return title.length > 12 ? `${title.slice(0, 11)}...` : title;
-};
-
-const formatRuntime = (minutes) => {
-  const endHour = 8 + Math.floor(minutes / 60);
-  const endMinute = String(minutes % 60).padStart(2, "0");
-  return `${String(endHour).padStart(2, "0")}:${endMinute}`;
 };
 
 const formatTimeLabel = (dateValue) => {
@@ -361,6 +360,8 @@ const ShowtimeManagementPage = () => {
   const navigate = useNavigate();
   const { data: heThongRap = [], isLoading: isLoadingHeThongRap } =
     useHeThongRap();
+  const { data: availableMovies = [], isLoading: isLoadingMovies } =
+    useAdminMovieList(MA_NHOM);
   const dateOptions = useMemo(() => createDateOptions(), []);
   const [activeDate, setActiveDate] = useState(dateOptions[0]?.value || "");
   const [keyword, setKeyword] = useState("");
@@ -378,12 +379,22 @@ const ShowtimeManagementPage = () => {
     })),
   });
 
+  const availableMovieIds = useMemo(
+    () => createAvailableMovieIdSet(availableMovies),
+    [availableMovies],
+  );
   const activeDateOption =
     dateOptions.find((item) => item.value === activeDate) || dateOptions[0];
-  const scheduleSystems = useMemo(
-    () => lichChieuQueries.map((query) => query.data).filter(Boolean),
-    [lichChieuQueries],
-  );
+  const scheduleSystems = useMemo(() => {
+    const rawScheduleSystems = lichChieuQueries
+      .map((query) => query.data)
+      .filter(Boolean);
+
+    return filterScheduleSystemsByAvailableMovies(
+      rawScheduleSystems,
+      availableMovieIds,
+    );
+  }, [lichChieuQueries, availableMovieIds]);
   const entries = useMemo(
     () => buildActualShowtimeEntries(scheduleSystems, activeDate, keyword),
     [scheduleSystems, activeDate, keyword],
@@ -420,6 +431,7 @@ const ShowtimeManagementPage = () => {
 
   const isLoading =
     isLoadingHeThongRap ||
+    isLoadingMovies ||
     (heThongRap.length > 0 && lichChieuQueries.some((query) => query.isLoading));
 
   if (isLoading) {
