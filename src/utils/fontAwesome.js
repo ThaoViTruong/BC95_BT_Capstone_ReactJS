@@ -2,6 +2,7 @@ export { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 export {
   faArrowLeft,
   faArrowRight,
+  faBars,
   faCalendarDays,
   faChevronLeft,
   faChevronRight,
@@ -21,3 +22,4 @@ export {
   faUsers,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
+

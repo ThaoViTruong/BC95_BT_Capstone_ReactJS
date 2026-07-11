@@ -191,29 +191,32 @@ const Cinema = () => {
   }, [currentCumRap, selectedDate]);
 
   return (
-    <div>
-      <div className="text-center mb-8">
-        <h2 className="text-3xl md:text-4xl font-bold mb-2">
+    <div className="rounded-[26px] border border-white/10 bg-[#101214] p-3 shadow-[0_24px_80px_rgba(0,0,0,0.25)] sm:p-4 lg:p-5">
+      <div className="mb-6 text-center sm:mb-8">
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-red-400 sm:text-xs">
+          Lịch chiếu
+        </p>
+        <h2 className="mb-2 text-2xl font-black uppercase md:text-4xl">
           Lịch chiếu theo <span className="text-yellow-400">Rạp</span>
         </h2>
-        <p className="text-gray-400">
+        <p className="text-xs text-gray-400 sm:text-sm">
           Chọn chuỗi rạp, cụm rạp và ngày để xem lịch chiếu
         </p>
       </div>
 
       {(isLoadingHeThongRap || isLoadingMovies) && <LoadingSpinner />}
 
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="md:w-64 flex-shrink-0">
-          <h3 className="text-gray-400 text-xs uppercase tracking-widest mb-4 font-medium">
+      <div className="flex flex-col gap-4 xl:flex-row xl:gap-6">
+        <div className="flex-shrink-0 xl:w-64">
+          <h3 className="mb-3 text-[11px] font-medium uppercase tracking-[0.26em] text-gray-400 sm:mb-4 sm:text-xs">
             Chuỗi rạp
           </h3>
-          <div className="space-y-2">
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-4 md:grid-cols-4 xl:block xl:space-y-2">
             {listHeThongRap?.map((heThongRap) => (
               <button
                 key={heThongRap.maHeThongRap}
                 onClick={() => handleSelectCinema(heThongRap.maHeThongRap)}
-                className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer ${
+                className={`flex min-h-[76px] flex-col items-center justify-center gap-2 rounded-xl border px-2 py-2.5 text-center transition-all duration-200 xl:w-full xl:min-h-0 xl:flex-row xl:justify-start xl:gap-4 xl:px-4 xl:py-3 xl:text-left ${
                   selectedCinema === heThongRap.maHeThongRap
                     ? "bg-yellow-400/10 border border-yellow-400 text-yellow-400"
                     : "bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700"
@@ -222,14 +225,14 @@ const Cinema = () => {
                 <img
                   src={heThongRap.logo}
                   alt={heThongRap.tenHeThongRap}
-                  className="w-10 h-10 object-contain rounded-lg bg-white p-1"
+                  className="h-9 w-9 rounded-lg bg-white p-1 object-contain sm:h-10 sm:w-10"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src =
                       "https://placehold.co/40x40/fff/000?text=Logo";
                   }}
                 />
-                <span className="font-medium text-sm text-left">
+                <span className="line-clamp-2 text-center text-[10px] font-medium xl:text-left xl:text-sm">
                   {heThongRap.tenHeThongRap}
                 </span>
               </button>
@@ -238,17 +241,17 @@ const Cinema = () => {
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3 mb-6">
+          <div className="mb-4 flex items-center gap-3 sm:mb-6">
             <img
               src={renderSelectedCinema?.logo}
               alt={renderSelectedCinema?.tenHeThongRap}
-              className="w-12 h-12 object-contain bg-white rounded-xl p-1"
+              className="h-10 w-10 rounded-xl bg-white p-1 object-contain sm:h-12 sm:w-12"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = "https://placehold.co/40x40/fff/000?text=Logo";
               }}
             />
-            <h3 className="text-2xl font-bold text-yellow-400">
+            <h3 className="text-lg font-bold text-yellow-400 sm:text-2xl">
               {renderSelectedCinema?.tenHeThongRap}
             </h3>
           </div>
@@ -256,49 +259,50 @@ const Cinema = () => {
           {isLoadingLichChieu && <LoadingSpinner />}
 
           {!isLoadingLichChieu && danhSachCumRap.length > 0 && (
-            <div className="grid grid-cols-12 gap-0 bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-              <div className="col-span-12 md:col-span-5 border-r border-gray-800 max-h-[750px] overflow-y-auto">
+            <div className="grid grid-cols-12 gap-0 overflow-hidden rounded-2xl border border-white/10 bg-[#151719]">
+              <div className="col-span-12 max-h-[320px] overflow-y-auto border-b border-white/10 md:col-span-5 md:max-h-[750px] md:border-b-0 md:border-r">
                 {danhSachCumRap.map((cumRap) => (
                   <button
                     key={cumRap.maCumRap}
                     onClick={() => setSelectedCumRap(cumRap.maCumRap)}
-                    className={`w-full text-left p-4 border-b border-gray-800 transition cursor-pointer ${
+                    className={`w-full border-b border-white/10 p-3 text-left transition sm:p-4 ${
                       currentCumRap?.maCumRap === cumRap.maCumRap
                         ? "bg-gray-800 border-l-4 border-l-yellow-400"
                         : "hover:bg-gray-800/60 border-l-4 border-l-transparent"
                     }`}
                   >
-                    <p className="text-yellow-400 font-semibold text-sm mb-1 line-clamp-1">
+                    <p className="mb-1 line-clamp-1 text-xs font-semibold text-yellow-400 sm:text-sm">
                       {cumRap.tenCumRap}
                     </p>
-                    <p className="text-gray-400 text-xs line-clamp-2 mb-1">
+                    <p className="mb-1 line-clamp-2 text-[11px] text-gray-400 sm:text-xs">
                       <FontAwesomeIcon icon={faLocationDot} className="mr-1" />
                       {cumRap.diaChi}
                     </p>
-                    <p className="text-gray-500 text-xs">
+                    <p className="text-[10px] text-gray-500 sm:text-xs">
                       {countMoviesWithShowtimeInNextSevenDays(cumRap.danhSachPhim)} phim có suất chiếu
                     </p>
                   </button>
                 ))}
               </div>
 
-              <div className="col-span-12 md:col-span-7 max-h-[750px] overflow-y-auto">
+              <div className="col-span-12 max-h-[750px] overflow-y-auto md:col-span-7">
                 {availableDates.length > 0 && (
-                  <div className="sticky top-0 z-10 bg-gray-900 border-b border-gray-800 px-3 py-3">
-                    <div className="flex gap-1 overflow-x-auto scrollbar-hide">
+                  <div className="sticky top-0 z-10 border-b border-white/10 bg-[#151719] px-3 py-3">
+                    <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                       {availableDates.map((item) => {
                         const isActive = item.key === selectedDate;
                         return (
                           <button
                             key={item.key}
                             onClick={() => setSelectedDate(item.key)}
-                            className={`flex-shrink-0 min-w-[70px] py-2 px-2 rounded-lg text-center transition-all cursor-pointer ${
+                            className={`flex-shrink-0 rounded-lg px-2 py-2 text-center transition-all ${
                               isActive
                                 ? "bg-yellow-400 text-black shadow-lg shadow-yellow-500/20"
                                 : "bg-gray-800 text-gray-300 hover:bg-gray-700"
                             }`}
+                            style={{ minWidth: "78px" }}
                           >
-                            <div className="text-sm font-bold">
+                            <div className="text-xs font-bold sm:text-sm">
                               {item.day}/{item.month}
                             </div>
                             <div
@@ -315,17 +319,17 @@ const Cinema = () => {
                   </div>
                 )}
 
-                <div className="mx-4 mt-4 bg-yellow-400/10 border border-yellow-400/40 text-yellow-400 text-sm px-4 py-2.5 rounded-lg flex items-center gap-2">
+                <div className="mx-3 mt-3 flex items-center gap-2 rounded-lg border border-yellow-400/40 bg-yellow-400/10 px-3 py-2 text-xs text-yellow-400 sm:mx-4 sm:mt-4 sm:px-4 sm:py-2.5 sm:text-sm">
                   <FontAwesomeIcon icon={faCircleInfo} />
                   <span>Nhấn vào suất chiếu để tiến hành mua vé</span>
                 </div>
 
                 {currentCumRap && (
-                  <div className="px-4 py-3 border-b border-gray-800">
-                    <p className="text-white font-semibold text-sm">
+                  <div className="border-b border-white/10 px-3 py-3 sm:px-4">
+                    <p className="text-sm font-semibold text-white">
                       {currentCumRap.tenCumRap}
                     </p>
-                    <p className="text-gray-400 text-xs mt-1">
+                    <p className="mt-1 text-[11px] text-gray-400 sm:text-xs">
                       <FontAwesomeIcon icon={faLocationDot} className="mr-1" />
                       {currentCumRap.diaChi}
                     </p>
@@ -336,16 +340,16 @@ const Cinema = () => {
                   filteredPhimByDate.map((phim) => (
                     <div
                       key={phim.maPhim}
-                      className="p-4 border-b border-gray-800 flex gap-3"
+                      className="flex flex-col gap-3 border-b border-white/10 p-3 sm:flex-row sm:p-4"
                     >
                       <Link
                         to={`/movie/${phim.maPhim}`}
-                        className="flex-shrink-0 block"
+                        className="mx-auto block flex-shrink-0 sm:mx-0"
                       >
                         <img
                           src={phim.hinhAnh}
                           alt={phim.tenPhim}
-                          className="w-20 h-28 object-cover rounded-lg hover:opacity-80 transition"
+                          className="h-24 w-[72px] rounded-lg object-cover transition hover:opacity-80 sm:h-28 sm:w-20"
                           onError={(e) => {
                             e.target.onerror = null;
                             e.target.src =
@@ -356,12 +360,12 @@ const Cinema = () => {
 
                       <div className="flex-1 min-w-0">
                         <Link to={`/movie/${phim.maPhim}`}>
-                          <h4 className="font-bold text-white mb-1 line-clamp-1 hover:text-yellow-400 transition">
+                          <h4 className="mb-1 line-clamp-1 text-sm font-bold text-white transition hover:text-yellow-400 sm:text-base">
                             {phim.tenPhim}
                           </h4>
                         </Link>
 
-                        <p className="text-gray-500 text-xs mb-3">
+                        <p className="mb-3 text-[11px] text-gray-500 sm:text-xs">
                           Suất chiếu trong 7 ngày kế tiếp
                         </p>
 
@@ -370,10 +374,10 @@ const Cinema = () => {
                             <Link
                               key={lich.maLichChieu}
                               to={`/booking/${lich.maLichChieu}`}
-                              className="group bg-gray-800 hover:bg-yellow-400 text-gray-200 hover:text-black text-xs px-3 py-2 rounded-lg transition border border-gray-700 hover:border-yellow-400 min-w-[70px] text-center"
+                              className="group min-w-[68px] rounded-lg border border-gray-700 bg-gray-800 px-2.5 py-2 text-center text-[11px] text-gray-200 transition hover:border-yellow-400 hover:bg-yellow-400 hover:text-black sm:min-w-[74px] sm:px-3 sm:text-xs"
                               title={`Giá: ${formatPrice(lich.giaVe)}`}
                             >
-                              <div className="font-bold text-sm">
+                              <div className="text-xs font-bold sm:text-sm">
                                 {formatTimeOnly(lich.ngayChieuGioChieu)}
                               </div>
                               <div className="text-[10px] text-gray-500 group-hover:text-gray-700 mt-0.5">

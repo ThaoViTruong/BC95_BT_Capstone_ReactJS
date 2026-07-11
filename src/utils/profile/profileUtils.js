@@ -29,13 +29,13 @@ export const userInfoSchema = Yup.object({
 });
 
 export const formLabelClassName =
-  "mb-2 block text-sm font-semibold text-white";
+  "mb-2 block text-[11px] font-semibold uppercase tracking-[0.12em] text-white/72 sm:text-xs";
 export const formInputClassName =
-  "w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20";
+  "w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm text-white outline-none transition placeholder:text-white/28 focus:border-red-400 focus:ring-2 focus:ring-red-500/15 sm:px-4 sm:py-3";
 export const formInputDisabledClassName =
-  "w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/65 outline-none";
+  "w-full rounded-xl border border-white/10 bg-black/10 px-3 py-2.5 text-sm text-white/65 outline-none sm:px-4 sm:py-3";
 export const cardClassName =
-  "rounded-[28px] border border-white/10 bg-[#10151f]/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
+  "rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(21,19,19,0.94),rgba(16,18,22,0.96))] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.22)] sm:rounded-[26px] sm:p-5 lg:p-6";
 
 export const getApiMessage = (content, fallbackMessage) => {
   if (typeof content === "string" && content.trim()) {

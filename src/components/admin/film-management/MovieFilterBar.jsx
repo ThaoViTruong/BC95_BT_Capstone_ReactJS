@@ -1,55 +1,66 @@
-import { FontAwesomeIcon, faPlus } from "../../../utils/fontAwesome";
+import {
+  FontAwesomeIcon,
+  faFilter,
+  faMagnifyingGlass,
+} from "../../../utils/fontAwesome";
 
 const MovieFilterBar = ({
   searchValue,
   statusFilter,
   onSearchChange,
   onStatusChange,
-  onOpenAddModal,
   statusOptions,
-  labelClassName,
-  inputClassName,
 }) => (
-  <div className="rounded-[28px] border border-white/10 bg-[#151515] p-6">
-    <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_220px_180px] xl:items-end">
+  <div className="rounded-[24px] border border-white/10 bg-[#151515] p-3 sm:p-5">
+    <div className="grid grid-cols-[minmax(0,1fr)_132px] items-end gap-2.5 sm:gap-3 lg:grid-cols-[minmax(0,1fr)_220px]">
       <div>
-        <label htmlFor="film-search" className={labelClassName}>
+        <label
+          htmlFor="film-search"
+          className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55 sm:mb-3 sm:text-xs"
+        >
           Tìm kiếm
         </label>
-        <input
-          id="film-search"
-          type="text"
-          value={searchValue}
-          onChange={onSearchChange}
-          placeholder="Tìm kiếm bằng tên hoặc ID của phim..."
-          className={inputClassName}
-        />
+        <div className="relative">
+          <FontAwesomeIcon
+            icon={faMagnifyingGlass}
+            className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/35 sm:left-3.5 sm:h-4 sm:w-4"
+          />
+          <input
+            id="film-search"
+            type="text"
+            value={searchValue}
+            onChange={onSearchChange}
+            placeholder="Tìm tên phim hoặc mã phim..."
+            className="w-full rounded-xl border border-white/10 bg-[#181818] py-2 pl-8 pr-3 text-xs text-white outline-none transition placeholder:text-white/40 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 sm:rounded-2xl sm:py-4 sm:pl-11 sm:pr-5 sm:text-base"
+          />
+        </div>
       </div>
       <div>
-        <label htmlFor="film-status" className={labelClassName}>
+        <label
+          htmlFor="film-status"
+          className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55 sm:mb-3 sm:text-xs"
+        >
           Trạng thái
         </label>
-        <select
-          id="film-status"
-          value={statusFilter}
-          onChange={onStatusChange}
-          className={inputClassName}
-        >
-          {statusOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <FontAwesomeIcon
+            icon={faFilter}
+            className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/35 sm:left-3.5 sm:h-4 sm:w-4"
+          />
+          <select
+            id="film-status"
+            value={statusFilter}
+            onChange={onStatusChange}
+            className="w-full appearance-none rounded-xl border border-white/10 bg-[#181818] py-2 pl-8 pr-8 text-xs text-white outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20 sm:rounded-2xl sm:py-4 sm:pl-11 sm:pr-10 sm:text-base"
+          >
+            {statusOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
-      <button
-        type="button"
-        onClick={onOpenAddModal}
-        className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-red-500 to-red-700 px-4 py-4 text-base font-semibold text-white transition hover:from-red-400 hover:to-red-600"
-      >
-        <FontAwesomeIcon icon={faPlus} />
-        <span>Thêm phim</span>
-      </button>
     </div>
   </div>
 );

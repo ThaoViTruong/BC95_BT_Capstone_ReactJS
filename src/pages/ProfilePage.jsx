@@ -47,9 +47,14 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_bottom,_rgba(99,70,178,0.45),_transparent_35%),linear-gradient(135deg,#041230_0%,#06153a_55%,#07132b_100%)] text-white">
-      <div className="mx-auto max-w-7xl px-4 py-10">
-        <div className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(220,38,38,0.18),_transparent_28%),linear-gradient(135deg,#07080b_0%,#0a0d12_45%,#0b1018_100%)] text-white">
+      <div className="mx-auto max-w-6xl px-3 py-6 sm:px-4 sm:py-8">
+        <div className="mb-4 hidden xl:block">
+          <h1 className="text-3xl font-black uppercase tracking-tight text-white">
+            Thông tin khách hàng
+          </h1>
+        </div>
+        <div className="grid gap-4 xl:grid-cols-[260px_minmax(0,1fr)] xl:gap-5">
           <ProfileSidebar
             profile={profile}
             activeTab={activeTab}
@@ -60,6 +65,7 @@ const ProfilePage = () => {
 
           <ProfileMainContent
             activeTab={activeTab}
+            setActiveTab={setActiveTab}
             formik={formik}
             updateUserMutation={updateUserMutation}
             paginatedTickets={paginatedTickets}

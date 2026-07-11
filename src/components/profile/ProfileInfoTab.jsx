@@ -1,3 +1,4 @@
+import { FontAwesomeIcon, faUsers, faEyeSlash } from "../../utils/fontAwesome";
 import {
   cardClassName,
   formInputClassName,
@@ -13,25 +14,27 @@ const renderFieldError = (formik, fieldName) => {
   return <p className="mt-2 text-sm text-red-400">{formik.errors[fieldName]}</p>;
 };
 
+const SectionHeading = ({ icon, title, description }) => (
+  <div className="mb-5 sm:mb-6">
+    <div className="flex items-center gap-2.5">
+      <FontAwesomeIcon icon={icon} className="text-sm text-rose-200" />
+      <h2 className="text-xl font-black uppercase tracking-tight text-white sm:text-2xl">
+        {title}
+      </h2>
+    </div>
+    {description ? (
+      <p className="mt-2 text-sm text-white/45">{description}</p>
+    ) : null}
+  </div>
+);
+
 const ProfileInfoTab = ({ formik, updateUserMutation }) => (
   <div className="space-y-6">
-    <div>
-      <h1 className="text-3xl font-black uppercase tracking-tight text-white">
-        Thông tin khách hàng
-      </h1>
-    </div>
-
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       <section className={cardClassName}>
-        <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-white">
-              Thông tin cá nhân
-            </h2>
-          </div>
-        </div>
+        <SectionHeading icon={faUsers} title="Thông tin cá nhân" />
 
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2 md:gap-5">
           <div>
             <label className={formLabelClassName}>Họ và tên</label>
             <input
@@ -76,11 +79,11 @@ const ProfileInfoTab = ({ formik, updateUserMutation }) => (
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end border-t border-white/10 pt-6">
+        <div className="mt-5 flex justify-end border-t border-white/10 pt-5 sm:mt-6 sm:pt-6">
           <button
             type="submit"
             disabled={updateUserMutation.isPending}
-            className="rounded-xl bg-yellow-400 px-5 py-3 text-sm font-bold text-gray-900 transition hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
+            className="rounded-xl bg-gradient-to-r from-red-600 to-red-700 px-5 py-2.5 text-sm font-bold text-white transition hover:from-red-500 hover:to-red-600 disabled:cursor-not-allowed disabled:opacity-70 sm:px-6 sm:py-3"
           >
             {updateUserMutation.isPending
               ? "Đang lưu thông tin..."
@@ -90,12 +93,11 @@ const ProfileInfoTab = ({ formik, updateUserMutation }) => (
       </section>
 
       <section className={cardClassName}>
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-white">Đổi mật khẩu</h2>
-          <p className="mt-1 text-sm text-white/55">
-            Chỉ nhập khi bạn muốn thay đổi mật khẩu hiện tại.
-          </p>
-        </div>
+        <SectionHeading
+          icon={faEyeSlash}
+          title="Đổi mật khẩu"
+          description="Chỉ nhập khi bạn muốn thay đổi mật khẩu hiện tại."
+        />
 
         <div className="grid gap-5">
           <div>
@@ -122,6 +124,18 @@ const ProfileInfoTab = ({ formik, updateUserMutation }) => (
             </div>
           ) : null}
         </div>
+
+        {formik.values.matKhau.trim() ? (
+          <div className="mt-5 flex justify-end border-t border-white/10 pt-5 sm:mt-6 sm:pt-6">
+            <button
+              type="submit"
+              disabled={updateUserMutation.isPending}
+              className="rounded-xl border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-70 sm:px-6 sm:py-3"
+            >
+              Cập nhật mật khẩu
+            </button>
+          </div>
+        ) : null}
       </section>
     </form>
   </div>

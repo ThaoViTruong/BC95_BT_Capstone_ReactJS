@@ -5,6 +5,7 @@ import {
   getTicketCinemaInfo,
   getTicketTotalPrice,
 } from "../../utils/profile/profileUtils";
+import { FontAwesomeIcon, faTicket } from "../../utils/fontAwesome";
 
 const ProfileTicketsTab = ({
   tickets,
@@ -17,21 +18,18 @@ const ProfileTicketsTab = ({
   onNextPage,
   onSelectPage,
 }) => (
-  <div className="space-y-6">
-    <div>
-      <h1 className="text-3xl font-black uppercase tracking-tight text-white">
-        Lịch sử mua hàng
-      </h1>
-    </div>
-
+  <div className="space-y-5 sm:space-y-6">
     <div className={cardClassName}>
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-4 flex flex-col gap-3 sm:mb-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white">
+          <div className="flex items-center gap-2.5">
+            <FontAwesomeIcon icon={faTicket} className="text-sm text-amber-200" />
+            <h2 className="text-xl font-black uppercase tracking-tight text-white sm:text-2xl">
             Danh sách đơn đã mua
-          </h2>
+            </h2>
+          </div>
         </div>
-        <span className="inline-flex rounded-full border border-yellow-400/20 bg-yellow-400/10 px-4 py-2 text-sm font-semibold text-yellow-300">
+        <span className="inline-flex rounded-full border border-yellow-400/20 bg-yellow-400/10 px-3 py-1.5 text-xs font-semibold text-yellow-300 sm:px-4 sm:py-2 sm:text-sm">
           Hiển thị {tickets.length} / {ticketCount} đơn
         </span>
       </div>
@@ -42,7 +40,58 @@ const ProfileTicketsTab = ({
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="overflow-x-auto">
+          <div className="space-y-3 md:hidden">
+            {tickets.map((ticket) => {
+              const cinemaInfo = getTicketCinemaInfo(ticket);
+              const isActive = selectedTicket?.maVe === ticket.maVe;
+              const totalPrice = getTicketTotalPrice(ticket);
+
+              return (
+                <div
+                  key={ticket.maVe}
+                  className={`rounded-xl border px-3 py-3 sm:rounded-2xl sm:px-4 sm:py-4 ${
+                    isActive
+                      ? "border-yellow-400/40 bg-yellow-400/10"
+                      : "border-white/10 bg-black/15"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-semibold text-white sm:text-sm">
+                        #{ticket.maVe}
+                      </p>
+                      <h3 className="mt-1 text-sm font-bold text-white sm:text-base">
+                        {ticket.tenPhim}
+                      </h3>
+                    </div>
+                    <span className="text-xs font-semibold text-yellow-300 sm:text-sm">
+                      {formatCurrency(totalPrice)}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 space-y-1.5 text-xs text-white/75 sm:mt-4 sm:space-y-2 sm:text-sm">
+                    <p>Rạp: {cinemaInfo.heThongRap || "—"}</p>
+                    <p>Ngày đặt: {formatDate(ticket.ngayDat)}</p>
+                    <p>Thời lượng: {ticket.thoiLuongPhim || 0} phút</p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => onSelectTicket(ticket.maVe)}
+                    className={`mt-3 w-full rounded-xl px-3 py-2 text-xs font-semibold transition sm:mt-4 sm:px-4 sm:py-2.5 sm:text-sm ${
+                      isActive
+                        ? "bg-yellow-400 text-gray-900"
+                        : "border border-white/10 bg-white/[0.05] text-white hover:bg-white/[0.12]"
+                    }`}
+                  >
+                    Xem vé
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="hidden overflow-x-auto md:block">
             <table className="min-w-full overflow-hidden rounded-2xl">
               <thead>
                 <tr className=" text-left text-sm font-bold text-white">
@@ -105,8 +154,8 @@ const ProfileTicketsTab = ({
             </table>
           </div>
 
-          <div className="flex flex-col gap-4 border-t border-white/10 pt-6 xl:flex-row xl:items-center xl:justify-between">
-            <p className="text-sm text-white/70">
+          <div className="flex flex-col gap-3 border-t border-white/10 pt-5 sm:gap-4 sm:pt-6 xl:flex-row xl:items-center xl:justify-between">
+            <p className="text-xs text-white/70 sm:text-sm">
               Trang <span className="font-semibold text-white">{activePage}</span>{" "}
               / {totalPages} - tổng cộng {ticketCount} đơn
             </p>
@@ -116,7 +165,7 @@ const ProfileTicketsTab = ({
                 type="button"
                 onClick={onPreviousPage}
                 disabled={activePage === 1}
-                className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/[0.1] disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/[0.1] disabled:cursor-not-allowed disabled:opacity-40 sm:px-4 sm:py-2 sm:text-sm"
               >
                 Trước
               </button>
@@ -127,7 +176,7 @@ const ProfileTicketsTab = ({
                     key={page}
                     type="button"
                     onClick={() => onSelectPage(page)}
-                    className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                    className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:py-2 sm:text-sm ${
                       page === activePage
                         ? "bg-yellow-400 text-gray-900"
                         : "border border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.1]"
@@ -142,7 +191,7 @@ const ProfileTicketsTab = ({
                 type="button"
                 onClick={onNextPage}
                 disabled={activePage === totalPages}
-                className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/[0.1] disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/[0.1] disabled:cursor-not-allowed disabled:opacity-40 sm:px-4 sm:py-2 sm:text-sm"
               >
                 Sau
               </button>

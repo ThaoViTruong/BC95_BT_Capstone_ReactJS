@@ -1,5 +1,5 @@
 // src/pages/MovieListPage.jsx
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import {
   FontAwesomeIcon,
@@ -27,6 +27,7 @@ const MovieListPage = () => {
   const [appliedToDate, setAppliedToDate] = useState("");
   const pageSize = 10;
   const movieListRef = useRef(null);
+  const movieRailRef = useRef(null);
   const location = useLocation();
   const debouncedSearch = useDebounce(search, 500);
   const formatDateForApi = (date) => {
@@ -36,7 +37,11 @@ const MovieListPage = () => {
   };
 
   useEffect(() => {
-    setCurrentPage(1);
+    const timeoutId = setTimeout(() => {
+      setCurrentPage(1);
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
   }, [debouncedSearch]);
 
   const normalQuery = useMovieList(
@@ -106,6 +111,14 @@ const MovieListPage = () => {
     }
   };
 
+  const scrollMovieRail = (direction) => {
+    if (!movieRailRef.current) return;
+    movieRailRef.current.scrollBy({
+      left: direction * 280,
+      behavior: "smooth",
+    });
+  };
+
   useEffect(() => {
     if (!location.hash) return;
     const id = location.hash.replace("#", "");
@@ -124,21 +137,24 @@ const MovieListPage = () => {
     <div className="min-h-screen bg-gray-950 text-white">
       <Banner />
 
-      <div className="relative bg-gradient-to-b from-gray-900 via-gray-950 to-gray-950 py-16 px-4 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-yellow-400/10 blur-[120px] rounded-full pointer-events-none" />
-        <div className="relative max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3">
+      <div className="relative overflow-hidden bg-gradient-to-b from-[#111318] via-gray-950 to-gray-950 px-3 py-10 sm:px-4 sm:py-14">
+        <div className="pointer-events-none absolute left-1/2 top-0 h-[240px] w-[520px] -translate-x-1/2 rounded-full bg-yellow-400/10 blur-[120px]" />
+        <div className="relative mx-auto max-w-5xl text-center">
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-red-400 sm:text-xs">
+            Khám phá phim
+          </p>
+          <h1 className="mb-3 text-3xl font-black sm:text-4xl md:text-5xl">
             Danh sách <span className="text-yellow-400">Phim</span>
           </h1>
-          <p className="text-gray-400 text-lg mb-10">
-            Khám phá hàng trăm bộ phim hấp dẫn đang chờ bạn
+          <p className="mx-auto mb-6 max-w-2xl text-sm text-gray-400 sm:mb-8 sm:text-base lg:text-lg">
+            Xem nhanh phim đang chiếu, lọc theo ngày phát hành và chọn suất chiếu phù hợp.
           </p>
-          <div className="bg-gray-800/40 backdrop-blur-xl rounded-2xl border border-gray-700/60 shadow-2xl overflow-hidden">
-            <div className="p-5 border-b border-gray-700/60">
+          <div className="overflow-hidden rounded-[22px] border border-white/10 bg-[#121417]/85 shadow-[0_24px_80px_rgba(0,0,0,0.3)] backdrop-blur-xl sm:rounded-[30px]">
+            <div className="border-b border-white/10 p-3 sm:p-5">
               <div className="relative">
                 <FontAwesomeIcon
                   icon={faMagnifyingGlass}
-                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-gray-400 sm:left-4"
                 />
                 <input
                   type="text"
@@ -150,74 +166,65 @@ const MovieListPage = () => {
                       : "Tìm kiếm tên phim..."
                   }
                   disabled={isDateFilterActive}
-                  className="w-full h-12 rounded-xl border border-gray-700 bg-gray-900/80 pl-12 pr-12 text-white placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-yellow-400 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="h-10 w-full rounded-xl border border-white/10 bg-[#0f1114] pl-9 pr-9 text-xs text-white placeholder-gray-500 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-yellow-400 disabled:cursor-not-allowed disabled:opacity-50 sm:h-12 sm:pl-12 sm:pr-12 sm:text-sm"
                 />
                 {search && (
                   <button
                     type="button"
                     onClick={() => setSearch("")}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white transition"
+                    className="absolute right-3 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-gray-700 text-gray-300 transition hover:bg-gray-600 hover:text-white sm:right-4"
                   >
                     <FontAwesomeIcon icon={faXmark} />
                   </button>
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-3 px-5 pt-5">
-              <div className="h-px flex-1 bg-gray-700/60" />
-              <span className="text-xs text-gray-400 font-medium uppercase tracking-widest flex items-center gap-2">
+            <div className="flex items-center gap-2 px-3 pt-3 sm:gap-3 sm:px-5 sm:pt-5">
+              <div className="h-px flex-1 bg-white/10" />
+              <span className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-[0.2em] text-gray-400 sm:gap-2 sm:text-xs sm:tracking-[0.24em]">
                 <FontAwesomeIcon icon={faCalendarDays} />
                 <span>Lọc theo khoảng thời gian</span>
               </span>
-              <div className="h-px flex-1 bg-gray-700/60" />
+              <div className="h-px flex-1 bg-white/10" />
             </div>
-            <div className="p-5">
-              <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+            <div className="p-3 sm:p-5">
+              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_88px] items-end gap-2 sm:gap-3 md:grid-cols-[1fr_1fr_auto]">
                 <div className="flex flex-col text-left">
-                  <label className="text-xs text-gray-400 mb-1.5 font-medium">
+                  <label className="mb-1 text-[10px] font-medium text-gray-400 sm:mb-1.5 sm:text-xs">
                     Từ ngày
                   </label>
                   <input
                     type="date"
                     value={fromDate}
                     onChange={(e) => setFromDate(e.target.value)}
-                    className="h-11 rounded-xl bg-gray-900/80 border border-gray-700 px-3 text-white focus:ring-2 focus:ring-yellow-400 focus:border-transparent outline-none transition-all [color-scheme:dark]"
+                    className="h-9 rounded-xl border border-white/10 bg-[#0f1114] px-2 text-[11px] text-white outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-yellow-400 [color-scheme:dark] sm:h-11 sm:px-3 sm:text-sm"
                   />
                 </div>
 
                 <div className="flex flex-col text-left">
-                  <label className="text-xs text-gray-400 mb-1.5 font-medium">
+                  <label className="mb-1 text-[10px] font-medium text-gray-400 sm:mb-1.5 sm:text-xs">
                     Đến ngày
                   </label>
                   <input
                     type="date"
                     value={toDate}
                     onChange={(e) => setToDate(e.target.value)}
-                    className="h-11 rounded-xl bg-gray-900/80 border border-gray-700 px-3 text-white focus:ring-2 focus:ring-yellow-400 focus:border-transparent outline-none transition-all [color-scheme:dark]"
+                    className="h-9 rounded-xl border border-white/10 bg-[#0f1114] px-2 text-[11px] text-white outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-yellow-400 [color-scheme:dark] sm:h-11 sm:px-3 sm:text-sm"
                   />
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex justify-end">
                   <button
                     onClick={handleApplyDateFilter}
-                    className="h-11 px-6 rounded-xl bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-semibold hover:from-yellow-500 hover:to-yellow-600 active:scale-95 transition-all cursor-pointer whitespace-nowrap shadow-lg shadow-yellow-500/30"
+                    className="h-9 w-full whitespace-nowrap rounded-xl bg-gradient-to-r from-yellow-400 to-yellow-500 px-3 text-xs font-semibold text-black shadow-lg shadow-yellow-500/20 transition-all hover:from-yellow-500 hover:to-yellow-600 active:scale-95 sm:h-11 sm:px-6 sm:text-sm"
                   >
                     Áp dụng
                   </button>
-                  {isDateFilterActive && (
-                    <button
-                      onClick={handleClearDateFilter}
-                      className="h-11 px-4 rounded-xl bg-gray-700 text-white hover:bg-gray-600 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
-                      title="Xóa bộ lọc"
-                    >
-                      <FontAwesomeIcon icon={faXmark} />
-                    </button>
-                  )}
                 </div>
               </div>
 
               {isDateFilterActive && (
-                <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/10 border border-yellow-400/30 text-sm">
+                <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-yellow-400/30 bg-yellow-400/10 px-3 py-2 text-[11px] sm:mt-4 sm:rounded-full sm:px-4 sm:text-sm">
                   <FontAwesomeIcon icon={faFilter} className="text-yellow-400" />
                   <span className="text-gray-300">
                     Đang lọc:{" "}
@@ -229,6 +236,14 @@ const MovieListPage = () => {
                       {formatDateForApi(appliedToDate)}
                     </b>
                   </span>
+                  <button
+                    type="button"
+                    onClick={handleClearDateFilter}
+                    className="ml-auto inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-700 text-[10px] text-white transition hover:bg-gray-600 sm:ml-1"
+                    title="Xóa bộ lọc"
+                  >
+                    <FontAwesomeIcon icon={faXmark} />
+                  </button>
                 </div>
               )}
             </div>
@@ -238,7 +253,8 @@ const MovieListPage = () => {
 
       <div
         ref={movieListRef}
-        className="max-w-7xl mx-auto px-4 py-8 scroll-mt-20"
+        id="movie-list-section"
+        className="mx-auto max-w-7xl px-3 py-8 scroll-mt-20 sm:px-4 sm:py-10"
       >
         {isLoading && <LoadingSpinner />}
 
@@ -250,8 +266,15 @@ const MovieListPage = () => {
         )}
 
         {!isLoading && !isError && (
-          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-            <p className="text-gray-400">
+          <div className="mb-5 flex items-end justify-between gap-3 sm:mb-6">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-red-400 sm:text-xs">
+                Danh sách phim
+              </p>
+              <h2 className="mt-2 text-2xl font-black uppercase text-white sm:text-3xl">
+                Phim Nổi Bật
+              </h2>
+              <p className="mt-2 max-w-2xl text-xs text-gray-400 sm:text-sm">
               {debouncedSearch ? (
                 <>
                   Tìm thấy{" "}
@@ -282,7 +305,25 @@ const MovieListPage = () => {
                   phim
                 </>
               )}
-            </p>
+              </p>
+            </div>
+
+            <div className="hidden items-center gap-2 md:flex xl:hidden">
+              <button
+                type="button"
+                onClick={() => scrollMovieRail(-1)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white transition hover:bg-white/10"
+              >
+                <FontAwesomeIcon icon={faChevronLeft} />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollMovieRail(1)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white transition hover:bg-white/10"
+              >
+                <FontAwesomeIcon icon={faChevronRight} />
+              </button>
+            </div>
           </div>
         )}
 
@@ -299,21 +340,34 @@ const MovieListPage = () => {
           </div>
         )}
 
-        <div
-          id="flim"
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 scroll-mt-20"
-        >
-          {movies.map((movie) => (
-            <MovieCard key={movie.maPhim} movie={movie} />
-          ))}
+        <div id="flim" className="scroll-mt-20">
+          <div
+            ref={movieRailRef}
+            className="flex gap-3 overflow-x-auto pb-2 xl:hidden"
+          >
+            {movies.map((movie) => (
+              <div
+                key={movie.maPhim}
+                className="w-[150px] min-w-[150px] sm:w-[180px] sm:min-w-[180px] md:w-[210px] md:min-w-[210px]"
+              >
+                <MovieCard movie={movie} />
+              </div>
+            ))}
+          </div>
+
+          <div className="hidden grid-cols-2 gap-5 lg:grid-cols-4 xl:grid xl:grid-cols-5">
+            {movies.map((movie) => (
+              <MovieCard key={movie.maPhim} movie={movie} />
+            ))}
+          </div>
         </div>
 
         {!isLoading && !isError && totalPages > 1 && !debouncedSearch && (
-          <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-2 sm:mt-10">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-yellow-400 hover:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-gray-800 px-3 py-2 text-sm text-white transition-colors hover:bg-yellow-400 hover:text-black disabled:cursor-not-allowed disabled:opacity-40 sm:px-4"
             >
               <FontAwesomeIcon icon={faChevronLeft} />
               <span>Trước</span>
@@ -325,7 +379,7 @@ const MovieListPage = () => {
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`w-10 h-10 rounded-lg font-medium transition-colors cursor-pointer ${
+                  className={`h-9 w-9 cursor-pointer rounded-lg text-sm font-medium transition-colors sm:h-10 sm:w-10 ${
                     currentPage === page
                       ? "bg-yellow-400 text-black"
                       : "bg-gray-800 text-white hover:bg-gray-700"
@@ -339,7 +393,7 @@ const MovieListPage = () => {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-yellow-400 hover:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-gray-800 px-3 py-2 text-sm text-white transition-colors hover:bg-yellow-400 hover:text-black disabled:cursor-not-allowed disabled:opacity-40 sm:px-4"
             >
               <span>Sau</span>
               <FontAwesomeIcon icon={faChevronRight} />
@@ -354,7 +408,7 @@ const MovieListPage = () => {
 
       <section
         id="cinema-section"
-        className="max-w-7xl mx-auto px-4 py-16 border-t border-gray-800 mt-10 scroll-mt-20"
+        className="mx-auto mt-10 max-w-7xl scroll-mt-20 border-t border-gray-800 px-3 py-10 sm:px-4 sm:py-14"
       >
         <Cinema />
       </section>
