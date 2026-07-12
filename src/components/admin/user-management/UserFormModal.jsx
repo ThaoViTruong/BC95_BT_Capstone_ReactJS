@@ -11,9 +11,9 @@ const UserFormModal = ({
   helperText,
 }) => {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-gray-900 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-6">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-gray-900 shadow-2xl">
+        <div className="flex items-start justify-between gap-4 border-b border-white/10 px-5 py-5 sm:px-6">
           <div>
             <h3 className="text-lg font-bold text-white">{title}</h3>
             {helperText ? (
@@ -29,8 +29,8 @@ const UserFormModal = ({
           </button>
         </div>
 
-        <form onSubmit={formik.handleSubmit} className="space-y-4 px-6 py-5">
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={formik.handleSubmit} className="space-y-4 px-5 py-5 sm:px-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-xs font-medium text-white/85">
                 Tài khoản
@@ -100,7 +100,7 @@ const UserFormModal = ({
             ) : null}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-xs font-medium text-white/85">
                 Số điện thoại
@@ -137,7 +137,7 @@ const UserFormModal = ({
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
             <button
               type="button"
               onClick={onClose}

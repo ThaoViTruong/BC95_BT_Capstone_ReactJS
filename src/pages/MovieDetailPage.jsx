@@ -76,8 +76,14 @@ const MovieDetailPage = () => {
 
   useEffect(() => {
     if (activeSystem >= todayShowtimeSystems.length) {
-      setActiveSystem(0);
+      const timeoutId = setTimeout(() => {
+        setActiveSystem(0);
+      }, 0);
+
+      return () => clearTimeout(timeoutId);
     }
+
+    return undefined;
   }, [activeSystem, todayShowtimeSystems.length]);
 
   const handleBooking = () => {
@@ -102,7 +108,7 @@ const MovieDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <div className="relative min-h-[70vh] flex items-end">
+      <div className="relative flex min-h-[70vh] items-end">
         <div
           className="absolute inset-0 bg-cover bg-center blur-sm scale-105"
           style={{
@@ -112,10 +118,10 @@ const MovieDetailPage = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/90 to-gray-950/40" />
 
-        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="relative mx-auto w-full max-w-7xl px-3 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
           <Link
             to="/movie"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition-colors mb-8 group"
+            className="group mb-6 inline-flex items-center gap-1.5 text-xs text-gray-400 transition-colors hover:text-yellow-400 sm:mb-8 sm:gap-2 sm:text-sm"
           >
             <FontAwesomeIcon
               icon={faArrowLeft}
@@ -124,13 +130,13 @@ const MovieDetailPage = () => {
             Quay lại danh sách
           </Link>
 
-          <div className="flex flex-col lg:flex-row gap-10">
+          <div className="flex flex-col gap-6 lg:flex-row lg:gap-10">
             <div className="flex-shrink-0 mx-auto lg:mx-0">
               <div className="relative group">
                 <img
                   src={movie?.hinhAnh}
                   alt={movie?.tenPhim}
-                  className="w-72 aspect-[2/3] object-cover rounded-2xl shadow-2xl 
+                  className="w-44 aspect-[2/3] rounded-xl object-cover shadow-2xl sm:w-64 sm:rounded-2xl lg:w-72
                              shadow-black/50 ring-1 ring-white/10 
                              group-hover:ring-yellow-400/30 group-hover:scale-[1.02] 
                              transition-all duration-500"
@@ -139,11 +145,11 @@ const MovieDetailPage = () => {
             </div>
 
             <div className="flex-1 flex flex-col justify-end">
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="mb-3 flex flex-wrap gap-2 sm:mb-4">
                 {movie?.hot && (
                   <span
                     className="bg-red-500/20 text-red-400 border border-red-500/30 
-                                  text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide"
+                                  text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide sm:px-3 sm:py-1.5 sm:text-xs"
                   >
                     Hot
                   </span>
@@ -166,20 +172,20 @@ const MovieDetailPage = () => {
                 )}
               </div>
               <h1
-                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 
+                className="mb-3 text-2xl font-extrabold leading-tight sm:mb-4 sm:text-4xl lg:text-5xl
                               bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent 
-                              leading-tight"
+                              "
               >
                 {movie?.tenPhim || "Tên phim không xác định"}
               </h1>
 
-              <div className="flex items-center gap-3 mb-6">
-                <div className="flex gap-0.5">
+              <div className="mb-5 flex flex-col gap-2 sm:mb-6 sm:flex-row sm:items-center sm:gap-3">
+                <div className="flex flex-wrap gap-0.5">
                   {Array.from({ length: 10 }).map((_, index) => (
                     <FontAwesomeIcon
                       key={index}
                       icon={faStar}
-                      className={`text-2xl ${
+                      className={`text-lg sm:text-2xl ${
                         index < (movie?.danhGia || 0)
                           ? "text-yellow-400"
                           : "text-gray-700"
@@ -187,18 +193,18 @@ const MovieDetailPage = () => {
                     />
                   ))}
                 </div>
-                <span className="text-gray-400 text-sm">
+                <span className="text-xs text-gray-400 sm:text-sm">
                   ({movie?.danhGia}/10 điểm)
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3">
-                  <p className="text-gray-500 text-xs mb-1 flex items-center gap-2">
+              <div className="mb-5 grid grid-cols-1 gap-2.5 sm:mb-6 sm:gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="rounded-xl border border-white/10 bg-white/5 p-2.5 backdrop-blur-sm sm:p-3">
+                  <p className="mb-1 flex items-center gap-2 text-[11px] text-gray-500 sm:text-xs">
                     <FontAwesomeIcon icon={faCalendarDays} />
                     <span>Khởi chiếu</span>
                   </p>
-                  <p className="text-white font-medium text-sm truncate">
+                  <p className="truncate text-xs font-medium text-white sm:text-sm">
                     {movie?.ngayKhoiChieu
                       ? new Date(movie.ngayKhoiChieu).toLocaleDateString(
                           "vi-VN",
@@ -206,39 +212,39 @@ const MovieDetailPage = () => {
                       : "—"}
                   </p>
                 </div>
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3">
-                  <p className="text-gray-500 text-xs mb-1 flex items-center gap-2">
+                <div className="rounded-xl border border-white/10 bg-white/5 p-2.5 backdrop-blur-sm sm:p-3">
+                  <p className="mb-1 flex items-center gap-2 text-[11px] text-gray-500 sm:text-xs">
                     <FontAwesomeIcon icon={faClapperboard} />
                     <span>Mã phim</span>
                   </p>
-                  <p className="text-white font-medium text-sm">
+                  <p className="text-xs font-medium text-white sm:text-sm">
                     #{movie?.maPhim}
                   </p>
                 </div>
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3">
-                  <p className="text-gray-500 text-xs mb-1 flex items-center gap-2">
+                <div className="rounded-xl border border-white/10 bg-white/5 p-2.5 backdrop-blur-sm sm:p-3">
+                  <p className="mb-1 flex items-center gap-2 text-[11px] text-gray-500 sm:text-xs">
                     <FontAwesomeIcon icon={faUsers} />
                     <span>Nhóm</span>
                   </p>
-                  <p className="text-white font-medium text-sm">
+                  <p className="text-xs font-medium text-white sm:text-sm">
                     {movie?.maNhom}
                   </p>
                 </div>
               </div>
 
               <div className="mb-8">
-                <p className="text-gray-300 leading-relaxed line-clamp-3">
+                <p className="line-clamp-3 text-sm leading-relaxed text-gray-300 sm:text-base">
                   {movie?.moTa || "Chưa có mô tả cho phim này."}
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
                 <a
                   href="#trailer"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 
                              bg-white/10 hover:bg-white/20 border border-white/20 
-                             text-white font-semibold px-8 py-3.5 rounded-xl 
+                             text-white font-semibold px-5 py-3 text-sm rounded-xl sm:px-8 sm:py-3.5 sm:text-base
                              transition-all duration-300"
                 >
                   <FontAwesomeIcon icon={faPlay} />
@@ -249,7 +255,7 @@ const MovieDetailPage = () => {
                   className="inline-flex items-center justify-center gap-2 
                              bg-gradient-to-r from-yellow-500 to-orange-500 
                              hover:from-yellow-400 hover:to-orange-400 
-                             text-gray-900 font-bold px-8 py-3.5 rounded-xl 
+                             text-gray-900 font-bold px-5 py-3 text-sm rounded-xl sm:px-8 sm:py-3.5 sm:text-base
                              transition-all duration-300 shadow-lg shadow-yellow-500/25 
                              hover:shadow-yellow-500/40 cursor-pointer"
                 >
@@ -265,9 +271,9 @@ const MovieDetailPage = () => {
       {movie?.trailer && (
         <div
           id="trailer"
-          className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+          className="mx-auto max-w-5xl px-3 py-10 sm:px-6 sm:py-16 lg:px-8"
         >
-          <h2 className="text-2xl font-bold mb-8 text-center">
+          <h2 className="mb-6 text-center text-xl font-bold sm:mb-8 sm:text-2xl">
             <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
               Trailer
             </span>
@@ -289,9 +295,9 @@ const MovieDetailPage = () => {
 
       <div
         ref={showtimeRef}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+        className="mx-auto max-w-7xl px-3 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-16"
       >
-        <h2 className="text-2xl font-bold mb-8 text-center">
+        <h2 className="mb-6 text-center text-xl font-bold sm:mb-8 sm:text-2xl">
           <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
             Lịch chiếu & Đặt vé
           </span>
@@ -299,56 +305,56 @@ const MovieDetailPage = () => {
 
         <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
           {loadingShowtimes ? (
-            <div className="p-16 text-center">
+            <div className="p-10 text-center sm:p-16">
               <div className="inline-block w-8 h-8 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin mb-4" />
               <p className="text-gray-400">Đang tải lịch chiếu...</p>
             </div>
           ) : todayShowtimeSystems.length > 0 ? (
-            <div className="flex min-h-[500px]">
-              <div className="w-20 sm:w-24 border-r border-gray-800 bg-gray-900/50 flex-shrink-0">
+            <div className="flex min-h-[500px] flex-col md:flex-row">
+              <div className="flex w-full flex-shrink-0 overflow-x-auto border-b border-gray-800 bg-gray-900/50 md:w-20 md:flex-col md:overflow-visible md:border-b-0 md:border-r sm:w-24">
                 {todayShowtimeSystems.map((heThong, index) => (
                   <button
                     key={heThong.maHeThongRap}
                     onClick={() => setActiveSystem(index)}
                     title={heThong.tenHeThongRap}
-                    className={`w-full p-3 sm:p-4 flex items-center justify-center 
+                    className={`flex min-w-[72px] items-center justify-center p-2.5 sm:min-w-[96px] sm:p-4 md:w-full
                                border-b border-gray-800 transition-all duration-300 cursor-pointer 
                                ${
                                  activeSystem === index
-                                   ? "bg-gradient-to-r from-yellow-500/10 to-transparent border-l-4 border-l-yellow-400 opacity-100"
-                                   : "hover:bg-white/5 opacity-40 hover:opacity-80 border-l-4 border-l-transparent"
+                                   ? "border-b-2 border-b-yellow-400 bg-gradient-to-r from-yellow-500/10 to-transparent opacity-100 md:border-b-0 md:border-l-4 md:border-l-yellow-400"
+                                   : "border-b-2 border-b-transparent opacity-40 hover:bg-white/5 hover:opacity-80 md:border-b-0 md:border-l-4 md:border-l-transparent"
                                }`}
                   >
                     <img
                       src={heThong.logo}
                       alt={heThong.tenHeThongRap}
-                      className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+                      className="h-8 w-8 object-contain sm:h-12 sm:w-12"
                     />
                   </button>
                 ))}
               </div>
 
-              <div className="flex-1 p-4 sm:p-6 overflow-y-auto max-h-[600px] custom-scrollbar">
+              <div className="custom-scrollbar max-h-[600px] flex-1 overflow-y-auto p-3 sm:p-6">
                 {todayShowtimeSystems[activeSystem]?.cumRapChieu.map(
                   (cumRap) => (
                     <div
                       key={cumRap.maCumRap}
-                      className="mb-8 pb-8 border-b border-gray-800 last:border-b-0 last:mb-0 last:pb-0"
+                      className="mb-6 border-b border-gray-800 pb-6 last:mb-0 last:border-b-0 last:pb-0 sm:mb-8 sm:pb-8"
                     >
-                      <div className="flex items-start gap-3 mb-4">
+                      <div className="mb-3 flex items-start gap-2.5 sm:mb-4 sm:gap-3">
                         <div className="w-2 h-2 rounded-full bg-green-400 mt-2 flex-shrink-0" />
                         <div>
-                          <h3 className="text-base sm:text-lg font-bold text-green-400 leading-tight">
+                          <h3 className="text-sm font-bold leading-tight text-green-400 sm:text-lg">
                             {cumRap.tenCumRap}
                           </h3>
-                          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                          <p className="mt-1 text-[11px] text-gray-500 sm:text-sm">
                             <FontAwesomeIcon icon={faLocationDot} className="mr-1" />
                             {cumRap.diaChi}
                           </p>
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-2 sm:gap-3 ml-5">
+                      <div className="ml-0 flex flex-wrap gap-1.5 sm:ml-5 sm:gap-3">
                         {cumRap.lichChieuPhim.slice(0, 12).map((lich) => {
                           const date = new Date(lich.ngayChieuGioChieu);
                           const ngay = date.toLocaleDateString("vi-VN", {
@@ -364,15 +370,12 @@ const MovieDetailPage = () => {
                             <Link
                               key={lich.maLichChieu}
                               to={`/booking/${lich.maLichChieu}`}
-                              className="group border border-gray-700 rounded-lg px-3 sm:px-4 py-2 
-                                         hover:border-yellow-500/50 hover:bg-yellow-500/5 
-                                         transition-all duration-300 flex flex-col items-center 
-                                         min-w-[80px]"
+                              className="group flex min-w-[66px] flex-col items-center rounded-lg border border-gray-700 px-2.5 py-1.5 transition-all duration-300 hover:border-yellow-500/50 hover:bg-yellow-500/5 sm:min-w-[80px] sm:px-4 sm:py-2"
                             >
-                              <span className="text-gray-400 text-xs">
+                              <span className="text-[10px] text-gray-400 sm:text-xs">
                                 {ngay}
                               </span>
-                              <span className="text-yellow-400 font-bold text-sm sm:text-base group-hover:text-yellow-300">
+                              <span className="text-xs font-bold text-yellow-400 group-hover:text-yellow-300 sm:text-base">
                                 {gio}
                               </span>
                             </Link>
@@ -385,8 +388,8 @@ const MovieDetailPage = () => {
               </div>
             </div>
           ) : (
-            <div className="p-16 text-center">
-              <p className="text-gray-500 text-lg">
+            <div className="p-10 text-center sm:p-16">
+              <p className="text-base text-gray-500 sm:text-lg">
                 <FontAwesomeIcon icon={faClapperboard} className="mr-2" />
                 Hiện chưa có lịch chiếu khả dụng trong ngày cho phim này
               </p>

@@ -2,7 +2,90 @@ import UserRoleBadge from "./UserRoleBadge";
 
 const UserTable = ({ users, onStartEdit, onRequestDelete }) => (
   <div className="overflow-hidden rounded-2xl border border-white/10 bg-gray-900">
-    <div className="overflow-x-auto">
+    <div className="space-y-4 p-4 lg:hidden">
+      {users.map((user, index) => (
+        <div
+          key={user.taiKhoan}
+          className="rounded-2xl border border-white/10 bg-gray-800/40 p-4"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-white/40">
+                Người dùng #{index + 1}
+              </p>
+              <h3 className="mt-2 text-lg font-semibold text-white">
+                {user.taiKhoan}
+              </h3>
+            </div>
+            <UserRoleBadge role={user.maLoaiNguoiDung} />
+          </div>
+
+          <div className="mt-4 space-y-2 text-sm text-white/80">
+            <p>Họ tên: {user.hoTen}</p>
+            <p>Email: {user.email}</p>
+            <p>Số điện thoại: {user.soDT}</p>
+          </div>
+
+          <div className="mt-4 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onStartEdit(user)}
+              aria-label={`Sửa người dùng ${user.taiKhoan}`}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10 text-amber-300 transition hover:bg-amber-400/20"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  d="M4 20h4l10-10-4-4L4 16v4z"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M13 7l4 4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={() => onRequestDelete(user)}
+              aria-label={`Xóa người dùng ${user.taiKhoan}`}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-300 transition hover:bg-red-500/20"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M4 7h16" strokeLinecap="round" />
+                <path d="M10 11v6" strokeLinecap="round" />
+                <path d="M14 11v6" strokeLinecap="round" />
+                <path
+                  d="M6 7l1 12h10l1-12"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M9 7V4h6v3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div className="hidden overflow-x-auto lg:block">
       <table className="min-w-[1080px] w-full text-base">
         <thead>
           <tr className="border-b border-white/10 bg-gray-800/50">

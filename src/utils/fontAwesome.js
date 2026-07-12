@@ -4,6 +4,7 @@ export * from "@fortawesome/free-solid-svg-icons";
 export {
   faArrowLeft,
   faArrowRight,
+  faBars,
   faCalendarDays,
   faChevronLeft,
   faChevronRight,
@@ -13,5 +14,5 @@ export {
   faUsers,
   faBars,
   faXmark,
-  faEye,         
 } from "@fortawesome/free-solid-svg-icons";
+

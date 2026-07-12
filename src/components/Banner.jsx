@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Link } from "react-router-dom";
 import {
   FontAwesomeIcon,
-  faArrowRight,
+  faCalendarDays,
   faChevronLeft,
   faChevronRight,
   faClapperboard,
@@ -12,7 +12,6 @@ import { useBanners, useMovieDetails } from "../hooks/useMovies";
 const Banner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const navigate = useNavigate();
   const { data: banners = [], isLoading, isError } = useBanners();
 
   const maPhimList = useMemo(() => banners.map((b) => b.maPhim), [banners]);
@@ -43,10 +42,6 @@ const Banner = () => {
 
   const goToSlide = (index) => setCurrentSlide(index);
 
-  const handleViewDetail = (maPhim) => {
-    navigate(`/movie/${maPhim}`);
-  };
-
   useEffect(() => {
     if (isPaused || bannersWithMovieInfo.length === 0) return;
     const interval = setInterval(nextSlide, 5000);
@@ -55,8 +50,14 @@ const Banner = () => {
 
   useEffect(() => {
     if (currentSlide >= bannersWithMovieInfo.length) {
-      setCurrentSlide(0);
+      const timeoutId = setTimeout(() => {
+        setCurrentSlide(0);
+      }, 0);
+
+      return () => clearTimeout(timeoutId);
     }
+
+    return undefined;
   }, [bannersWithMovieInfo.length, currentSlide]);
 
   if (isLoading) {
@@ -84,12 +85,13 @@ const Banner = () => {
 
   return (
     <div
-      className="relative w-full h-[45vh] md:h-[55vh] lg:h-[65vh] max-h-[600px] overflow-hidden bg-slate-900 group"
+      className="group relative w-full overflow-hidden bg-slate-900"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 top-0 z-[1] bg-[radial-gradient(circle_at_top,_rgba(239,68,68,0.18),_transparent_40%)]" />
       <div
-        className="flex w-full h-full transition-transform duration-700 ease-in-out"
+        className="flex h-[54vh] max-h-[620px] min-h-[360px] w-full transition-transform duration-700 ease-in-out sm:h-[58vh] lg:h-[65vh]"
         style={{ transform: `translateX(-${currentSlide * 100}%)` }}
       >
         {bannersWithMovieInfo.map((banner) => (
@@ -108,25 +110,38 @@ const Banner = () => {
               }}
             />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/30 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-950/70 via-gray-950/20 to-transparent" />
-            <div className="absolute bottom-16 md:bottom-20 left-6 md:left-16 max-w-xl text-white animate-fadeIn">
-              <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-3 drop-shadow-lg line-clamp-2">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/55 to-transparent" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-gray-950/90 via-gray-950/40 to-transparent" />
+            <div className="absolute bottom-6 left-3 right-3 z-10 animate-fadeIn sm:bottom-10 sm:left-6 sm:right-auto sm:max-w-lg lg:bottom-16 lg:left-12 lg:max-w-2xl">
+              <div className="rounded-[24px] border border-white/10 bg-black/35 p-4 backdrop-blur-md sm:p-5 lg:p-6">
+                <div className="mb-3 flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-red-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white sm:text-xs">
+                    Đang chiếu nổi bật
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] text-white/75 sm:text-xs">
+                    <FontAwesomeIcon icon={faCalendarDays} />
+                    Cập nhật liên tục
+                  </span>
+                </div>
+
+              <h2 className="mb-2 line-clamp-2 text-2xl font-extrabold text-white drop-shadow-lg sm:text-4xl lg:mb-3 lg:text-5xl">
                 {banner.tenPhim}
               </h2>
 
-              <p className="text-sm md:text-base lg:text-lg mb-3 md:mb-5 text-gray-200 drop-shadow line-clamp-2">
+              <p className="mb-4 line-clamp-3 text-xs text-gray-200 drop-shadow sm:text-sm lg:mb-5 lg:text-base">
                 {banner.moTa ||
                   "Đặt vé ngay hôm nay để trải nghiệm những bộ phim bom tấn với chất lượng hình ảnh và âm thanh tuyệt đỉnh"}
               </p>
 
-              <button
-                onClick={() => handleViewDetail(banner.maPhim)}
-                className="cursor-pointer inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 bg-red-600 hover:bg-red-700 rounded-md font-semibold text-sm md:text-base transition-all duration-300 hover:scale-105 shadow-lg shadow-red-600/30"
-              >
-                <span>Xem Chi Tiết</span>
-                <FontAwesomeIcon icon={faArrowRight} />
-              </button>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <Link
+                  to={`/movie/${banner.maPhim}`}
+                  className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white transition-all duration-300 hover:bg-red-700 hover:scale-[1.02] sm:px-5 sm:py-2.5 sm:text-sm"
+                >
+                  <span>Chi tiết</span>
+                </Link>
+              </div>
+              </div>
             </div>
           </div>
         ))}
@@ -136,7 +151,7 @@ const Banner = () => {
         <>
           <button
             onClick={prevSlide}
-            className="cursor-pointer absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 text-white text-lg md:text-xl transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 z-10"
+            className="absolute left-2 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-black/45 text-white transition-all duration-300 hover:scale-110 hover:bg-black/70 md:left-4 md:flex md:h-11 md:w-11 md:text-xl md:opacity-0 md:group-hover:opacity-100"
             aria-label="Previous slide"
           >
             <FontAwesomeIcon icon={faChevronLeft} />
@@ -144,20 +159,20 @@ const Banner = () => {
 
           <button
             onClick={nextSlide}
-            className="cursor-pointer absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/70 text-white text-lg md:text-xl transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 z-10"
+            className="absolute right-2 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-black/45 text-white transition-all duration-300 hover:scale-110 hover:bg-black/70 md:right-4 md:flex md:h-11 md:w-11 md:text-xl md:opacity-0 md:group-hover:opacity-100"
             aria-label="Next slide"
           >
             <FontAwesomeIcon icon={faChevronRight} />
           </button>
 
-          <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5 sm:bottom-5 sm:gap-2">
             {bannersWithMovieInfo.map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
                   currentSlide === index
-                    ? "w-8 bg-red-600"
+                    ? "w-6 bg-red-600 sm:w-8"
                     : "w-1.5 bg-white/60 hover:bg-white"
                 }`}
                 aria-label={`Go to slide ${index + 1}`}

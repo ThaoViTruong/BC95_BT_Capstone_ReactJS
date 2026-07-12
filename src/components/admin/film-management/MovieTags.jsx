@@ -1,11 +1,11 @@
 import { getMovieTags } from "../../../utils/admin/filmManagementUtils";
 
-const MovieTags = ({ movie }) => (
-  <div className="mt-4 flex flex-wrap gap-2.5">
+const MovieTags = ({ movie, compact = false }) => (
+  <div className={`mt-3 flex flex-wrap ${compact ? "gap-2" : "gap-2.5"} sm:mt-4`}>
     {getMovieTags(movie).map((tag) => (
       <span
         key={`${movie.maPhim}-${tag.label}`}
-        className={`rounded-full px-3 py-1.5 text-sm font-medium ${tag.className}`}
+        className={`rounded-full font-medium ${compact ? "px-2.5 py-1 text-[11px]" : "px-3 py-1.5 text-sm"} ${tag.className}`}
       >
         {tag.label}
       </span>

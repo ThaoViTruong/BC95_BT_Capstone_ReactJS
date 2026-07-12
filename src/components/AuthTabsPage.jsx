@@ -35,10 +35,10 @@ const registerSchema = Yup.object({
 })
 
 const inputClassName =
-  'w-full border border-white/25 bg-slate-800/80 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-400 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20'
+  'w-full border border-white/25 bg-slate-800/80 px-3 py-2.5 text-sm text-white outline-none transition placeholder:text-gray-400 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 sm:px-4 sm:py-3'
 
 const tabClassName =
-  'flex-1 border-b-2 px-4 py-4 text-center text-sm font-bold uppercase tracking-wide transition'
+  'flex-1 border-b-2 px-3 py-3 text-center text-xs font-bold uppercase tracking-wide transition sm:px-4 sm:py-4 sm:text-sm'
 
 const navLinks = [
   { label: 'Phim', to: '/movie' },
@@ -170,16 +170,16 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
 
   return (
     <div className="min-h-screen bg-[#080c18] text-white">
-      <div className="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col border-x border-violet-500/40">
+      <div className="mx-auto flex min-h-screen w-full max-w-screen-xl flex-col border-x border-violet-500/40">
         <header className="border-b border-violet-500/30 bg-[#050816]/95">
-          <div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-            <Link to="/movie" className="text-2xl font-extrabold uppercase tracking-tight text-white">
+          <div className="flex flex-col gap-3 px-3 py-3 sm:px-6 sm:py-4 md:flex-row md:items-center md:justify-between lg:px-8">
+            <Link to="/movie" className="text-xl font-extrabold uppercase tracking-tight text-white sm:text-2xl">
               CINE<span className="text-red-500">FLEX</span>
             </Link>
 
-            <nav className="hidden items-center gap-6 text-sm text-gray-300 md:flex">
+            <nav className="flex flex-wrap items-center gap-2 text-xs text-gray-300 sm:gap-4 sm:text-sm md:justify-end md:gap-6">
               {navLinks.map((item) => (
-                <Link key={item.label} to={item.to} className="transition hover:text-yellow-400">
+                <Link key={item.label} to={item.to} className="rounded-lg px-2 py-1 transition hover:text-yellow-400">
                   {item.label}
                 </Link>
               ))}
@@ -198,7 +198,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                 backgroundSize: 'cover',
               }}
             >
-              <div className="w-full p-12">
+              <div className="w-full p-10 xl:p-12">
                 <p className="mb-3 text-sm uppercase tracking-[0.4em] text-yellow-400">CineFlex</p>
                 <h1 className="max-w-md text-5xl font-bold uppercase leading-tight">
                   Mở khóa <span className="text-red-500">trải nghiệm</span> điện ảnh
@@ -209,7 +209,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
               </div>
             </div>
 
-            <div className="flex items-center justify-center px-4 py-10 sm:px-6 lg:px-10">
+            <div className="flex items-center justify-center px-3 py-6 sm:px-6 sm:py-10 lg:px-10">
               <div className="w-full max-w-2xl overflow-hidden border border-white/10 bg-black/70 shadow-[0_20px_80px_rgba(0,0,0,0.45)] backdrop-blur-sm">
                 <div className="grid grid-cols-2 bg-[#1a1a1a]">
                   <Link
@@ -234,13 +234,13 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                   </Link>
                 </div>
 
-                <div className="bg-[#181818]/95 p-6 sm:p-8 md:p-10">
+                <div className="bg-[#181818]/95 p-4 sm:p-8 md:p-10">
                   {activeTab === 'login' ? (
                     <div>
-                      <h2 className="text-3xl font-bold text-white">Đăng nhập</h2>
-                      <p className="mt-3 text-sm text-gray-400">Đăng nhập để tiếp tục trải nghiệm hệ thống đặt vé.</p>
+                      <h2 className="text-xl font-bold text-white sm:text-3xl">Đăng nhập</h2>
+                      <p className="mt-2 text-xs text-gray-400 sm:mt-3 sm:text-sm">Đăng nhập để tiếp tục trải nghiệm hệ thống đặt vé.</p>
 
-                      <form onSubmit={loginFormik.handleSubmit} autoComplete="off" className="mt-8 space-y-5">
+                      <form onSubmit={loginFormik.handleSubmit} autoComplete="off" className="mt-6 space-y-4 sm:mt-8 sm:space-y-5">
                         {loginError ? (
                           <div className="border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
                             {loginError}
@@ -248,7 +248,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                         ) : null}
 
                         <div>
-                          <label htmlFor="login-taiKhoan" className="mb-2 block text-sm font-medium text-white">
+                          <label htmlFor="login-taiKhoan" className="mb-1.5 block text-xs font-medium text-white sm:mb-2 sm:text-sm">
                             Tài khoản <span className="text-red-400">*</span>
                           </label>
                           <input
@@ -263,7 +263,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                         </div>
 
                         <div>
-                          <label htmlFor="login-matKhau" className="mb-2 block text-sm font-medium text-white">
+                          <label htmlFor="login-matKhau" className="mb-1.5 block text-xs font-medium text-white sm:mb-2 sm:text-sm">
                             Mật khẩu <span className="text-red-400">*</span>
                           </label>
                           <div className="relative">
@@ -278,7 +278,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                             <button
                               type="button"
                               onClick={() => setIsLoginPasswordVisible((prevState) => !prevState)}
-                              className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-gray-400 transition hover:text-yellow-400 focus:outline-none focus:text-yellow-400"
+                              className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-gray-400 transition hover:text-yellow-400 focus:outline-none focus:text-yellow-400 sm:w-12"
                               aria-label={isLoginPasswordVisible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                             >
                               <FontAwesomeIcon icon={isLoginPasswordVisible ? faEyeSlash : faEye} />
@@ -287,7 +287,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                           {renderError(loginFormik, 'matKhau')}
                         </div>
 
-                        <div className="flex items-center justify-between text-sm text-gray-400">
+                        <div className="flex flex-col gap-2 text-xs text-gray-400 sm:flex-row sm:items-center sm:justify-between sm:text-sm">
                           <label className="flex items-center gap-2">
                             <input type="checkbox" className="h-4 w-4 border border-white/20 bg-transparent accent-yellow-400" />
                             <span>Lưu mật khẩu đăng nhập</span>
@@ -298,12 +298,12 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                         <button
                           type="submit"
                           disabled={loginFormik.isSubmitting}
-                          className="w-full bg-yellow-400 px-6 py-3 text-base font-bold uppercase tracking-wide text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-70"
+                          className="w-full bg-yellow-400 px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-70 sm:px-6 sm:py-3 sm:text-base"
                         >
                           {loginFormik.isSubmitting ? 'Đang xử lý...' : 'Đăng nhập'}
                         </button>
 
-                        <p className="text-center text-sm text-gray-400">
+                        <p className="text-center text-xs text-gray-400 sm:text-sm">
                           Chưa có tài khoản?{' '}
                           <Link to="/register" className="font-semibold text-yellow-400 hover:text-yellow-300">
                             Đăng ký ngay
@@ -313,10 +313,10 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                     </div>
                   ) : (
                     <div>
-                      <h2 className="text-3xl font-bold text-white">Đăng ký</h2>
-                      <p className="mt-3 text-sm text-gray-400">Tạo tài khoản mới để trở thành một phần của CINEFLEX.</p>
+                      <h2 className="text-xl font-bold text-white sm:text-3xl">Đăng ký</h2>
+                      <p className="mt-2 text-xs text-gray-400 sm:mt-3 sm:text-sm">Tạo tài khoản mới để trở thành một phần của CINEFLEX.</p>
 
-                      <form onSubmit={registerFormik.handleSubmit} autoComplete="off" className="mt-8 space-y-5">
+                      <form onSubmit={registerFormik.handleSubmit} autoComplete="off" className="mt-6 space-y-4 sm:mt-8 sm:space-y-5">
                         {registerError ? (
                           <div className="border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
                             {registerError}
@@ -329,9 +329,9 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                           </div>
                         ) : null}
 
-                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
                           <div>
-                            <label htmlFor="register-taiKhoan" className="mb-2 block text-sm font-medium text-white">
+                            <label htmlFor="register-taiKhoan" className="mb-1.5 block text-xs font-medium text-white sm:mb-2 sm:text-sm">
                               Tài khoản <span className="text-red-400">*</span>
                             </label>
                             <input
@@ -346,7 +346,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                           </div>
 
                           <div>
-                            <label htmlFor="register-hoTen" className="mb-2 block text-sm font-medium text-white">
+                            <label htmlFor="register-hoTen" className="mb-1.5 block text-xs font-medium text-white sm:mb-2 sm:text-sm">
                               Họ tên <span className="text-red-400">*</span>
                             </label>
                             <input
@@ -361,7 +361,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                           </div>
 
                           <div>
-                            <label htmlFor="register-matKhau" className="mb-2 block text-sm font-medium text-white">
+                            <label htmlFor="register-matKhau" className="mb-1.5 block text-xs font-medium text-white sm:mb-2 sm:text-sm">
                               Mật khẩu <span className="text-red-400">*</span>
                             </label>
                             <input
@@ -376,7 +376,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                           </div>
 
                           <div>
-                            <label htmlFor="register-nhapLaiMatKhau" className="mb-2 block text-sm font-medium text-white">
+                            <label htmlFor="register-nhapLaiMatKhau" className="mb-1.5 block text-xs font-medium text-white sm:mb-2 sm:text-sm">
                               Nhập lại mật khẩu <span className="text-red-400">*</span>
                             </label>
                             <input
@@ -391,7 +391,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                           </div>
 
                           <div>
-                            <label htmlFor="register-email" className="mb-2 block text-sm font-medium text-white">
+                            <label htmlFor="register-email" className="mb-1.5 block text-xs font-medium text-white sm:mb-2 sm:text-sm">
                               Email <span className="text-red-400">*</span>
                             </label>
                             <input
@@ -406,7 +406,7 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                           </div>
 
                           <div>
-                            <label htmlFor="register-soDt" className="mb-2 block text-sm font-medium text-white">
+                            <label htmlFor="register-soDt" className="mb-1.5 block text-xs font-medium text-white sm:mb-2 sm:text-sm">
                               Số điện thoại <span className="text-red-400">*</span>
                             </label>
                             <input
@@ -424,12 +424,12 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
                         <button
                           type="submit"
                           disabled={registerFormik.isSubmitting}
-                          className="w-full bg-yellow-400 px-6 py-3 text-base font-bold uppercase tracking-wide text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-70"
+                          className="w-full bg-yellow-400 px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-70 sm:px-6 sm:py-3 sm:text-base"
                         >
                           {registerFormik.isSubmitting ? 'Đang xử lý...' : 'Đăng ký'}
                         </button>
 
-                        <p className="text-center text-sm text-gray-400">
+                        <p className="text-center text-xs text-gray-400 sm:text-sm">
                           Đã có tài khoản?{' '}
                           <Link to="/login" className="font-semibold text-yellow-400 hover:text-yellow-300">
                             Đăng nhập ngay
@@ -444,8 +444,8 @@ const AuthTabsPage = ({ activeTab = 'login' }) => {
           </div>
         </main>
 
-        <footer className="border-t border-violet-500/30 bg-black/90 px-4 py-8 sm:px-6 lg:px-8">
-          <div className="grid gap-8 md:grid-cols-[1.2fr_1fr_1fr_1fr]">
+        <footer className="border-t border-violet-500/30 bg-black/90 px-3 py-6 sm:px-6 sm:py-8 lg:px-8">
+          <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-[1.2fr_1fr_1fr_1fr]">
             <div>
               <Link to="/movie" className="text-2xl font-extrabold uppercase tracking-tight text-white">
                 CINE<span className="text-red-500">FLEX</span>

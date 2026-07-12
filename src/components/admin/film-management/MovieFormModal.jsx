@@ -12,17 +12,17 @@ const MovieFormModal = ({
   inputClassName,
 }) => {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-8 backdrop-blur-sm">
-      <div className="max-h-[90vh] w-full max-w-5xl overflow-auto rounded-[32px] border border-white/10 bg-[#101010] p-8 shadow-[0_30px_80px_rgba(0,0,0,0.45)]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm sm:py-8">
+      <div className="max-h-[90vh] w-full max-w-5xl overflow-auto rounded-[32px] border border-white/10 bg-[#101010] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.45)] sm:p-6 lg:p-8">
         <div className="flex flex-col gap-4 border-b border-white/10 pb-6 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.3em] text-red-400">
               {title}
             </p>
-            <h3 className="mt-3 text-4xl font-bold text-white">
+            <h3 className="mt-3 text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
               {description}
             </h3>
-            <p className="mt-3 text-base leading-8 text-white/75">
+            <p className="mt-3 text-sm leading-7 text-white/75 sm:text-base sm:leading-8">
               Tạo phim mới với poster, ngày phát hành, trailer và trạng thái
               trình chiếu.
             </p>
@@ -36,8 +36,8 @@ const MovieFormModal = ({
           </button>
         </div>
 
-        <form onSubmit={onSubmit} className="mt-8 space-y-6">
-          <div className="grid gap-6 xl:grid-cols-2">
+        <form onSubmit={onSubmit} className="mt-6 space-y-6 sm:mt-8">
+          <div className="grid gap-5 sm:gap-6 xl:grid-cols-2">
             <div>
               <label className={labelClassName}>Tên phim</label>
               <input
@@ -99,7 +99,7 @@ const MovieFormModal = ({
                 type="file"
                 accept="image/*"
                 onChange={onImageChange}
-                className="w-full rounded-2xl border border-white/10 bg-[#181818] px-5 py-4 text-base text-white outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-red-500/15 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-red-500/25"
+                className="w-full rounded-2xl border border-white/10 bg-[#181818] px-4 py-3 text-sm text-white outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-red-500/15 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-red-500/25 sm:px-5 sm:py-4 sm:text-base"
               />
               <p className="mt-3 text-sm text-white/65">
                 {imageFile
@@ -141,7 +141,7 @@ const MovieFormModal = ({
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:justify-end">
+          <div className="flex flex-col-reverse gap-4 border-t border-white/10 pt-6 sm:flex-row sm:justify-end">
             <button
               type="button"
               onClick={onClose}

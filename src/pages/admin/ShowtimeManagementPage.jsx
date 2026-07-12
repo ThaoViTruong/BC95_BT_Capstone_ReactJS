@@ -2,6 +2,7 @@ import { Fragment, useState, useMemo } from "react";
 import { useQueries } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import {
+  faCalendarDays,
   FontAwesomeIcon,
   faChevronLeft,
   faChevronRight,
@@ -39,6 +40,10 @@ const HALL_COLUMN_WIDTH = 220;
 const TIME_SLOT_MIN_WIDTH = 92;
 const TIMELINE_MIN_WIDTH =
   HALL_COLUMN_WIDTH + TIME_SLOTS.length * TIME_SLOT_MIN_WIDTH;
+const MOBILE_HALL_COLUMN_WIDTH = 84;
+const MOBILE_TIME_SLOT_WIDTH = 74;
+const MOBILE_TIMELINE_MIN_WIDTH =
+  MOBILE_HALL_COLUMN_WIDTH + TIME_SLOTS.length * MOBILE_TIME_SLOT_WIDTH;
 const DAY_START_HOUR = 8;
 const SLOT_INTERVAL_MINUTES = 120;
 const DEFAULT_SHOWTIME_DURATION_MINUTES = 90;
@@ -297,18 +302,20 @@ const getNextDateValue = (dateOptions, activeDate, direction) => {
   return dateOptions[nextIndex].value;
 };
 
-const StatCard = ({ accentClassName, icon, label, value, subValue }) => (
+const StatCard = ({ accentClassName, icon, label, mobileLabel, value }) => (
   <div
-    className={`rounded-[28px] border bg-[#121212] p-6 shadow-[0_16px_48px_rgba(0,0,0,0.25)] ${accentClassName}`}
+    className={`min-w-0 rounded-[18px] border bg-[#121212] p-2.5 shadow-[0_16px_48px_rgba(0,0,0,0.25)] sm:rounded-[24px] sm:p-4 ${accentClassName}`}
   >
-    <div className="flex items-start justify-between gap-4">
-      <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-xl text-white/80">
+    <div className="flex h-full flex-col items-center justify-center gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:text-right">
+      <div className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 text-xs text-white/80 sm:h-10 sm:w-10 sm:text-base">
         {icon}
       </div>
-      <div className="text-right">
-        <p className="text-sm font-medium text-white/55">{label}</p>
-        <p className="mt-2 text-4xl font-bold text-white">{value}</p>
-        <p className="mt-1 text-sm text-white/50">{subValue}</p>
+      <div className="min-w-0">
+        <p className="text-[10px] font-medium leading-tight text-white/55 sm:text-xs">
+          <span className="sm:hidden">{mobileLabel || label}</span>
+          <span className="hidden sm:inline">{label}</span>
+        </p>
+        <p className="mt-1 text-2xl font-bold leading-none text-white sm:text-3xl">{value}</p>
       </div>
     </div>
   </div>
@@ -355,6 +362,82 @@ const ShowtimeCard = ({ entry, onOpenCreate }) => {
     </button>
   );
 };
+
+const CompactMobileTimeline = ({ hallItems, entriesByHall, onOpenCreate }) => (
+  <div className="overflow-x-auto">
+    <div
+      className="grid gap-x-2 gap-y-3"
+      style={{
+        minWidth: `${MOBILE_TIMELINE_MIN_WIDTH}px`,
+        gridTemplateColumns: `${MOBILE_HALL_COLUMN_WIDTH}px repeat(12, minmax(${MOBILE_TIME_SLOT_WIDTH}px, 1fr))`,
+      }}
+    >
+      <div className="self-center pl-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/28">
+        Rạp
+      </div>
+      {TIME_SLOTS.map((slot) => (
+        <div
+          key={slot}
+          className="text-center text-[10px] font-semibold uppercase tracking-[0.12em] text-white/30"
+        >
+          {slot}
+        </div>
+      ))}
+
+      {hallItems.map((hall) => (
+        <Fragment key={hall.id}>
+          <div className="flex min-h-[78px] flex-col justify-center rounded-[18px] border border-white/5 bg-white/[0.02] px-2">
+            <p className="line-clamp-2 text-xs font-black uppercase text-white">
+              {hall.name}
+            </p>
+            <p className="mt-1 line-clamp-1 text-[9px] uppercase tracking-[0.12em] text-white/35">
+              {hall.format}
+            </p>
+          </div>
+
+          <div className="relative col-span-12 min-h-[78px] rounded-[18px] border border-white/5 bg-gradient-to-br from-white/[0.015] to-transparent">
+            <div className="absolute inset-0 grid grid-cols-12">
+              {TIME_SLOTS.map((slot) => (
+                <div
+                  key={`${hall.id}-${slot}`}
+                  className="border-l border-white/[0.04] first:border-l-0"
+                />
+              ))}
+            </div>
+
+            <div className="relative z-10 grid h-full grid-cols-12 gap-1.5 p-1.5">
+              {(entriesByHall[hall.id] || []).map((entry) => (
+                <div
+                  key={entry.id}
+                  style={{
+                    gridColumn: `${entry.startSlot + 1} / span ${entry.span}`,
+                  }}
+                >
+                  <ShowtimeCard entry={entry} onOpenCreate={onOpenCreate} />
+                </div>
+              ))}
+
+              {!(entriesByHall[hall.id] || []).length ? (
+                <div className="col-span-12 flex min-h-[66px] items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02] text-[11px] text-white/35">
+                  Chưa có suất chiếu
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </Fragment>
+      ))}
+
+      {!hallItems.length ? (
+        <div
+          className="rounded-[18px] border border-dashed border-white/10 bg-white/[0.02] px-4 py-10 text-center text-sm text-white/45"
+          style={{ gridColumn: "1 / -1" }}
+        >
+          Không có lịch chiếu thực tế cho ngày đã chọn.
+        </div>
+      ) : null}
+    </div>
+  </div>
+);
 
 const ShowtimeManagementPage = () => {
   const navigate = useNavigate();
@@ -407,8 +490,30 @@ const ShowtimeManagementPage = () => {
   const activeSystemCount = useMemo(() => {
     return new Set(hallItems.map((hall) => hall.format.split(" - ")[0])).size;
   }, [hallItems]);
+  const totalKnownHallCount = useMemo(() => {
+    const hallSet = new Set();
+
+    scheduleSystems.forEach((heThong) => {
+      (heThong.lstCumRap || []).forEach((cumRap) => {
+        (cumRap.danhSachPhim || []).forEach((phim) => {
+          (phim.lstLichChieuTheoPhim || []).forEach((lich) => {
+            hallSet.add(getHallId(heThong, cumRap, lich));
+          });
+        });
+      });
+    });
+
+    return hallSet.size;
+  }, [scheduleSystems]);
   const todaysShowtimes = entries.length;
   const activeHallCount = hallItems.length;
+  const hallUsageRate = totalKnownHallCount
+    ? `${((activeHallCount / totalKnownHallCount) * 100).toFixed(1)}%`
+    : "0%";
+  const activeSystemRatio = `${activeSystemCount}/${Math.max(
+    heThongRap.length,
+    activeSystemCount,
+  )}`;
 
   const handleDateChange = (direction) => {
     setActiveDate(getNextDateValue(dateOptions, activeDate, direction));
@@ -443,38 +548,41 @@ const ShowtimeManagementPage = () => {
   }
 
   return (
-    <div className="space-y-8 font-sans text-white">
-      <div className="rounded-[32px] border border-white/10 bg-[#101010] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+    <div className="space-y-5 font-sans text-white sm:space-y-8">
+      <div className="rounded-[24px] border border-white/10 bg-[#101010] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:rounded-[32px] sm:p-6">
+        <div className="mb-2 hidden text-xs font-semibold uppercase tracking-[0.22em] text-white/30 md:block">
+          Theater 01 / Quản lý lịch chiếu
+        </div>
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div>
-            <h1 className="text-4xl font-black uppercase tracking-tight text-white">
+            <h1 className="text-2xl font-black uppercase tracking-tight text-white sm:text-4xl">
               Quản Lý Lịch Chiếu
             </h1>
-            <p className="mt-3 text-base text-white/55">
+            <p className="mt-2 text-xs text-white/55 sm:mt-3 sm:text-base">
               Theo dõi suất chiếu theo ngày, phòng chiếu và trạng thái hoạt
               động.
             </p>
           </div>
 
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
             <div className="relative w-full sm:w-80">
               <input
                 type="text"
                 value={keyword}
                 onChange={(event) => setKeyword(event.target.value)}
                 placeholder="Tìm phim, rạp..."
-                className="w-full rounded-full border border-white/10 bg-white/[0.04] px-12 py-3 text-base text-white outline-none transition focus:border-white/20 focus:ring-2 focus:ring-red-500/15 placeholder:text-white/35"
+                className="w-full rounded-full border border-white/10 bg-white/[0.04] px-11 py-2.5 text-xs text-white outline-none transition placeholder:text-white/35 focus:border-white/20 focus:ring-2 focus:ring-red-500/15 sm:px-12 sm:py-3 sm:text-base"
               />
               <FontAwesomeIcon
                 icon={faMagnifyingGlass}
-                className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/35"
+                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35 sm:left-4 sm:h-5 sm:w-5"
               />
             </div>
 
             <button
               type="button"
               onClick={handleCreateButton}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-red-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-red-500"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-red-600 px-5 py-2.5 text-xs font-semibold text-white transition hover:bg-red-500 sm:px-6 sm:py-3 sm:text-base"
             >
               <FontAwesomeIcon icon={faPlus} />
               Thêm suất chiếu
@@ -483,59 +591,103 @@ const ShowtimeManagementPage = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
         <StatCard
           accentClassName="border-red-500/35"
           icon={<FontAwesomeIcon icon={faClock} />}
           label="Suất chiếu hôm nay"
+          mobileLabel="Suất hôm nay"
           value={todaysShowtimes}
-          subValue="Đang hiển thị theo bộ lọc hiện tại"
         />
         <StatCard
           accentClassName="border-yellow-500/35"
           icon={<FontAwesomeIcon icon={faTicket} />}
-          label="Rạp có lịch"
-          value={activeHallCount}
-          subValue="Số rạp có suất chiếu trong ngày đã chọn"
+          label="Tỷ lệ lấp đầy"
+          mobileLabel="Lấp đầy"
+          value={hallUsageRate}
         />
         <StatCard
           accentClassName="border-white/15"
           icon={<FontAwesomeIcon icon={faUsers} />}
-          label="Chuỗi rạp có lịch"
-          value={activeSystemCount}
-          subValue="Số hệ thống rạp có suất chiếu thực tế"
+          label="Phòng đang hoạt động"
+          mobileLabel="Phòng hoạt động"
+          value={activeSystemRatio}
         />
       </div>
 
-      <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#111111] shadow-[0_24px_80px_rgba(0,0,0,0.3)]">
-        <div className="flex flex-col gap-4 border-b border-white/10 px-6 py-5">
-          <div className="flex items-center gap-3">
-            <span className="rounded-full bg-white/8 px-4 py-2 text-sm font-semibold text-white/85">
-              {activeDateOption?.label}
+      <div className="overflow-hidden rounded-[24px] border border-white/10 bg-[#111111] shadow-[0_24px_80px_rgba(0,0,0,0.3)] sm:rounded-[32px]">
+        <div className="flex flex-col gap-3 border-b border-white/10 px-3 py-4 sm:px-6 sm:py-5">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/40">
+                Lịch chiếu rạp
+              </p>
+              <p className="mt-1 text-lg font-black text-white sm:text-2xl">
+                {activeDateOption?.label}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => handleDateChange(-1)}
+                disabled={activeDate === dateOptions[0]?.value}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-sm text-white transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-35 sm:h-9 sm:w-9"
+              >
+                <FontAwesomeIcon icon={faChevronLeft} />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDateChange(1)}
+                disabled={
+                  activeDate === dateOptions[dateOptions.length - 1]?.value
+                }
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-sm text-white transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-35 sm:h-9 sm:w-9"
+              >
+                <FontAwesomeIcon icon={faChevronRight} />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {dateOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setActiveDate(option.value)}
+                className={`whitespace-nowrap rounded-xl px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] transition sm:text-xs ${
+                  option.value === activeDate
+                    ? "bg-red-600 text-white"
+                    : "border border-white/10 bg-white/[0.03] text-white/65 hover:bg-white/[0.06]"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="hidden items-center gap-2 md:flex">
+            <span className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/65">
+              <FontAwesomeIcon icon={faCalendarDays} />
+              Hiển thị theo ngày đang chọn
             </span>
-            <button
-              type="button"
-              onClick={() => handleDateChange(-1)}
-              disabled={activeDate === dateOptions[0]?.value}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-35"
-            >
-              <FontAwesomeIcon icon={faChevronLeft} />
-            </button>
-            <button
-              type="button"
-              onClick={() => handleDateChange(1)}
-              disabled={
-                activeDate === dateOptions[dateOptions.length - 1]?.value
-              }
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-35"
-            >
-              <FontAwesomeIcon icon={faChevronRight} />
-            </button>
+            {keyword ? (
+              <span className="inline-flex rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/65">
+                Bộ lọc: {keyword}
+              </span>
+            ) : null}
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <div className="px-6 py-6" style={{ minWidth: `${TIMELINE_MIN_WIDTH}px` }}>
+        <div className="px-3 py-3 md:hidden">
+          <CompactMobileTimeline
+            hallItems={hallItems}
+            entriesByHall={entriesByHall}
+            onOpenCreate={handleOpenCreate}
+          />
+        </div>
+
+        <div className="hidden overflow-x-auto md:block">
+          <div className="px-4 py-4 lg:px-6 lg:py-6" style={{ minWidth: `${TIMELINE_MIN_WIDTH}px` }}>
             <div
               className="grid gap-x-4 gap-y-6"
               style={{
@@ -556,16 +708,16 @@ const ShowtimeManagementPage = () => {
 
               {hallItems.map((hall) => (
                 <Fragment key={hall.id}>
-                  <div className="flex min-h-[132px] flex-col justify-center rounded-[24px] border border-white/5 bg-white/[0.015] px-5">
-                    <p className="text-3xl font-black text-white">
+                  <div className="flex min-h-[120px] flex-col justify-center rounded-[20px] border border-white/5 bg-white/[0.015] px-4 lg:min-h-[132px] lg:rounded-[24px] lg:px-5">
+                    <p className="text-2xl font-black text-white lg:text-3xl">
                       {hall.name}
                     </p>
-                    <p className="mt-2 text-sm font-medium uppercase tracking-[0.18em] text-white/35">
+                    <p className="mt-2 text-xs font-medium uppercase tracking-[0.16em] text-white/35 lg:text-sm lg:tracking-[0.18em]">
                       {hall.format}
                     </p>
                   </div>
 
-                  <div className="relative col-span-12 min-h-[132px] rounded-[24px] border border-white/5 bg-gradient-to-br from-white/[0.015] to-transparent">
+                  <div className="relative col-span-12 min-h-[120px] rounded-[20px] border border-white/5 bg-gradient-to-br from-white/[0.015] to-transparent lg:min-h-[132px] lg:rounded-[24px]">
                     <div className="absolute inset-0 grid grid-cols-12">
                       {TIME_SLOTS.map((slot) => (
                         <div
