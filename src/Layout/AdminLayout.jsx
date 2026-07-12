@@ -16,6 +16,15 @@ const AdminLayout = () => {
     const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false)
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const accountMenuRef = useRef(null)
+    const displayName =
+        profile?.hoTen || user?.hoTen || user?.taiKhoan || 'Người dùng'
+    const avatarText =
+        displayName
+            .split(' ')
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((word) => word[0]?.toUpperCase())
+            .join('') || 'A'
 
     const navLinkClassName = ({isActive}) => {
         return isActive ?
