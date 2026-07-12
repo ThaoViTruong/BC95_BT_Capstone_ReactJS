@@ -12,7 +12,5 @@ export {
   faClapperboard,
   faClock,
   faUsers,
-  faBars,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-
