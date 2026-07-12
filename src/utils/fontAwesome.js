@@ -1,4 +1,6 @@
 export { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+export * from "@fortawesome/free-solid-svg-icons";
+
 export {
   faArrowLeft,
   faArrowRight,
@@ -8,16 +10,8 @@ export {
   faCircleInfo,
   faClapperboard,
   faClock,
-  faEye,
-  faEyeSlash,
-  faFilter,
-  faHouse,
-  faLocationDot,
-  faMagnifyingGlass,
-  faPlay,
-  faPlus,
-  faStar,
-  faTicket,
   faUsers,
+  faBars,
   faXmark,
+  faEye,         
 } from "@fortawesome/free-solid-svg-icons";

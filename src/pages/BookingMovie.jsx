@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react'
+﻿import { useState, useMemo } from 'react'
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon, faArrowLeft } from "../utils/fontAwesome";
 import { useSeatList, useBookTicket } from "../hooks/useBooking";
 import { useToast } from "../components/ToastProvider";
 import LoadingSpinner from "../components/LoadingSpinner";
+import BookingSuccessModal from "../components/BookingSuccessModal";
 
 const BookingMovie = () => {
   const { maLichChieu } = useParams();
@@ -13,6 +14,7 @@ const BookingMovie = () => {
   const bookTicketMutation = useBookTicket();
 
   const [selectedSeats, setSelectedSeats] = useState([]);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   const totalPrice = useMemo(
     () => selectedSeats.reduce((sum, s) => sum + s.giaVe, 0),
@@ -49,12 +51,7 @@ const BookingMovie = () => {
     bookTicketMutation.mutate(payload, {
       onSuccess: () => {
         setSelectedSeats([]);
-        showToast({
-          type: "success",
-          title: "Đặt vé thành công",
-          message: "Bạn đã đặt vé thành công.",
-        });
-        navigate("/profile", { state: { activeTab: "history" } });
+        setIsSuccessModalOpen(true);
       },
       onError: (error) => {
         showToast({
@@ -66,6 +63,15 @@ const BookingMovie = () => {
         });
       },
     });
+  };
+
+  const handleConfirm = () => {
+    setIsSuccessModalOpen(false);
+    navigate("/profile", { state: { activeTab: "history" } });
+  };
+
+  const handleClose = () => {
+    setIsSuccessModalOpen(false);
   };
 
   if (isLoading) return <LoadingSpinner />;
@@ -92,6 +98,12 @@ const BookingMovie = () => {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
+      <BookingSuccessModal
+        isOpen={isSuccessModalOpen}
+        onConfirm={handleConfirm}
+        onClose={handleClose}
+      />
+
       <div className="max-w-7xl mx-auto px-4 pt-6">
         <button
           onClick={() => navigate(-1)}
@@ -182,7 +194,7 @@ const BookingMovie = () => {
                 <img
                   src={thongTinPhim.hinhAnh}
                   alt={thongTinPhim.tenPhim}
-                  className="w-full h-full object-cover "
+                  className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
                 <div className="absolute bottom-3 left-4 right-4">
@@ -274,4 +286,3 @@ const InfoRow = ({ label, value, small = false }) => (
 );
 
 export default BookingMovie;
-

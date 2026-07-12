@@ -2,7 +2,14 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { FontAwesomeIcon, faClapperboard, faClock, faUsers } from '../utils/fontAwesome'
+import {
+    FontAwesomeIcon,
+    faClapperboard,
+    faClock,
+    faUsers,
+    faBars,
+    faXmark,
+} from '../utils/fontAwesome'
 import { logout, selectorIsLoggedIn, selectorUser } from '../store/authSlice'
 import { useProfile } from '../hooks/useUser'
 
@@ -14,38 +21,50 @@ const AdminLayout = () => {
     const isLoggedIn = useSelector(selectorIsLoggedIn)
     const { data: profile } = useProfile(isLoggedIn)
     const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const accountMenuRef = useRef(null)
-    const displayName = profile?.hoTen || user?.hoTen || user?.taiKhoan || 'Quản trị viên'
-    const avatarText = displayName
-        .split(' ')
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((word) => word[0]?.toUpperCase())
-        .join('') || 'A'
 
-    const navLinkClassName = ({isActive}) => {
-        return isActive ?
-        "flex items-center gap-4 px-5 py-4 rounded-2xl text-lg font-semibold transition-all bg-yellow-400 text-gray-900"
-        : "flex items-center gap-4 px-5 py-4 rounded-2xl text-lg font-semibold transition-all text-white hover:bg-gray-800"
+    const displayName =
+        profile?.hoTen || user?.hoTen || user?.taiKhoan || 'Quản trị viên'
+    const avatarText =
+        displayName
+            .split(' ')
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((word) => word[0]?.toUpperCase())
+            .join('') || 'A'
+
+    const navLinkClassName = ({ isActive }) => {
+        return isActive
+            ? 'flex items-center gap-4 px-5 py-3 lg:py-4 rounded-2xl text-base lg:text-lg font-semibold transition-all bg-yellow-400 text-gray-900'
+            : 'flex items-center gap-4 px-5 py-3 lg:py-4 rounded-2xl text-base lg:text-lg font-semibold transition-all text-white hover:bg-gray-800'
     }
 
     const handleLogout = () => {
-        queryClient.refetchQueries({queryKey: ['profile']})
+        queryClient.refetchQueries({ queryKey: ['profile'] })
         dispatch(logout())
     }
 
+    // Đóng menu / sidebar khi đổi route
     useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            setIsAccountMenuOpen(false)
-        }, 0)
-
-        return () => clearTimeout(timeoutId)
+        setIsAccountMenuOpen(false)
+        setIsSidebarOpen(false)
     }, [location.pathname])
 
+    // Khóa scroll khi sidebar mobile mở
     useEffect(() => {
-        if (!isAccountMenuOpen) {
-            return undefined
+        if (isSidebarOpen) {
+            document.body.style.overflow = 'hidden'
+        } else {
+            document.body.style.overflow = ''
         }
+        return () => {
+            document.body.style.overflow = ''
+        }
+    }, [isSidebarOpen])
+
+    useEffect(() => {
+        if (!isAccountMenuOpen) return undefined
 
         const handleClickOutside = (event) => {
             if (!accountMenuRef.current?.contains(event.target)) {
@@ -75,7 +94,6 @@ const AdminLayout = () => {
                 { label: 'Trang Quản trị', to: '/admin/films' },
             ]
         }
-
         return [
             { label: 'Trang Đặt vé', to: '/movie' },
             { label: 'Hồ sơ', to: '/admin/profile' },
@@ -83,47 +101,104 @@ const AdminLayout = () => {
     }, [location.pathname])
 
     return (
-        <div className="min-h-screen bg-gray-950 flex font-sans text-white">
-            <aside className="w-72 flex-shrink-0 bg-gray-900 border-r border-gray-800 flex flex-col">
-                <div className="px-7 py-6 border-b border-gray-800">
+        <div className="min-h-screen bg-gray-950 flex font-sans text-white relative">
+            {/* Overlay khi mở sidebar trên mobile */}
+            {isSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/60 z-40 lg:hidden"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
+            {/* SIDEBAR */}
+            <aside
+                className={`
+                    fixed lg:static top-0 left-0 h-full z-50
+                    w-72 flex-shrink-0 bg-gray-900 border-r border-gray-800
+                    flex flex-col
+                    transform transition-transform duration-300 ease-in-out
+                    ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                    lg:translate-x-0
+                `}
+            >
+                <div className="px-6 py-5 border-b border-gray-800 flex items-center justify-between">
                     <Link
                         to="/movie"
-                        className="inline-block text-3xl font-extrabold uppercase tracking-tight text-white transition-opacity hover:opacity-85"
+                        className="inline-block text-2xl lg:text-3xl font-extrabold uppercase tracking-tight text-white transition-opacity hover:opacity-85"
                     >
                         CINE<span className="text-red-500">FLEX</span>
                     </Link>
+                    {/* Nút đóng sidebar trên mobile */}
+                    <button
+                        type="button"
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="lg:hidden text-white text-xl p-2 hover:bg-gray-800 rounded-lg"
+                    >
+                        <FontAwesomeIcon icon={faXmark} />
+                    </button>
                 </div>
-                <nav className="flex-1 px-4 py-5 space-y-2">
-                    <p className="text-white text-sm uppercase tracking-widest px-5 mb-4">Quản lý</p>
+
+                <nav className="flex-1 px-4 py-5 space-y-2 overflow-y-auto">
+                    <p className="text-white text-xs lg:text-sm uppercase tracking-widest px-5 mb-4">
+                        Quản lý
+                    </p>
                     <NavLink to="/admin/users" className={navLinkClassName}>
-                        <FontAwesomeIcon icon={faUsers} className="text-xl" />
+                        <FontAwesomeIcon icon={faUsers} className="text-lg lg:text-xl" />
                         Người dùng
                     </NavLink>
                     <NavLink to="/admin/films" className={navLinkClassName}>
-                        <FontAwesomeIcon icon={faClapperboard} className="text-xl" />
+                        <FontAwesomeIcon icon={faClapperboard} className="text-lg lg:text-xl" />
                         Phim
                     </NavLink>
                     <NavLink to="/admin/showtimes" className={navLinkClassName}>
-                        <FontAwesomeIcon icon={faClock} className="text-xl" />
+                        <FontAwesomeIcon icon={faClock} className="text-lg lg:text-xl" />
                         Lịch chiếu
                     </NavLink>
                 </nav>
             </aside>
-            <div className="flex-1 flex flex-col min-w-0">
-                <header className="bg-gray-900 border-b border-gray-800 px-8 py-5 flex items-center justify-between flex-shrink-0">
-                    <div className="text-2xl font-semibold text-white"></div>
-                    <div className="flex items-center gap-5">
+
+            {/* MAIN CONTENT */}
+            <div className="flex-1 flex flex-col min-w-0 w-full">
+                {/* HEADER */}
+                <header className="bg-gray-900 border-b border-gray-800 px-4 sm:px-6 lg:px-8 py-3 lg:py-5 flex items-center justify-between flex-shrink-0 gap-3">
+                    {/* Nút hamburger + logo mobile */}
+                    <div className="flex items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setIsSidebarOpen(true)}
+                            className="lg:hidden text-white text-xl p-2 hover:bg-gray-800 rounded-lg"
+                            aria-label="Mở menu"
+                        >
+                            <FontAwesomeIcon icon={faBars} />
+                        </button>
+                        <Link
+                            to="/movie"
+                            className="lg:hidden text-lg sm:text-xl font-extrabold uppercase tracking-tight text-white"
+                        >
+                            CINE<span className="text-red-500">FLEX</span>
+                        </Link>
+                    </div>
+
+                    {/* Account menu */}
+                    <div className="flex items-center gap-3 lg:gap-5">
                         <div className="relative" ref={accountMenuRef}>
                             <button
                                 type="button"
-                                onClick={() => setIsAccountMenuOpen((prevState) => !prevState)}
-                                className="flex items-center gap-3 rounded-2xl border border-yellow-400/20 bg-yellow-400/10 px-3 py-2 text-left transition-colors hover:bg-yellow-400/15 focus:outline-none focus:ring-2 focus:ring-yellow-400/40"
+                                onClick={() =>
+                                    setIsAccountMenuOpen((prevState) => !prevState)
+                                }
+                                className="flex items-center gap-2 sm:gap-3 rounded-2xl border border-yellow-400/20 bg-yellow-400/10 px-2 sm:px-3 py-2 text-left transition-colors hover:bg-yellow-400/15 focus:outline-none focus:ring-2 focus:ring-yellow-400/40"
                             >
-                                <div className="min-w-0 text-right">
-                                    <p className="truncate text-sm font-semibold text-white">{displayName}</p>
-                                    <p className="text-xs text-yellow-300">Quản trị viên</p>
+                                {/* Tên - ẩn trên mobile nhỏ */}
+                                <div className="hidden sm:block min-w-0 text-right max-w-[140px]">
+                                    <p className="truncate text-sm font-semibold text-white">
+                                        {displayName}
+                                    </p>
+                                    <p className="text-xs text-yellow-300">
+                                        Quản trị viên
+                                    </p>
                                 </div>
-                                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-yellow-400 text-base font-bold text-gray-950">
+                                <div className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-yellow-400 text-sm sm:text-base font-bold text-gray-950">
                                     {avatarText}
                                 </div>
                             </button>
@@ -131,8 +206,12 @@ const AdminLayout = () => {
                             {isAccountMenuOpen ? (
                                 <div className="absolute right-0 top-[calc(100%+12px)] z-50 w-56 overflow-hidden rounded-2xl border border-white/10 bg-[#111827] shadow-[0_18px_48px_rgba(0,0,0,0.42)]">
                                     <div className="border-b border-white/10 px-4 py-3">
-                                        <p className="truncate text-sm font-semibold text-white">{displayName}</p>
-                                        <p className="text-xs text-yellow-300">Quản trị viên</p>
+                                        <p className="truncate text-sm font-semibold text-white">
+                                            {displayName}
+                                        </p>
+                                        <p className="text-xs text-yellow-300">
+                                            Quản trị viên
+                                        </p>
                                     </div>
 
                                     <div className="p-2">
@@ -141,7 +220,9 @@ const AdminLayout = () => {
                                                 key={item.label}
                                                 to={item.to}
                                                 className="block rounded-xl px-4 py-3 text-sm font-medium text-white/85 transition-colors hover:bg-white/10 hover:text-white"
-                                                onClick={() => setIsAccountMenuOpen(false)}
+                                                onClick={() =>
+                                                    setIsAccountMenuOpen(false)
+                                                }
                                             >
                                                 {item.label}
                                             </Link>
@@ -159,14 +240,14 @@ const AdminLayout = () => {
                         </div>
                     </div>
                 </header>
-                <main className="flex-1 p-7 overflow-auto">
+
+                {/* MAIN */}
+                <main className="flex-1 p-4 sm:p-6 lg:p-7 overflow-auto">
                     <Outlet />
                 </main>
             </div>
         </div>
-
     )
 }
 
 export default AdminLayout
-
